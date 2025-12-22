@@ -1,0 +1,95 @@
+{
+	"app": {
+		"moduleSelected": 1,
+		"tabPos": 1
+	},
+	"sendToSharedClips": false,
+	"//sharedClipsDir": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本\\clipflow-sharedclips",
+	"sharedClipsDir": "c:\\Users\\haraldchan\\Desktop\\clipflow-sharedclips",
+	"dbConfig": {
+		"host": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本",
+		"main": "GuestProfilesDB\\GuestProfiles",
+		"archive": "GuestProfilesDB\\GuestProfilesArchive",
+		"backup": "GuestProfilesBackup",
+		"cleanPeriodDays": 180
+	},
+	"resvHandler": {
+		"currentReservation": "",
+		"entryParams": {
+			"jielv": {
+				"agent": "jielv",
+				"name": "深圳捷旅",
+				"profileName": "Shenzhen jielv holiday",
+				"profileType": "Travel Agent",
+				"ratecode": ["WHJL", "WHJB1", "WHJB2"],
+				"resType": "TRAVEL AGENT GTD",
+				"market": "WHL",
+				"source": "WHO"
+			},
+			"kingsley": {
+				"agent": "kingsley",
+				"name": "广州奇利",
+				"profileName": "Guangzhou Kingsley Business Consultant",
+				"profileType": "Travel Agent",
+				"ratecode": ["WHLRN", "", ""],
+				"resType": "TRAVEL AGENT GTD",
+				"market": "WHL",
+				"source": "WHO"
+			},
+			"ctrip-ota": {
+				"agent": "ctrip-ota",
+				"name": "携程 OTA",
+				"profileNamePoa": "%Ctrip Ctrip Computer Techn",
+				"profileName": "%Ctrip Computer Technology",
+				"profileType": "Travel Agent",
+				"ratecode": ["OTAR", "", ""],
+				"resType": "OTA GTD",
+				"market": "DIS",
+				"source": "OTA"
+			},
+			"ctrip-ota-shanglv": {
+				"agent": "ctrip-ota-shanglv",
+				"name": "携程商旅尊享",
+				"profileNamePoa": "%商旅现付",
+				"profileName": "%商旅月结",
+				"profileType": "Company",
+				"ratecode": ["CORS", "", ""],
+				"resType": "COMPANY GTD",
+				"market": "RFP",
+				"source": "OTA"
+			},
+			"ctrip-business": {
+				"agent": "ctrip-business",
+				"name": "携程商旅协议",
+				"profileName": "",
+				"profileType": "Company",
+				"ratecode": ["CORS", "", ""],
+				"resType": "COMPANY GTD",
+				"market": "COR",
+				"source": "COS"
+			},
+			"meituan": {
+				"agent": "meituan",
+				"name": "美团酒店",
+				"profileName": "MEI TUAN",
+				"profileType": "Travel Agent",
+				"ratecode": ["OTAR", "", ""],
+				"resType": "OTA GTD",
+				"market": "DIS",
+				"source": "OTA"
+			}
+		},
+    "workflow-ota": {
+      "profile": true,
+      "routing": true,
+      "resType": true,
+      "market": true,
+      "source": true,
+      "ratecode": true
+    }
+	},
+	"serverAgent": {
+		"agentEnabled": false,
+		"clientEnabled": true
+	}
+}
