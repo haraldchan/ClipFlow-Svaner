@@ -1,3 +1,5 @@
+; schema
+#Include schema\guest-profile.ahk
 ; components
 #Include components\pmn-app.ahk
 #Include components\guest-profile-list.ahk
