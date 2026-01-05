@@ -7,6 +7,11 @@ class useFileDB {
 		this.archive := dbConfig.HasOwnProp("archive") ? dbConfig.archive : ""
 		this.backup := dbConfig.HasOwnProp("backup") ? dbConfig.backup : ""
 		this.cleanPeriodDays := dbConfig.HasOwnProp("cleanPeriodDays") ? dbConfig.cleanPeriodDays : 180
+		this.cacheKey := dbConfig.HasOwnProp("cacheKey") ? dbConfig.cacheKey : ""
+
+		if (this.cacheKey) {
+			this.cache := this.load(,, 60 * 24)
+		}
 	}
 
 	cleanup() {
@@ -79,20 +84,21 @@ class useFileDB {
 	 * @return {Array<Map>}
 	 */
 	load(db := this.main, queryDate := FormatTime(A_Now, "yyyyMMdd"), queryPeriodInput := 60) {
-		if (queryDate == FormatTime(A_Now, "yyyyMMdd")) {
-			return this.loadOneDay(db, queryDate, queryPeriodInput)
-		}
-		else if (FileExist(this.archive . "\" . queryDate . " - archive.json")) {
-			return this.loadArchiveOneDay(queryDate)
-		}
-		else {
-			if (!FileExist(this.archive . "\" . queryDate . " - archive.json")) {
-				if (DateDiff(A_Now, queryDate, "Days") > 0) {
-					SetTimer(() => this.createArchive(queryDate), -100)
-				}
-				return this.loadOneDay(db, queryDate, 60 * 24 * this.cleanPeriodDays)
-			}
-		}
+		; if (queryDate == FormatTime(A_Now, "yyyyMMdd")) {
+		; 	return this.loadOneDay(db, queryDate, queryPeriodInput)
+		; }
+		; else if (FileExist(this.archive . "\" . queryDate . " - archive.json")) {
+		; 	return this.loadArchiveOneDay(queryDate)
+		; }
+		; else {
+		; 	if (!FileExist(this.archive . "\" . queryDate . " - archive.json")) {
+		; 		if (DateDiff(A_Now, queryDate, "Days") > 0) {
+		; 			SetTimer(() => this.createArchive(queryDate), -100)
+		; 		}
+		; 		return this.loadOneDay(db, queryDate, 60 * 24 * this.cleanPeriodDays)
+		; 	}
+		; }
+		return this.loadOneDay(db, queryDate, queryPeriodInput)
 	}
 
 	/**
@@ -103,16 +109,21 @@ class useFileDB {
 	 * @return {Array<Map>}
 	 */
 	loadOneDay(db := this.main, queryDate := FormatTime(A_Now, "yyyyMMdd"), queryPeriodInput := 60) {
-		loadedPaths := this.getPathsByPeriod(db, queryDate, queryPeriodInput)
+		queryPeriod := queryPeriodInput
 		parsedData := []
+
+		; using cache
+		; if (this.HasOwnProp("cache") && this.cache.Length) {
+		; 	min := this.cache[1][this.cacheKey].toFormat("yyyyMMddHHmm")
+		; 	queryPeriod := A_Now.toFormat("yyyyMMddHHmm").minutesBetween(min) + 1
+
+		; 	parsedData := this.cache.filter(item => item[this.cacheKey].toFormat("yyyyMMddHHmm") != min)
+		; }
+
+		loadedPaths := this.getPathsByPeriod(db, queryDate, queryPeriod)
 
 		for file in loadedPaths {
 			jsonStr := FileRead(file, "UTF-8")
-			; try {
-			; 	parsedProfiles.Push(JSON.parse(jsonStr))
-			; } catch {
-			; 	parsedProfiles.InsertAt(A_Index, this._handleMalformedJson(str).map(profile => JSON.parse(profile))*)
-			; }
 			
 			res := JSON.parse(jsonStr)
 			if (res is Error) {
@@ -123,6 +134,10 @@ class useFileDB {
 			}
 		}
 
+		; if (this.HasOwnProp("cache")) {
+		; 	this.cache := parsedData
+		; }
+		
 		return parsedData
 	}
 
