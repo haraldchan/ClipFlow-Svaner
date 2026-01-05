@@ -8,13 +8,13 @@ class Struct {
      *  tel:  Number
      * })
      * ```
-     * @param {Object} structObject An object defining the structure and data types for each field.
+     * @param {Object | Map} structObject An object defining the structure and data types for each field.
      */
     __New(structObject) {
         this.structObject := structObject
         this.typeMap := Map()
 
-        for key, type in this.structObject.OwnProps() {
+        for key, type in (this.structObject is Map ? this.structObject : this.structObject.OwnProps()) {
             this.typeMap[key] := type
         }
     }
@@ -245,7 +245,7 @@ class Struct {
             }
             ; literal types
             else if (typeMap[key] is Array && ArrayExt.every(typeMap[key], t => t is Primitive)) {
-                if (!ArrayExt.find(typeMap[key], item => item = value)) {
+                if (!ArrayExt.some(typeMap[key], item => item = value)) {
                     throw TypeError(Format("Type mismatch.`n`nAssignables: {1}", ArrayExt.join(typeMap[key], " | ")), -1, value)
                 }
             }
