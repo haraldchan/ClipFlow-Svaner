@@ -112,6 +112,15 @@ PMN_App(App, moduleTitle, db, identifier) {
         else {
             incomingGuest["fileName"] := A_Now . "==" . Random(10000, 99999)
             incomingGuest["regTime"] := A_Now
+
+            ; handle "港澳台居民居住证" missing lastname/firstname
+            if (incomingGuest["guestType"] == "港澳台居民居住证" && (!incomingGuest["nameLast"] || !incomingGuest["nameFirst"])) {
+                dict := useDict()
+                unpack(dict.getFullnamePinyin(incomingGuest["name"]), [&nameLast, &nameFirst])
+                incomingGuest["nameLast"] := nameLast
+                incomingGuest["nameFirst"] := nameFirst
+            }
+
             db.add(JSON.stringify(incomingGuest))
 
             isBirthday := incomingGuest["birthday"] == FormatTime(A_Now, "yyyy-MM-dd")
@@ -226,7 +235,6 @@ PMN_App(App, moduleTitle, db, identifier) {
                     } 
                     ; from HK/MO/TW
                     else if (item["guestType"] == "港澳台旅客") {
-                        
                         if (InStr(item["name"], searchInput) || InStr(item["nameLast"], searchInput) || InStr(item["nameFirst"], searchInput)) {
                             filteredItems.InsertAt(1, item)
                         }
