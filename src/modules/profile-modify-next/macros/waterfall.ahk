@@ -101,7 +101,8 @@ class PMN_Waterfall {
         }
 
         ; sort by Prs.
-        Click 838, 378, "Right"
+        ImageSearch(&outX, &outY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["opera-active-win.PNG"])
+        Click outX + 672, outY + 222, "Right"
         Sleep 200
         Send "{Down}"
         Sleep 200
