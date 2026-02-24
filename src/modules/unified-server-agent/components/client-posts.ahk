@@ -123,7 +123,6 @@ ClientPosts(App, enabled) {
                 form := selectedPost["content"]["form"]
                 PostDetails_QM2(selectedPost, "BlankShare", {
                     styles: {
-                        useCopyBtn: false
                     },
                     form : {
                         shareRoomNums: form["shareRoomNums"],
