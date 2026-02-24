@@ -12,8 +12,13 @@ PMN_App(App, moduleTitle, db, identifier) {
         "default", "Norm cBlack",
         "后台服务在线", "Bold cGreen",
         "超时无响应", "Bold cRed",
+        "后台错误停止", "Bold cRed"
     )
     handleDelegateActivate(ctrl, _) {
+        App["guest-profile-list"].GetPos(&X, &Y, &W, &H)
+        App["guest-profile-list"].Move(,, ctrl.Value ? W*0.7 : W/0.7)
+        App["component:SentPosts"].visible(ctrl.Value)
+        
         delegate.set(ctrl.Value)
         if (ctrl.Value == false) {
             return
@@ -35,7 +40,7 @@ PMN_App(App, moduleTitle, db, identifier) {
                 )
         ), ctrl.Enabled := true) , -100)
     }
-    effect(delegate, state => App["qm2Agent"].Enabled := state)
+    effect(delegate, state => App["qm2-agent"].Enabled := state)
 
 
     ; settings
@@ -113,14 +118,6 @@ PMN_App(App, moduleTitle, db, identifier) {
             incomingGuest["fileName"] := A_Now . "==" . Random(10000, 99999)
             incomingGuest["regTime"] := A_Now
 
-            ; handle "港澳台居民居住证" missing lastname/firstname
-            if (incomingGuest["guestType"] == "港澳台居民居住证" && (!incomingGuest["nameLast"] || !incomingGuest["nameFirst"])) {
-                dict := useDict()
-                unpack(dict.getFullnamePinyin(incomingGuest["name"]), [&nameLast, &nameFirst])
-                incomingGuest["nameLast"] := nameLast
-                incomingGuest["nameFirst"] := nameFirst
-            }
-
             db.add(JSON.stringify(incomingGuest))
 
             isBirthday := incomingGuest["birthday"] == FormatTime(A_Now, "yyyy-MM-dd")
@@ -130,7 +127,6 @@ PMN_App(App, moduleTitle, db, identifier) {
                 isBirthday ? "T3" : "T1.5"
             )
         }
-    
 
         currentGuest.set(JSON.parse(A_Clipboard))
 
@@ -392,9 +388,8 @@ PMN_App(App, moduleTitle, db, identifier) {
         QM2_Panel({ selectedGuests: groupedSelectedGuests })
     }
 
-
-    ; hotkey setup
-    setHotkeys() {
+    onMount() {
+        ; hotkey setup
         HotIfWinActive(POPUP_TITLE)
         Hotkey "!f", (*) => App["searchBox"].Focus()
         Hotkey "!Left", (*) => toggleDate("-")
@@ -435,11 +430,14 @@ PMN_App(App, moduleTitle, db, identifier) {
 
             lvIsCheckedAll.set(c => !c)
         }
+
+        ; bind check status
+        shareCheckStatus(App["selecti-all-btn"], App["guest-profile-list"], lvIsCheckedAll)
     }
 
 
     return (
-        App.AddGroupBox("Section R18 w685 y+20", ""),
+        App.AddGroupBox("Section y+20 w685 h410", ""),
         App.AddText("xp15", moduleTitle . " ⓘ ").onClick((*) => PMN_Settings(settings)),
         
         ; agent mode
@@ -477,17 +475,14 @@ PMN_App(App, moduleTitle, db, identifier) {
         ; profile list
         GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile),
 
+        ; sent posts
+        SentPosts(App, serverConnection),
+
         ; waterfall controls
-        App.AddCheckBox("vselecti-all-btn Hidden w80 h20 xp6 y+5", "全选 (&A)"),
-        shareCheckStatus(
-            App["selecti-all-btn"], 
-            App["guest-profile-list"], 
-            lvIsCheckedAll
-        ),
+        App.AddCheckBox("vselecti-all-btn Hidden w80 h20 @align[x]:date y+5", "全选 (&A)"),
         App.AddText("Hidden h20 x+15 0x200", "Party: "),
         App.AddEdit("vparty-num Hidden x+1 w100 h20", ""),
 
-        ; hotkey setup
-        setHotkeys()
+        onMount()
     )
 }
