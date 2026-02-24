@@ -1,0 +1,150 @@
+/**
+ * @param {Svaner} App
+ * @param {signal} serverConnection
+ */
+SentPosts(App, ServerConnection) {
+    comp := Component(App, A_ThisFunc)
+
+    postQueue := signal([{ status: "", time: "", id: "" }])
+    
+    postStatus := Map(
+        "PENDING", "已发送",
+        "COLLECTED", "处理中",
+        "MODIFIED", "已完成",
+        "ABORTED", "错误终止",
+        "RETRY", "重试中",
+        "RESENT", "已重发",
+        "ABANDONED", "超时弃用",
+        "NOTFOUND", "无效房号",
+        "PING", "连接中",
+        "ONLINE", "在线"
+    )
+
+    handlePostUpdate(*) {
+        posts := []
+        showMyOwnPosts := App["sent-posts-show-my-own-posts"].Value
+        
+        ; check pmn posts
+        loop files (agent.pool . "\*.json") {
+            if (A_LoopFileName.includes("PING") || A_LoopFileName.includes("ONLINE")) {
+                continue
+            }
+
+            if (A_LoopFileName.includes("ABORTED")) {
+                ServerConnection.set("后台错误停止")
+                App["connection-status"].Visible := true
+            }
+
+            if (showMyOwnPosts && !A_LoopFileName.includes(A_ComputerName)) {
+                continue
+            }
+
+            status := StrSplit(A_LoopFileName, "==")[1]
+            post := JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8"))
+            post["status"] := postStatus[status]
+            post["time"] := FormatTime(post["id"].substr(1, 14), "yyyy/MM/dd HH:mm")
+            post["action"] := "Profile"
+
+            posts.InsertAt(1, post)
+        }
+
+        ; check qm posts
+        loop files (agent.qmPool . "\*.json") {
+            if (showMyOwnPosts && !A_LoopFileName.includes(A_ComputerName)) {
+                continue
+            }                
+
+            status := StrSplit(A_LoopFileName, "==")[1]
+            post := JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8"))
+            post["status"] := postStatus[status]
+            post["time"] := FormatTime(post["id"].substr(1, 14), "yyyy/MM/dd HH:mm")
+            post["action"] := match(post["content"]["module"], Map(
+                "BlankShare", "Share",
+                "PaymentRelation", "PayBy PayFor",
+                "DepositEntry", "Deposit/Auth"
+            ))
+            posts.InsertAt(1, post)
+        }     
+
+        if (posts.Length > 0) {
+            postQueue.set(posts)
+            App["sent-post-list"].ModifyCol(3, "SortDesc")
+        }
+    }
+    
+    showPostDetails(LV, row, *) {
+        if (row == 0 || row > 10000 || LV.GetText(row, 1) == "连接中") {
+            return
+        }
+
+        selectedPost := postQueue.value.find(post => post["id"] == LV.GetText(row, 4))
+        
+        switch selectedPost["action"] {
+            case "Profile":
+                PostDetails_Profile(selectedPost)
+            case "PayBy PayFor":
+                form := selectedPost["content"]["form"]
+                PostDetails_QM2(selectedPost, "PaymentRelation", {
+                    form : {
+                        pfRoom: form["pfRoom"],
+                        pfName: form["pfName"],
+                        party:  form["party"],
+                        partyRoomQty: form["partyRoomQty"],
+                        pbRoom: form["pbRoom"],
+                        pbName: form["pbName"]
+                    }
+                })
+            case "Share": 
+                form := selectedPost["content"]["form"]
+                PostDetails_QM2(selectedPost, "BlankShare", {
+                    styles: {
+                        useCopyBtn: false
+                    },
+                    form : {
+                        shareRoomNums: form["shareRoomNums"],
+                        shareQty: form["shareQty"],
+                        checkIn: form["checkIn"]
+                    },
+                    children: App => App.AddCheckBox("Checked vsendPmPost h20 x+20 yp 0x200", "Share Check-in 后录入 Profile")
+                })
+            default:
+                return
+        }
+    }
+
+    comp.render := this => this.Add(
+        StackBox(
+            App,
+            {
+                name: "sent-posts-stackbox",
+                groupbox: {
+                    title: "已发送代行",
+                    options: "vsent-posts-gb Section x510 @align[yh]:guest-profile-list w190"
+                },
+            },
+            () => [
+                ; post status list
+                App.AddButton("xs90 yp+0 h18 w18 +Center", "↻")
+                   .onClick(handlePostUpdate)
+                   .SetFont("Bold"),
+                App.AddCheckBox("vsent-posts-show-my-own-posts Checked x+10 h18", "本机发送"),
+                App.AddListView(
+                    {
+                        lvOptions: "vsent-post-list Grid -Multi LV0x4000 w168 h280 xs10 yp+25"
+                    },
+                    {
+                        keys: ["status", "action", "time", "id"],
+                        titles: ["当前状态", "代行类型", "发送时间", "POST ID"],
+                        widths: [60, 100, 150, 170]
+                    }, 
+                    postQueue
+                ).onContextMenu(showPostDetails)
+            ]
+        )
+    )
+
+    return (
+        comp.render().visible(false)
+        ; handlePostUpdate()
+    )
+}
