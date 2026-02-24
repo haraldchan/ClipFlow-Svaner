@@ -76,7 +76,7 @@ class useStore {
             super.set(newSignalValue)
 
             for store in this.stores {
-                store.set({ newValue: this.value })
+                store.set({ udpater: { state: this.name, value: this.value, instance: this } })
             }
         }
 

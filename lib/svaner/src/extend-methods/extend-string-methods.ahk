@@ -20,28 +20,28 @@ class StringExt {
      * @returns {number} Length of the string.
      */
     static length(str) => StrLen(str)
-    
+
     /**
      * Converts a string to lowercase.
      * @param {string} str - The string to convert.
      * @returns {string} Lowercase string.
      */
     static toLower(str) => StrLower(str)
-    
+
     /**
      * Converts a string to uppercase.
      * @param {string} str - The string to convert.
      * @returns {string} Uppercase string.
      */
     static toUpper(str) => StrUpper(str)
-    
+
     /**
      * Converts a string to title case.
      * @param {string} str - The string to convert.
      * @returns {string} Title case string.
      */
     static toTitle(str) => StrTitle(str)
-    
+
     /**
      * Trims whitespace from both ends of a string.
      * @param {string} str - The string to trim.
@@ -49,7 +49,7 @@ class StringExt {
      * @returns {string} Trimmed string.
      */
     static trim(str, chars := " ") => Trim(str, chars)
-    
+
     /**
      * Trims whitespace from the start of a string.
      * @param {string} str - The string to trim.
@@ -57,7 +57,7 @@ class StringExt {
      * @returns {string} Trimmed string.
      */
     static trimStart(str, chars := " ") => LTrim(str, chars)
-    
+
     /**
      * Trims whitespace from the end of a string.
      * @param {string} str - The string to trim.
@@ -65,7 +65,7 @@ class StringExt {
      * @returns {string} Trimmed string.
      */
     static trimEnd(str, chars := " ") => RTrim(str, chars)
-    
+
     /**
      * Checks if a string includes a substring.
      * @param {string} haystack - The string to search in.
@@ -75,7 +75,7 @@ class StringExt {
      * @returns {number} Position of substring or 0 if not found.
      */
     static includes(haystack, needle, caseSense := false, startPos := 1) => InStr(haystack, needle, caseSense, startPos)
-    
+
     /**
      * Replaces occurrences of a substring in a string.
      * @param {string} str - The string to modify.
@@ -87,7 +87,7 @@ class StringExt {
      * @returns {string} String with replacements.
      */
     static replace(str, needle, replacement := "", caseSense := false, &outputVarCount := 0, limit := -1) => StrReplace(str, needle, replacement, caseSense, &outputVarCount, limit)
-    
+
     /**
      * Splits a string into an array.
      * @param {string} str - The string to split.
@@ -96,7 +96,7 @@ class StringExt {
      * @returns {Array} Array of substrings.
      */
     static split(str, delimiters := ",", omitChars := "") => StrSplit(str, delimiters, omitChars)
-    
+
     /**
      * Returns a substring from a string.
      * @param {string} str - The string to extract from.
@@ -134,7 +134,7 @@ class StringExt {
      */
     static repeat(str, times) {
         newStr := ""
-        
+
         loop times {
             newStr .= str
         }
@@ -164,16 +164,89 @@ class StringExt {
         return newStr
     }
 
+    /**
+     * Determines whether this string begins with the characters of a specified string, returning true or false as appropriate.
+     * @param {String} haystack 
+     * @param {String} needle 
+     * @param {true|false} caseSense 
+     * @returns {true|false}
+     */
     static startsWith(haystack, needle, caseSense := false, startPos := 1) {
         index := InStr(haystack, needle, caseSense, startPos)
 
         return index == startPos ? true : false
     }
 
+    /**
+     * Determines whether this string ends with the characters of a specified string, returning true or false as appropriate.
+     * @param {String} haystack 
+     * @param {String} needle 
+     * @param {true|false} caseSense 
+     * @returns {true|false}
+     */
     static endsWith(haystack, needle, caseSense := false) {
         startPos := StrLen(haystack) - StrLen(needle) + 1
-        index := InStr(haystack, needle, caseSense, )
+        index := InStr(haystack, needle, caseSense,)
 
         return index == startPos ? true : false
+    }
+
+    /**
+     * Change string to a certain casing.
+     * @param {"camel" | "pascal" | "kebab" | "snake" | "constant"} casing 
+     */
+    static toCase(str, casing := "kebab") {
+        splitted := []
+
+        switch {
+            case InStr(str, "-"):
+                ; kebab
+                splitted := StrSplit(str, "-")
+            case InStr(str, "_"):
+                ; snake
+                splitted := StrSplit(str, "_")
+            default:
+                ; pascal/camel
+                word := ""
+                loop parse str, "" {
+                    if (A_LoopField ~= "^[A-Z]$") {
+                        if (word) {
+                            splitted.Push(word)
+                            word := ""
+                        }
+                        word := A_LoopField
+                    }
+                    else if (A_Index == StrLen(str)) {
+                        word .= A_LoopField
+                        splitted.Push(word)
+                    }
+                    else {
+                        word .= A_LoopField
+                    }
+                }
+        }
+
+        changed := ""
+        switch casing {
+            case "camel":
+                for word in splitted {
+                    if (A_Index == 1) {
+                        changed := StrLower(word)
+                    }
+                    changed .= StrTitle(word)
+                }
+            case "pascal":
+                for word in splitted {
+                    changed .= StrTitle(word)
+                }
+            case "kebab":
+                changed := ArrayExt.join(ArrayExt.map(splitted, word => StrLower(word)), "-")
+            case "snake":
+                changed := ArrayExt.join(ArrayExt.map(splitted, word => StrLower(word)), "_")
+            case "constant":
+                changed := ArrayExt.join(ArrayExt.map(splitted, word => StrUpper(word)), "_")
+        }
+
+        return changed
     }
 }

@@ -121,4 +121,15 @@ class MapExt {
             return res
         }
     }
+
+    /**
+     * Executes a provided function once for each Map key and value.
+     * @param {Map} _map - The target Map object.
+     * @param {()=>void} fn - The function to execute for each element.
+     */
+    static forEach(_map, fn) {
+        for key, val in _map {
+            mutatedEntry := fn(key, val)
+        }
+    }
 }

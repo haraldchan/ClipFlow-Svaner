@@ -1,4 +1,4 @@
-class StackBox {
+class StackBox extends Component{
     /**
      * Creates a StackBox component for containing child controls.
      * @param {Svaner} svanerInstance The Svaner instance to which the StackBox belongs
@@ -9,9 +9,11 @@ class StackBox {
      * options := {
      *     ; available options
      *     name: "stack-box",
-     *     fontOptions: "s12 bold",
-     *     fontName: "Times New Roman",
-     *          
+     *     font: {
+     *         name: "Times New Roman",
+     *         options: "s12 bold"
+     *     }
+     * 
      *     ; GroupBox options
      *     groupbox: { 
      *         title: "This is a StackBox",
@@ -46,15 +48,17 @@ class StackBox {
      */
     __New(svanerInstance, options, renderCallback) {
         this.svaner := svanerInstance
-        this.name := options.HasOwnProp("name") ? "$" . options.name : ""
+        this.name := options.HasOwnProp("name") ? options.name : ""
         if (this.name) {
             this.svaner.components[this.name] := this
         }
 
-        this.fontName := options.HasOwnProp("fontName") ? options.fontName : ""
-        this.fontOptions := options.HasOwnProp("fontOptions") ? options.fontOptions : ""
+        this.fontName := options.HasOwnProp("font") && options.font.HasOwnProp("name") ? options.font.name : ""
+        this.fontOptions := options.HasOwnProp("font") && options.font.HasOwnProp("options") ? options.font.options : ""        
+
         this.renderCallback := (*) => renderCallback()
         this.ctrls := []
+        this.childComponents := []
 
         ; GroupBox option
         this.gbOptions := this.svaner.__parseOptions(options.groupbox.options)
@@ -68,7 +72,6 @@ class StackBox {
     
             if (this.checkbox.HasOwnProp("options")) {
                 this.cbOptions := this.svaner.__parseOptions(this.checkbox.options)
-
             }
 
             this.cbEvents := options.checkbox.HasOwnProp("events") ? options.checkbox.events : ""
@@ -150,6 +153,7 @@ class StackBox {
         this.gbCtrl.SetFont(this.fontOptions, this.fontName)
         this.ctrls.Push(this.gbCtrl)
         this.gbCtrl.GetPos(&gbX, &gbY, &gbWidth, &gbHeight)
+        this.svaner.__applyCallbackDirectives(this.gbCtrl, this.gbOptions.callbacks)
 
         ; mount CheckBox if using check box as title
         if (this.checkbox) {
@@ -157,6 +161,7 @@ class StackBox {
             this.cbCtrl.SetFont(this.fontOptions, this.fontName)
             this.cbCtrl.OnEvent("Click", (ctrl, _) => this.setEnable(ctrl.Value))
             this.ctrls.Push(this.cbCtrl)
+            this.svaner.__applyCallbackDirectives(this.cbCtrl, this.cbOptions.callbacks)
         }
 
         ; add events

@@ -125,6 +125,27 @@ class SvanerGroupBox extends Svaner.Control {
 }
 
 
+class SvanerListBox extends Svaner.Control {
+    /**
+     * Add a reactive GroupBox control to Gui
+     * @param {Gui} GuiObject The target Gui Object.
+     * @param {string} options Options apply to the control, same as Gui.Add.
+     * @param {string} content Text or formatted text to hold signal values.
+     * @param {signal} [depend] Subscribed signal
+     * @param {array} [key] the keys or index of the signal's value
+     * @returns {SvanerGSvanerListBoxoupBox}     
+     */
+    __New(GuiObject, options := "", content := "", depend := 0, key := 0) {
+        TypeChecker.checkType(options, String, "Parameter #1 (options) is not a String")
+        TypeChecker.checkType(content, String, "Parameter #2 (content) is not a String")
+        TypeChecker.checkTypeDepend(depend)
+
+        this.key := key
+        super.__New(GuiObject, "ListBox", options, content, depend, key)
+    }  
+}
+
+
 class SvanerListView extends Svaner.Control {
     /**
      * Add a reactive ListView control to Gui

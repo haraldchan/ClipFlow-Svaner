@@ -165,7 +165,7 @@ MouseSpy_Information(App, config, AppWindowTitle, suspendText) {
 
                 ; relative distance
                 App.AddText("@use:label-text" . " yp+30", "Distance:"),
-                App.AddEdit("@use:edit-long", "x {1}, y {2}", distance, ["x", "y"]),
+                App.AddEdit("@use:edit-long", "x{1}, y{2}", distance, ["x", "y"]),
 
                 ; anchor types
                 App.AddText("xs10 yp+35 w150 h20 0x200", "Anchor Type").SetFont("s9 bold"),

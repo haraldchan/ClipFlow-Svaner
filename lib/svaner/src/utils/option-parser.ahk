@@ -32,10 +32,9 @@ class OptionParser {
             }
 
             if (StringExt.startsWith(directive, "@use:")) {
-                this.customUseDirectives[directive] := optionsOrCallback
-            }
-            else if (StringExt.startsWith(directive, "@func:")) {
-                this.callbackDirectives[directive] := optionsOrCallback
+                (optionsOrCallback is Func)
+                ? this.callbackDirectives[directive] := optionsOrCallback
+                : this.customUseDirectives[directive] := optionsOrCallback
             }
         }
     }
@@ -55,12 +54,23 @@ class OptionParser {
             return opt
         }
         ; func directive, ignore
-        else if (StringExt.startsWith(opt, "@func:")) {
+        ; else if (StringExt.startsWith(opt, "@func:")) {
+        ;     return this.callbackDirectives[opt]
+        ; }
+        else if (this.callbackDirectives.Has(opt)) {
             return this.callbackDirectives[opt]
         }
         ; preset directives
         else if (this.presetDirectives.Has(opt)) {
             return Format(" {1} ", this.presetDirectives[opt])
+        }
+        ; ddl field heigh
+        else if (StringExt.startsWith(opt, "@ddl:h")) {
+            CB_SETITEMHEIGHT := 0x0153
+            FIELD := -1
+            height := Integer(StrReplace(opt, "@ddl:h", ""))
+
+            return this.callbackDirectives[opt] := ctrl => PostMessage(CB_SETITEMHEIGHT, FIELD, height, ctrl)
         }
         ; custom directives
         else if (this.customUseDirectives.Has(opt)) {
@@ -80,6 +90,7 @@ class OptionParser {
         }
     }
 
+
     _parseCustomUseDirectives(opt, callbackArray) {
         if (!InStr(this.customUseDirectives[opt], "@")) {
             return Format(" {1} ", this.customUseDirectives[opt])
@@ -97,6 +108,7 @@ class OptionParser {
 
         return parsed
     }
+
 
     _handleAlignDirectives(opt) {
         splittedOpts := StrSplit(opt, ":")
@@ -122,6 +134,7 @@ class OptionParser {
         return parsedPos
     }
 
+
     _handleRelativeDirectives(opt) {
         splittedOpts := StrSplit(opt, ":")
         relatives := StrLower(StringExt.replaceThese(splittedOpts[1], ["@relative[", "]"]))
@@ -132,14 +145,14 @@ class OptionParser {
         parsedPos := ""
         for offset in StrSplit(relatives, ";") {
             switch {
-                case InStr(offset, "x",,1):
-                    parsedPos .= Format(" x{1} ", this._calcRelative(offset, X) + Width)       
-                case InStr(offset, "y",,1):
-                    parsedPos .= Format(" y{1} ", this._calcRelative(offset, Y) + Height)       
-                case InStr(offset, "w",,1):
-                    parsedPos .= Format(" w{1} ", this._calcRelative(offset, Width))       
-                case InStr(offset, "h",,1):
-                    parsedPos .= Format(" h{1} ", this._calcRelative(offset, Height))       
+                case InStr(offset, "x", , 1):
+                    parsedPos .= Format(" x{1} ", this._calcRelative(offset, X) + Width)
+                case InStr(offset, "y", , 1):
+                    parsedPos .= Format(" y{1} ", this._calcRelative(offset, Y) + Height)
+                case InStr(offset, "w", , 1):
+                    parsedPos .= Format(" w{1} ", this._calcRelative(offset, Width))
+                case InStr(offset, "h", , 1):
+                    parsedPos .= Format(" h{1} ", this._calcRelative(offset, Height))
             }
         }
 
@@ -161,7 +174,7 @@ class OptionParser {
                 return xywz - offsetNum
             case "*":
                 return xywz * offsetNum
-            case "/":                
+            case "/":
                 return xywz / offsetNum
         }
     }
