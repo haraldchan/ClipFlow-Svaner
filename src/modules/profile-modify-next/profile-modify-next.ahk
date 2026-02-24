@@ -4,6 +4,7 @@
 #Include components\pmn-app.ahk
 #Include components\guest-profile-list.ahk
 #Include components\guest-profile-details.ahk
+#Include components\sent-posts.ahk
 #Include components\settings.ahk
 ; macros
 #Include macros\fill-in.ahk
