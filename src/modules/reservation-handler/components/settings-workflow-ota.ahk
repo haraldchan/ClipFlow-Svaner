@@ -24,7 +24,7 @@ RHS_WorkflowOta(App) {
     }
 
     return (
-        App.AddText("x400 y100 w200", "录入流程设置").SetFont("bold s10.5"),
+        App.AddText("x400 @relative[y+15]:cur-agent w200 h20", "录入流程设置").SetFont("bold s10.5"),
         App.AddText("x400 y+10", "启用或关闭部分预订录入流程。"),
 
         ; controller check-boxes
