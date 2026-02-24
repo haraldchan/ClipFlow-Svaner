@@ -16,7 +16,7 @@ GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile) {
     }
 
     options := {
-        lvOptions: "vguest-profile-list Grid -ReadOnly -Multi LV0x4000 w658 r16 xp-580 y+10",
+        lvOptions: "vguest-profile-list Grid -ReadOnly -Multi @lv:label-tip @align[x]:date y+10 w658 h320",
         itemOptions: ""
     }
 
@@ -64,7 +64,6 @@ GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile) {
 
     return (    
         App.AddListView(options, columnDetails, listContent)
-           .SetFont("s10.5")
            .onContextMenu(showProfileDetails)
            .onDoubleClick(markAsPrimary)
            .onItemEdit(handleUpdateItem)
