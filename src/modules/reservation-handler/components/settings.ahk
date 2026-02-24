@@ -19,7 +19,7 @@ ReservationHandlerSettings(App) {
 
     return (
         App.AddText("x30 y+10 w65 h25 0x200", "当前 Agent").SetFont("Bold"),
-        App.AddDDL("x+10 w250 Choose1", agentNames)
+        App.AddDDL("vcur-agent x+10 w250 Choose1", agentNames)
            .onChange((ctrl, _) => selectedAgent.set(agentComponentSet.keys()[ctrl.Value])),
 
         Dynamic(App, selectedAgent, agentComponentSet),
