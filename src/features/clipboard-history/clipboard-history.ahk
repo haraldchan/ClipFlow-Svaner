@@ -124,13 +124,12 @@ ClipboardHistory(App) {
     }
 
     App.defineDirectives(
-        "@use:chi-gb", "x20 y+9",
-        "@use:chi-gb-first", "x20 y+21",
+        "@use:chi-gb", "@align[x]:chi-first-gb y+10",
         "@use:ch-btn", "w40 h40"
     )
 
     return (
-        CLIP_HISTORY_LENGTH.times(() => ClipHistoryItem(App, clipHistory, A_Index)),
-        SharedClips(App, sendToSharedClips)
+        CLIP_HISTORY_LENGTH.times(() => ClipHistoryItem(App, clipHistory, A_Index))
+        ; SharedClips(App, sendToSharedClips)
     )
 }

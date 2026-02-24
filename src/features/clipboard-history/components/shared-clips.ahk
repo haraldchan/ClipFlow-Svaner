@@ -63,7 +63,7 @@ SharedClips(App, sendToSharedClips) {
 
 
     return (
-        App.AddGroupBox("Section x330 y70 w380 r19", "Shared Clips - 共享剪贴板").SetFont("s9 bold"),
+        App.AddGroupBox("Section x330 w380 h433 @align[y]:chi-first-gb", "Shared Clips - 共享剪贴板").SetFont("s9 bold"),
         
         ; sync clips to SHARED_CLIPS_DIR
         App.AddCheckbox("xs15 yp+25 h20", "同步到共享剪贴板", { check: sendToSharedClips }).bind(),

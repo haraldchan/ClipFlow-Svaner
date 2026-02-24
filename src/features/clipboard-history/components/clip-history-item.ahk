@@ -94,7 +94,7 @@ ClipHistoryItem(App, clipHistory, index) {
 
     return (
         App.AddGroupBox(
-            "Section w300 r2 " . (index == 1 ? "@use:chi-gb-first" : "@use:chi-gb"),
+            "Section w300 h70 " . (index == 1 ? "vchi-first-gb" : "@use:chi-gb"),
             "{1}", clipHistory, 
             { index: index, keys: ["type"] }
         ).SetFont("bold"),
@@ -103,15 +103,18 @@ ClipHistoryItem(App, clipHistory, index) {
         App.AddButton("x+1 w0 h0", ""), 
 
         ; copy/open file btn
-        App.AddEdit("xs10 yp+20 w230 r2 ReadOnly", "{1}", clipHistory, { index: index, keys: ["text"] }),
+        App.AddEdit("xs10 yp+20 w230 h40 ReadOnly", "{1}", clipHistory, { index: index, keys: ["text"] }),
         App.AddButton(("vchi-function-btn" . index) . " x+1 @use:ch-btn @button:icon-only", "")
            .OnClick(handleHistoryContentCopy)
            .OnDoubleClick(handleOpenFromPath),
         
         ; image 
         App.AddPic(("vchi-pic" . index) . " xp+0 yp+0 @pic:real-size Hidden @use:ch-btn", "")
-           .OnEvent("Click", handleHistoryContentCopy)
+           .OnEvent("Click", handleHistoryContentCopy),
         
+        ; bottom
+        App.AddText("xs10 y+1 w230 h1 border Hidden", "bla"),
+
         onMount()
     )
 }
