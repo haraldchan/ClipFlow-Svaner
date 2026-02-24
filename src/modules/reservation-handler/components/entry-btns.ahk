@@ -46,7 +46,7 @@ EntryBtns(App, curResv) {
     }
 
     return (
-        App.AddGroupBox("Section y+10 w310 r2 ", "录入订单"),
+        App.AddGroupBox("Section y+10 w310 h70", "录入订单"),
         App.AddButton("ventry1 xs10 w140 h40 yp+20", "").OnEvent("Click", handleEntry),
         App.AddButton("ventry2 w140 x+10 h40", "").OnEvent("Click", handleEntry)
     )

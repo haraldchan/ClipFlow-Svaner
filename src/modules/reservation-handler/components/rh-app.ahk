@@ -38,7 +38,7 @@ RH_App(App, moduleTitle, identifier) {
     }
 
     return (
-        App.AddGroupBox("Section R18 w685 y+20", ""),
+        App.AddGroupBox("Section w685 h460 y+20", ""),
         App.AddText("xp15", moduleTitle),
 
         ; read me info

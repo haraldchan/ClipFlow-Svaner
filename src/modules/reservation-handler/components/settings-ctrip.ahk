@@ -28,7 +28,7 @@ RHS_SettingsCtrip(App, params) {
     comp := Component(App, agent)
     comp.render := this => this.Add(
         ; profile
-        App.AddGroupBox("Section x25 y100 w330 r4.5", "基本信息").SetFont("bold"),
+        App.AddGroupBox("Section x25 y70 w330 h130", "基本信息").SetFont("bold"),
         ; profile name
         App.AddText("xs10 yp+25 w65 h25 0x200", agent == "ctrip-ota" ? "OTA现付" : "商旅现付"),
         App.AddEdit("v" . agent . "-profileNamePoa" . " x+10 h25 w230", params["profileNamePoa"]),
@@ -39,7 +39,7 @@ RHS_SettingsCtrip(App, params) {
         App.AddRadio("x+10 h25 " . (params["profileType"] == "Company" ? "Checked" : ""), "Company"),
         
         ; related fields
-        App.AddGroupBox("Section x25 y+30 w330 r5", "预订填入内容").SetFont("bold"),
+        App.AddGroupBox("Section x25 y+30 w330 h140", "预订填入内容").SetFont("bold"),
         ; rate code
         App.AddText("xs10 yp+25 w65 h25 0x200", "Rate Code"),
         App.AddEdit("v" . agent . "-bbf0" . " x+10 h25 w70", params["ratecode"][1]),
@@ -57,7 +57,7 @@ RHS_SettingsCtrip(App, params) {
         App.AddEdit("v" . agent . "-source" . " x+10 h25 w75", params["source"]),
         
         ; save
-        App.AddButton("v" . agent . "-save" . " x280 y+30 h30 w80", "保 存").OnEvent("Click", saveParams)
+        App.AddButton("v" . agent . "-save" . " x280 y+30 h30 w80", "保 存").onClick(saveParams)
     )
 
     return comp
