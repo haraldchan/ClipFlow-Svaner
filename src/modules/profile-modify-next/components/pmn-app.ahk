@@ -5,17 +5,12 @@
  * @param {String} identifier 
  */
 PMN_App(App, moduleTitle, db, identifier) {
-    ; server agent delegate
+    ; server agent delegate/ enable QM2 panel
     delegate := signal(false)
     serverConnection := signal("")
-    serverConnStatus := Map(
-        "default", "Norm cBlack",
-        "后台服务在线", "Bold cGreen",
-        "超时无响应", "Bold cRed",
-        "后台错误停止", "Bold cRed"
-    )
+
     handleDelegateActivate(ctrl, _) {
-        App["guest-profile-list"].GetPos(&X, &Y, &W, &H)
+        App["guest-profile-list"].GetPos(,, &W)
         App["guest-profile-list"].Move(,, ctrl.Value ? W*0.7 : W/0.7)
         App["component:SentPosts"].visible(ctrl.Value)
         
@@ -23,24 +18,40 @@ PMN_App(App, moduleTitle, db, identifier) {
         if (ctrl.Value == false) {
             return
         }
-        
+
+        App["qm2-agent"].Enabled := ctrl.Value
         ctrl.Enabled := false
         serverConnection.set("尝试连接中...")
-        App["connection-status"].Visible := true
 
         SetTimer(() => ((
             agent.PING()
-                ? (
-                    serverConnection.set("后台服务在线"), 
-                    SetTimer(() => App["connection-status"].Visible := false, -2000)
-                ) : (
+                ? serverConnection.set("后台服务在线")
+                : (
                     delegate.set(false), 
                     ctrl.Value := false, 
                     serverConnection.set("超时无响应")
                 )
         ), ctrl.Enabled := true) , -100)
     }
-    effect(delegate, state => App["qm2-agent"].Enabled := state)
+
+    effect(serverConnection, handleConnStatus)
+    handleConnStatus(curServerConnection) {
+        connStatusText := App["connection-status"]
+        connStatusText.Visible := true
+
+        switch curServerConnection {
+            case "尝试连接中...":
+                connStatusText.SetFont("norm cBlack")
+            case "后台服务在线":
+                connStatusText.SetFont("bold cGreen")
+                SetTimer(() => connStatusText.Visible := false, -2000)
+            default: 
+                connStatusText.SetFont("bold cRed")
+                App["guest-profile-list"].GetPos(,, &W)
+                App["guest-profile-list"].Move(,, W/0.7)
+                App["component:SentPosts"].visible(false)
+        }
+    }
 
 
     ; settings
@@ -360,7 +371,7 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         selectedGuests := []
         ; pick selected guests
-        checkedRows := LV.getCheckedRowNumbers()
+        checkedRows := LV.getCheckedRowNumbers() 
         if (!checkedRows.Length) {
             QM2_Panel({ sendPm: false })
             return
@@ -441,8 +452,8 @@ PMN_App(App, moduleTitle, db, identifier) {
         App.AddText("xp15", moduleTitle . " ⓘ ").onClick((*) => PMN_Settings(settings)),
         
         ; agent mode
-        App.AddCheckBox("vdelegate-check-box x+10 Disabled", "后台代行").OnEvent("Click", handleDelegateActivate),
-        App.AddText("vconnection-status x+20 w80 Hidden", " {1}", serverConnection).SetFontStyles(serverConnStatus),
+        App.AddCheckBox("vdelegate-check-box x+10 Disabled", "后台代行").onClick(handleDelegateActivate),
+        App.AddText("vconnection-status x+20 w80 Hidden", " {1}", serverConnection),
         
         ; datetime
         App.AddDateTime("vdate xs15 yp+25 w90 h25", "yyyy/MM/dd")
@@ -470,13 +481,13 @@ PMN_App(App, moduleTitle, db, identifier) {
         App.AddButton("vfillin x+5 w80 h25 Default", "{1}", fillBtnText)
            .onClick(fillPmsProfile)
            .onContextMenu((*) => settings.update("fillOverwrite", o => !o)),
-        App.AddButton("vqm2-agent x+5 w80 h25", "&QM2 Agent").onClick(showQm2Panel),
+        App.AddButton("vqm2-agent x+5 w80 h25 Disabled", "&QM2 Agent").onClick(showQm2Panel),
 
         ; profile list
         GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile),
 
         ; sent posts
-        SentPosts(App, serverConnection),
+        SentPosts(App, serverConnection, listContent),
 
         ; waterfall controls
         App.AddCheckBox("vselecti-all-btn Hidden w80 h20 @align[x]:date y+5", "全选 (&A)"),
