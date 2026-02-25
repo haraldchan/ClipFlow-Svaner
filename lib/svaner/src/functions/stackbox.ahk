@@ -79,6 +79,7 @@ class StackBox extends Component{
 
         ; mount controls
         this._renderStackBox(this.svaner)
+        this.render := (*) => []
     }
 
     _saveCtrls(savedCtrls, renderedCtrls) {
