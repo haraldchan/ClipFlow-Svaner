@@ -2,8 +2,6 @@
  * @param {Object} props 
  */
 QM2_Panel(props) {
-    ; App := Gui("+AlwaysOnTop", "ServerAgents - QM2 Agent")
-    ; App.SetFont(, "微软雅黑")
     App := Svaner({
         gui: {
             options: "+AlwaysOnTop",
@@ -23,19 +21,18 @@ QM2_Panel(props) {
     })
 
     modules := OrderedMap(
-        BlankShare, "生成空白(NRR) Share",
-        PaymentRelation, "生成 PayBy PayFor 信息"
-    )
-    selectedModule := signal(BlankShare.name)
-    moduleComponents := OrderedMap(
-        "BlankShare",      (*) => BlankShare(App, { children: App => App.AddCheckBox((p.sendPm ? "Checked " : "") . "vsendPmPost h20 x+20 yp 0x200", "Share Check-in 后录入 Profile") }),
-        "PaymentRelation", PaymentRelation
+        "生成空白(NRR) Share", BlankShare,
+        "生成 PayBy PayFor 信息", PaymentRelation
     )
 
-    effect(selectedModule, handleModuleChange)
-    handleModuleChange(moduleName) {
-        for module in modules {
-            App[module.name . "-action"].Opt(module.name = moduleName ? "+Default" : "-Default")
+    selectedModule := signal(modules.keys()[1])
+
+    handleModuleChange(ctrl, _) {
+        moduleName := modules[ctrl.Text].name
+        selectedModule.set(ctrl.Text)
+
+        for desc, module in modules {
+            App[module.name.toCase("kebab") . "-action"].Opt(desc == ctrl.Text ? "+Default" : "-Default")
         }
     }
 
@@ -51,7 +48,6 @@ QM2_Panel(props) {
         return 0
     }
 
-    
     handleBlankShareDelegate(*) {
         if (!App["share-room-nums"].Value) {
             return 0
@@ -68,12 +64,19 @@ QM2_Panel(props) {
         return 0
     }
 
-    ; db := useFileDB(CONFIG.read("dbSettings"))
+    db := useFileDB({
+            ; main: dbConfig["host"] . "\" . dbConfig["main"],
+            ; archive: dbConfig["host"] . "\" . dbConfig["archive"],
+            ; backup: dbConfig["host"] . "\" . dbConfig["backup"],
+            main: "",
+            archive: "",
+            backup: "",
+    })
     handleTriggerPmPost() {
         roomNums := form.shareRoomNums.trim()
         profiles := p.selectedGuests.Length == 0
-            ; ? db.load(,, agent.collectRange).filter(guest => roomNums.includes(!guest["roomNum"] ? "null" : guest["roomNum"]))
-            ; : p.selectedGuests
+            ? db.load(,, agent.collectRange).filter(guest => roomNums.includes(!guest["roomNum"] ? "null" : guest["roomNum"]))
+            : p.selectedGuests
 
         SetTimer(() => (
             post := agent.delegate({
@@ -95,7 +98,7 @@ QM2_Panel(props) {
         roomCountMap := Map()
         for roomProfiles in p.selectedGuests {
             for roomNum, profiles in roomProfiles {
-                roomCountMap[roomNum] := profiles.Length - 1
+                roomCountMap[roomNum] := profiles.Length <= 1 ? 0 : profiles.Length - 1
             }
         }
 
@@ -105,34 +108,36 @@ QM2_Panel(props) {
         App["share-qty"].Value := roomCountMap.values().join(" ")
 
         ; re-label btns
-        BlankShareAction := App["blankshare-action"]
+        BlankShareAction := App["blank-share-action"]
         BlankShareAction.Text := "Share 代行"
         BlankShareAction.Opt("+Default")
 
         ; override events
         BlankShareAction.onClick(handleBlankShareDelegate, -1)
-        App["paymentrelation-action"].onClick(handlePaymentRelationDelegate, -1)
+        App["payment-relation-action"].onClick(handlePaymentRelationDelegate, -1)
 
         App.Show()
     }
 
     App.defineDirectives(
-        "@use:box-x", "x20",
-        "@use:box-y", "y110",
+        "@use:box-x", "x10",
         "@use:box-w", "w350",
-        "@use:box-xyw", "@use:box-x @use:box-y @use:box-w"
+        "@use:box", "@use:box-x @relative[y+10]:op-radio-group @use:box-w",
+        "@use:form-text", "xs10 yp+30 w100 h25 0x200",
+        "@use:form-edit", "x+10 w200 h25 0x200"
     )
 
     return (
-        ; GroupBox frame
-        App.AddGroupBox("Section w370 h300 x10 y10", "QM2 Agent").SetFont("s12 Bold"),
-
-        ; QM modules
-        modules.keys().map(module =>
-            App.AddRadio(A_Index == 1 ? "Checked xs10 yp+30 h20" : "xs10 yp+30 h20", modules[module])
-               .onClick((*) => selectedModule.set(module.name))
+        StackBox(App, 
+            {
+                name: "op-radio-group",
+                groupbox: { options: "vop-radio-group Section x10 y+10 w350 Hidden " . Format("h{1}", 30 * modules.keys().Length) } 
+            },
+            () => modules.entries().map(
+                (entry, index) => App.AddRadio(index == 1 ? "xs1 h20 yp+1 Checked" : "xs1 h20 yp+30" , entry[1]).onClick(handleModuleChange)
+            )
         ),
-        Dynamic(App, selectedModule, moduleComponents),
+        Dynamic(App, selectedModule, modules),
         
         ; initializing
         onMount()
