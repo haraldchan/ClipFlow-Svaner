@@ -52,7 +52,7 @@ class UnifiedAgent extends useServerAgent {
     /**
      * <Agent>
      */
-    InputBlock() {
+    blockInput() {
         if (!WinExist(this.popupTitle)) {
             UnifiedAgentModal(() => this.isListening.set("离线"))
         }
@@ -86,10 +86,10 @@ class UnifiedAgent extends useServerAgent {
         if (status == "在线") {
             loop {
                 ; block input
-                this.InputBlock()
+                this.blockInput()
 
                 ; handle post
-                this.postHandler()
+                this.handlePosts()
 
                 Sleep this.interval
             } until (this.isListening.value == "离线")
@@ -100,7 +100,24 @@ class UnifiedAgent extends useServerAgent {
     /**
      * <Agent>
      */
-    postHandler() {
+    resetPostsToPending() {
+        postsToReset := []
+
+        postsToReset.Push(this.COLLECT("COLLECTED", this.qmPool))
+        postsToReset.Push(this.COLLECT("RETRY", this.qmPool))
+        postsToReset.Push(this.COLLECT("COLLECTED"))
+        postsToReset.Push(this.COLLECT("RETRY"))
+
+        for post in postsToReset {
+            this.updatePostStatus(post, "PENDING")
+        }
+    }
+
+
+    /**
+     * <Agent>
+     */
+    handlePosts() {
         if (!WinExist("ahk_class SunAwtFrame")) {
             MsgBox("后台 Opera PMS 不在线。", POPUP_TITLE, "4096 T1")
             this.isListening.set("离线")
@@ -108,12 +125,12 @@ class UnifiedAgent extends useServerAgent {
         }
         
         this.keepAlive()
+        this.resetPostsToPending()
 
         qmPosts := this.COLLECT("PENDING", this.qmPool)
         pmnPosts := this.COLLECT("PENDING")
-        retryPmnPosts := this.COLLECT("RETRY")
 
-        if (pmnPosts.Length || qmPosts.Length || retryPmnPosts.Length) {
+        if (pmnPosts.Length || qmPosts.Length) {
             WinHide(this.popupTitle)
         }
         
@@ -123,10 +140,6 @@ class UnifiedAgent extends useServerAgent {
 
         if (pmnPosts.Length) {
             this.modifyPostedProfiles(pmnPosts)
-        }
-
-        if (retryPmnPosts.Length) {
-            this.modifyPostedProfiles(retryPmnPosts)
         }
 
         this.currentHandlingPost := ""
