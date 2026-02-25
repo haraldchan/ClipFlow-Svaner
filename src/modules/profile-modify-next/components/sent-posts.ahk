@@ -1,8 +1,9 @@
 /**
  * @param {Svaner} App
  * @param {signal} serverConnection
+ * @param {signal} listContent
  */
-SentPosts(App, ServerConnection) {
+SentPosts(App, ServerConnection, listContent) {
     comp := Component(App, A_ThisFunc)
 
     postQueue := signal([{ status: "", time: "", id: "" }])
@@ -20,7 +21,12 @@ SentPosts(App, ServerConnection) {
         "ONLINE", "在线"
     )
 
-    handlePostUpdate(*) {
+    effect(listContent, handlePostUpdate)
+    handlePostUpdate(curListContent) {
+        if (curListContent[1]["roomNum"] == "Loading...") {
+            return
+        }
+
         posts := []
         showMyOwnPosts := App["sent-posts-show-my-own-posts"].Value
         
@@ -123,11 +129,7 @@ SentPosts(App, ServerConnection) {
                 },
             },
             () => [
-                ; post status list
-                App.AddButton("xs90 yp+0 h18 w18 +Center", "↻")
-                   .onClick(handlePostUpdate)
-                   .SetFont("Bold"),
-                App.AddCheckBox("vsent-posts-show-my-own-posts Checked x+10 h18", "本机发送"),
+                App.AddCheckBox("vsent-posts-show-my-own-posts Checked xp+120 h15 w60", "本机发送"),
                 App.AddListView(
                     {
                         lvOptions: "vsent-post-list Grid -Multi LV0x4000 w168 h280 xs10 yp+25"
@@ -143,8 +145,5 @@ SentPosts(App, ServerConnection) {
         )
     )
 
-    return (
-        comp.render().visible(false)
-        ; handlePostUpdate()
-    )
+    return comp.render().visible(false)
 }
