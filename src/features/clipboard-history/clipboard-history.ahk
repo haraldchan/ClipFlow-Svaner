@@ -6,17 +6,17 @@
  * @param {Svaner} App 
  */
 ClipboardHistory(App) {
-    SHARED_CLIPS_DIR := CONFIG.read("sharedClipsDir")
-    SHARED_CLIPS_DIR_META := SHARED_CLIPS_DIR . "\meta"
+    ; SHARED_CLIPS_DIR := CONFIG.read("sharedClipsDir")
+    ; SHARED_CLIPS_DIR_META := SHARED_CLIPS_DIR . "\meta"
     IMG_EXTS := ["jpg", "jpeg", "gif", "png", "tiff", "bmp", "ico"]
     CLIP_HISTORY_LENGTH := 6
-    CLIP_HISTORY_DIR := A_MyDocuments . "\clipflow-clips"
+    CLIP_HISTORY_DIR := APP_DATA_DIR . "\clipflow-clips"
     if (!DirExist(CLIP_HISTORY_DIR)) {
         DirCreate(CLIP_HISTORY_DIR)
     }
-    if (!DirExist(SHARED_CLIPS_DIR)) {
-        DirCreate(SHARED_CLIPS_DIR)
-    }
+    ; if (!DirExist(SHARED_CLIPS_DIR)) {
+    ;     DirCreate(SHARED_CLIPS_DIR)
+    ; }
 
     sendToSharedClips := signal(CONFIG.read("sendToSharedClips"))
     effect(sendToSharedClips, isSend => CONFIG.write("sendToSharedClips", isSend))
@@ -45,7 +45,7 @@ ClipboardHistory(App) {
 
         if (newHistory.Length > CLIP_HISTORY_LENGTH) {
             newHistory.Pop()
-        }
+        } 
 
         clipHistory.set(newHistory)
     }
@@ -68,33 +68,33 @@ ClipboardHistory(App) {
             FileAppend(ClipboardAll(), clipName)
         }
 
-        if (saveClip && sendToSharedClips.value) {
-            if (!DirExist(SHARED_CLIPS_DIR_META)) {
-                DirCreate(SHARED_CLIPS_DIR_META)
-            } 
+        ; if (saveClip && sendToSharedClips.value) {
+        ;     if (!DirExist(SHARED_CLIPS_DIR_META)) {
+        ;         DirCreate(SHARED_CLIPS_DIR_META)
+        ;     } 
 
-            dest := SHARED_CLIPS_DIR_META . "\" . fileName
+        ;     dest := SHARED_CLIPS_DIR_META . "\" . fileName
 
-            jsonIndexer := {
-                type: capturedType,
-                text: capturedType == "Text" ? A_Clipboard : dest,
-                contentPath: (capturedType.includes("file") || capturedType == "Image") ? dest : ""
-            }
+        ;     jsonIndexer := {
+        ;         type: capturedType,
+        ;         text: capturedType == "Text" ? A_Clipboard : dest,
+        ;         contentPath: (capturedType.includes("file") || capturedType == "Image") ? dest : ""
+        ;     }
 
-            ; copy file/image to meta dir
-            if !(A_Clipboard == dest) {
-                if (capturedType.includes("file") || capturedType == "Image") {
-                    FileCopy(A_Clipboard, dest, true)
-                }
+        ;     ; copy file/image to meta dir
+        ;     if !(A_Clipboard == dest) {
+        ;         if (capturedType.includes("file") || capturedType == "Image") {
+        ;             FileCopy(A_Clipboard, dest, true)
+        ;         }
 
-                ; add json indexer
-                FileAppend(
-                    JSON.stringify(jsonIndexer), 
-                    Format("{1}\{2}={3}.json", SHARED_CLIPS_DIR, timeStamp, rand), 
-                    "UTF-8"
-                )                    
-            }  
-        }
+        ;         ; add json indexer
+        ;         FileAppend(
+        ;             JSON.stringify(jsonIndexer), 
+        ;             Format("{1}\{2}={3}.json", SHARED_CLIPS_DIR, timeStamp, rand), 
+        ;             "UTF-8"
+        ;         )                    
+        ;     }  
+        ; }
 
         return {
             type: capturedType,
