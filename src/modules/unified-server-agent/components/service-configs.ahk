@@ -27,7 +27,7 @@ ServiceConfigs(App, enabled, isListening) {
 
     effect(isListening, cur => App["service-activator"].Value := cur != "离线")
 
-    handleConnect(ctrl, _) {
+    handleServiceStart(ctrl, _) {
         if (MsgBox("服务将启动，请确保 Opera 处于 InHouse 界面", "Server Agent", "4096 OKCancel") == "Cancel") {
             ctrl.Value := false
             return
@@ -37,6 +37,42 @@ ServiceConfigs(App, enabled, isListening) {
         App["interval"].Enabled := !ctrl.Value
         App["expiration"].Enabled := !ctrl.Value
         App["collect-range"].Enabled := !ctrl.Value
+
+        SetTimer(handleInHouseWindowReset)
+    }
+
+    handleInHouseWindowReset(*) {
+        if (!ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["error.PNG"])) {
+            return
+        }
+
+        SetTimer(, 0)
+        PMN_FillIn.end()
+        ; close all windows
+        loop {
+            Send "!w"
+            Sleep 100
+            Send "{Up}"
+            Sleep 100
+            Send "{Enter}"
+            Sleep 100
+            Send "!c"
+            utils.waitLoading()
+            Send "{Esc}"
+            utils.waitLoading()
+
+            if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-logo.PNG"])) {
+                break
+            }
+        }
+
+        ; restore In-house window
+        Send "!f"
+        utils.waitLoading()
+        Send "{Down}"
+        Sleep 100
+        Send "{Enter}"
+        utils.waitLoading()
     }
 
     comp.render := this => this.Add(
@@ -57,7 +93,7 @@ ServiceConfigs(App, enabled, isListening) {
             },
             () => [
                 ; service activation
-                App.AddCheckBox("vservice-activator xs20 yp+30","启动服务").onClick(handleConnect),
+                App.AddCheckBox("vservice-activator xs20 yp+30","启动服务").onClick(handleServiceStart),
                 App.AddText("x+10", "本机: " . A_ComputerName),
 
                 ; service state
