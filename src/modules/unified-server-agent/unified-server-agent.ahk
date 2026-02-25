@@ -29,7 +29,6 @@ ServerAgentPanel(App) {
         isListening: isListening
     })
 
-
     return (
         App.AddText("x30 y+10 h40 w580", "ProfileModifyNext Server").SetFont("s13 q5 Bold"),
         
