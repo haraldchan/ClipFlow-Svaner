@@ -21,8 +21,8 @@ SentPosts(App, ServerConnection, listContent) {
         "ONLINE", "在线"
     )
 
-    effect(listContent, handlePostUpdate)
-    handlePostUpdate(curListContent) {
+    effect(listContent, handlePostListUpdate)
+    handlePostListUpdate(curListContent) {
         if (curListContent[1]["roomNum"] == "Loading...") {
             return
         }
