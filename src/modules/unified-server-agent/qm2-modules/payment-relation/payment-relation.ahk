@@ -59,18 +59,18 @@ PaymentRelation(App, props := {}) {
     )
 
     comp.render := (this) => this.Add(
-        StackBox(
-            App, 
+        StackBox(App, 
             {
                 name: "pay-for-stack-box",
+                font: { options: "bold" },
                 groupbox: {
                     title: "P/F房(支付人)",
-                    options: "vpayfor-panel Section @use:box-x @use:box-y w170 r6"
+                    options: "vpayfor-panel Section @use:box-x @relative[y+10]:op-radio-group w170 h130"
                 } 
             },
             () => [
                 ; pay for
-                App.AddText("@use:pr-text", "房号"),
+                App.AddText("@use:pr-text yp+25", "房号"),
                 App.AddEdit("vpf-room Number @use:pr-edit", f.pfRoom),
 
                 App.AddText("@use:pr-text", "姓名/确认号 "),
@@ -84,26 +84,26 @@ PaymentRelation(App, props := {}) {
             ]
         ),
 
-        StackBox(
-            App,
+        StackBox(App,
             {
                 name: "pay-by-stack-box",
+                font: { options: "bold" },
                 groupbox: {
                     title: "P/B房(被支付人)",
-                    options: "vpayby-panel Section x+3 @align[yw]:payfor-panel r6"
+                    options: "vpayby-panel Section x+3 @align[ywh]:payfor-panel"
                 }
             },
             () => [
                 ; pay by
-                App.AddText("@use:pr-text", "房号"),
-                App.AddEdit("vpb-room Number @use:pr-edit", ""),
+                App.AddText("@use:pr-text yp+25", "房号"),
+                App.AddEdit("vpb-room Number @use:pr-edit", f.pbRoom),
                 App.AddText("@use:pr-text", "姓名/确认号 "),
-                App.AddEdit("vpb-name @use:pr-edit", f.pbName),
+                App.AddEdit("vpb-name @use:pr-edit", f.pbName)
             ]
         ),
 
         ; btns  
-        App.AddButton("vpaymentrelation-action w300 h40 @align[x]:payfor-panel y+25", "录 入 全 部").onClick(action),
+        App.AddButton("vpayment-relation-action w300 h40 @align[x]:payfor-panel y+10", "录 入 全 部").onClick(action),
         App.AddButton("w40 h40 x+10", "清空").onClick(clear)
     )
 

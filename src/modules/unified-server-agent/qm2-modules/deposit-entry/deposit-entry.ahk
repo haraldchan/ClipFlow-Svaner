@@ -8,11 +8,55 @@
  */
 
 class DepositEntry {
+    static isRunning := false
+
+    static start() {
+        WinMaximize "ahk_class SunAwtFrame"
+        WinActivate "ahk_class SunAwtFrame"
+        WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
+        BlockInput true
+
+        Hotkey("F12", (*) => this.end(), "On")
+        this.isRunning := true
+    }
+
+    static end() {
+        BlockInput false
+        WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
+
+        Hotkey("F12", (*) => {}, "Off")
+        this.isRunning := false
+    }
+
     static regex := {
         visa: "^4\d{12}(\d{3})?$",
         master: "^(5[1-5]\d{14}|2(2[2-9]\d{12}|[3-6]\d{13}|7[01]\d{12}|720\d{12}))$",
         amex: "^3[47]\d{13}$",
         jcb: "^35(2[89]|[3-8]\d)\d{12}$"
+    }
+
+    /**
+     * @param {String} cardInfo 
+     * @returns {"VS" | "MC" | "AE" | "JC" | "UP"} 
+     */
+    static validateType(cardInfo) {
+        switch {
+            ; Visa
+            case RegExMatch(cardInfo, this.regex.visa):
+                return "VS"
+                ; MasterCard
+            case RegExMatch(cardInfo, this.regex.master):
+                return "MC"
+                ; Amex
+            case RegExMatch(cardInfo, this.regex.amex):
+                return "AE"
+                ; JCB
+            case RegExMatch(cardInfo, this.regex.jcb):
+                return "JC"
+                ; Union Pay
+            default:
+                return "UP"
+        }
     }
 
     /**
@@ -44,10 +88,15 @@ class DepositEntry {
 
         parsedCard := cardInfoCopied.replaceThese([";", "?"]).split("=")
 
-        cardType := this.validateType(parsedCard[1]),
-            cardNum := parsedCard[1],
-            exp := parsedCard[2].substr(3, 4) . parsedCard[2].substr(1, 2),
-            auth := cardType == "UP" && (cardNum.startsWith(1) || cardNum.startsWith(2)) ? cardNum.substr(1, 1) . cardNum.substr(-5) : ""
+        cardType := this.validateType(parsedCard[1])
+        cardNum := parsedCard[1]
+        exp := parsedCard[2].substr(3, 4) . parsedCard[2].substr(1, 2)
+        auth := cardType == "UP" && (cardNum.startsWith(1) || cardNum.startsWith(2)) ? cardNum.substr(1, 1) . cardNum.substr(-5) : ""
+
+        if (cardType != "UP" && InStr(cardNum, "000000",, 7)) {
+            MsgBox("外卡卡号不完整，请手动录入。", "Deposit Entry", "4096 T2")
+            return
+        }
 
         depositInfo := {
             cardType: cardType,
@@ -71,9 +120,13 @@ class DepositEntry {
 
         Prompt := Gui("+AlwaysOnTop", "Deposit Entry")
         Prompt.SetFont(, "微软雅黑")
-        Prompt.OnEvent("Close", p => p.Destroy())
+        Prompt.OnEvent("Close", destroyPrompt)
 
-        destroyPrompt(*) => Prompt.Destroy()
+        destroyPrompt(*) {
+            ; restore card info
+            A_Clipboard := Format("{1}`t{2}", depositInfo.cardNum, depositInfo.exp)
+            Prompt.Destroy()
+        }
 
         completeInfo(*) {
             depositInfo.cardType := Prompt.getCtrlByTypeAll("Radio")
@@ -104,7 +157,7 @@ class DepositEntry {
         }
 
         sendQmPost(depositInfo) {
-            agent := useServerAgent({ pool: "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow\src\Servers\test-pool" })
+            agent := useServerAgent({ pool: "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow\src\Servers\qm-pool" })
             agent.POST({
                 module: "DepositEntry",
                 form: depositInfo
@@ -138,54 +191,45 @@ class DepositEntry {
             Prompt.AddEdit("vamount x+1 w150 h25", ""),
             Prompt.AddEdit("vauth x+1 w70 h25", depositInfo.auth),
             ; server delegate
-            Prompt.AddCheckbox("vde-delegate xs10 yp+30 w80 h25 Checked", "后台代行").onEvent("Click", delegateDepositEntry),
+            Prompt.AddCheckbox("vde-delegate Checked xs10 yp+30 w80 h25", "后台代行").onEvent("Click", delegateDepositEntry),
             Prompt.AddEdit("vroom x+1 w150 h25", (depositInfo.room || "(房间号)")),
             ; btns
             Prompt.AddButton("x175 w80 h25", "取消 (&C)").OnEvent("Click", destroyPrompt),
-            Prompt.AddButton("x+5 w80 h25", "确定 (&O)").OnEvent("Click", completeInfo),
+            Prompt.AddButton("x+5 w80 h25 Default", "确定 (&O)").OnEvent("Click", completeInfo),
             onMount()
         )
-    }
-
-    /**
-     * @param {String} cardNum 
-     * @returns {"VS" | "MC" | "AE" | "JC" | "UP"} 
-     */
-    static validateType(cardNum) {
-        message := "Card No.:{1} is a {2} card."
-
-        switch {
-            ; Visa
-            case RegExMatch(cardNum, this.regex.visa):
-                return "VS"
-                ; MasterCard
-            case RegExMatch(cardNum, this.regex.master):
-                return "MC"
-                ; Amex
-            case RegExMatch(cardNum, this.regex.amex):
-                return "AE"
-                ; JCB
-            case RegExMatch(cardNum, this.regex.jcb):
-                return "JC"
-                ; Union Pay
-            default:
-                return "UP"
-        }
     }
 
     /**
      * @param {Deposit} depositInfo 
      */
     static entry(depositInfo) {
+        this.start()
+
         if (!WinExist("ahk_class SunAwtFrame")) {
             return
         }
+        WinActivate("ahk_class SunAwtFrame")
 
         if (depositInfo is Map) {
-            depositInfo := JSON.parse(JSON.stringify(depositInfo),, false)   
+            depositInfo := JSON.parse(JSON.stringify(depositInfo), , false)
         }
 
-        WinActivate("ahk_class SunAwtFrame")
+        ; dismiss alerts
+        loop {
+            ; if there is a alert box
+            if (PixelGetColor(551, 421) != "0xFFFFFF") {
+                break
+            }
+
+            Send "{Enter}"
+            Sleep 250
+        }
+        if (!this.isRunning) {
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
+            return
+        }
+
         loop {
             if (ImageSearch(&outX, &outY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["opera-active-win.PNG"])) {
                 break
@@ -199,8 +243,13 @@ class DepositEntry {
         Click 3
         Sleep 100
         Send "{Text}" . depositInfo.cardType
+        Sleep 100
         Send "{Tab}"
         utils.waitLoading()
+        if (!this.isRunning) {
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
+            return
+        }
 
         ; dismiss pre-exist card select
         CoordMode("Pixel", "Screen")
@@ -219,6 +268,10 @@ class DepositEntry {
         } until (A_Index > 5)
         Send "{Esc}"
         utils.waitLoading()
+        if (!this.isRunning) {
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
+            return
+        }
 
         ; enter cardNum & exp
         Send Format("{Text}{1}`n{2}", depositInfo.cardNum, depositInfo.exp)
@@ -238,16 +291,18 @@ class DepositEntry {
         Send "!m"
         utils.waitLoading()
         Send Format("{Text}{1}`n{2}", depositInfo.amount, depositInfo.auth)
-        Sleep 100
+        Sleep 200
         Send "!o"
         utils.waitLoading()
         Send "!c"
         utils.waitLoading()
+
+        this.end()
     }
 
     static USE(depositInfo) {
         if (depositInfo is Map) {
-            depositInfo := JSON.parse(JSON.stringify(depositInfo),, false)   
+            depositInfo := JSON.parse(JSON.stringify(depositInfo),, false)
         }
 
         ; clear form
@@ -278,17 +333,6 @@ class DepositEntry {
         utils.waitLoading()
         Send "!e"
         utils.waitLoading()
-
-        ; dismiss alerts
-        loop {
-            ; if there is a alert box
-            if (PixelGetColor(551, 421) != "0xFFFFFF") {
-                break
-            }
-
-            Send "{Enter}"
-            Sleep 250
-        }
 
         this.entry(depositInfo)
         utils.waitLoading()

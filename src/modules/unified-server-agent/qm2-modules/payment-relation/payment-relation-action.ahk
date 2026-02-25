@@ -79,8 +79,6 @@ class PaymentRelation_Action {
                 return
             }
 
-
-
             ; pbs
             loop form["partyRoomQty"] {
                 this.search(" ", form["party"])
@@ -281,6 +279,16 @@ class PaymentRelation_Action {
         utils.waitLoading()
         Send "!o"
         utils.waitLoading()
+        Sleep 200
+
+        ; check if "record already exist" popup
+        if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["info.PNG"])) {
+            Send "!c"
+            utils.waitLoading()
+            Send "!n"
+            utils.waitLoading()
+        }
+
         Send "!c"
         utils.waitLoading()
         Sleep 200

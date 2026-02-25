@@ -27,22 +27,23 @@ BlankShare(App, props := {}) {
         StackBox(App,
             {
                 name: "blank-share-stack-box",
+                font: { options: "bold" },
                 groupbox: {
                     title: "生成空白(NRR) Share",
-                    options: "Section r7 @use:box-xyw",
+                    options: "vbs-stackbox Section h165 @use:box",
                 }
             },
             () => [
                 ; room number(s)
-                App.AddText("xs10 w100 h20 0x200 yp+30", "房号 (空格分割)"),
-                App.AddEdit("vshare-room-nums x+5 w200 h20 0x200", f.shareRoomNums),
+                App.AddText("@use:form-text yp+25", "房号 (空格分割)"),
+                App.AddEdit("vshare-room-nums @use:form-edit", f.shareRoomNums),
                 ; share qty
-                App.AddText("xs10 w100 h20 0x200 yp+30", "空白 Share 数量"),
-                App.AddEdit("vshare-qty x+5 w200 h20 0x200", f.shareQty),
+                App.AddText("@use:form-text", "空白 Share 数量"),
+                App.AddEdit("vshare-qty @use:form-edit", f.shareQty),
                 ; is checkin
                 App.AddCheckBox("vcheck-in xs10 h20 yp+30 0x200 " . (f.checkIn ? "Checked" : ""), "是否 Check In"),
-                ; comp.children.Call(),
-                App.AddButton("vblankshare-action xs10 y+10 w100", "生成 Share").onClick(action)
+                App.AddCheckBox("vsendPmPost h20 x+20 yp 0x200 Checked", "Share Check-in 后录入 Profile"),
+                App.AddButton("vblank-share-action xs10 y+20 w100", "生成 Share").onClick(action)
             ]
         )
     )
