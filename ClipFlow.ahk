@@ -5,13 +5,15 @@
 #Include src\App.ahk
 
 ; global consts
-VERSION := "1.7.1"
+VERSION := "1.8.0"
 POPUP_TITLE := "ClipFlow " . VERSION
 WIN_GROUP := ["ahk_class SunAwtFrame"]
 IMAGES := useImages(A_ScriptDir . "\assets")
+APP_DATA_DIR := A_AppData . "\ClipFlow"
 CONFIG := useJsonConfig(
 	"./clipflow.config.json",
 	"clipflow.config.json",
+	APP_DATA_DIR
 )
 
 ; init config
@@ -38,8 +40,8 @@ ClipFlowApp.Show()
 Pause:: ClipFlowApp.Show()
 F11:: utils.cleanReload(WIN_GROUP)
 ^F11:: {
-	if (DirExist(A_MyDocuments . "\clipflow-clips")) {
-		DirDelete(A_MyDocuments . "\clipflow-clips", true)
+	if (DirExist(APP_DATA_DIR . "\clipflow-clips")) {
+		DirDelete(APP_DATA_DIR . "\clipflow-clips", true)
 	}
 
 	if (FileExist(CONFIG.path)) {
