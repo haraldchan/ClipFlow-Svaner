@@ -7,15 +7,20 @@ ClipFlow/
  |      |──── features/
  |      |      |──── flow-modes/
  |      |      |      └──── flow-modes.ahk
- |      |      |──── clipboard-history/
- |      |      |      |──── clipboard-history.ahk
- |      |      |      |──── clipboard-history-item.ahk
- |      |      |      |──── shared-clips.ahk
- |      |      |      └──── shared-clips-item.ahk
+ |      |      └──── control-center/
+ |      |             |──── control-center.ahk
+ |      |             |──── clipboard-history/
+ |      |             |      |──── clipboard-history.ahk
+ |      |             |      |──── clipboard-history-item.ahk
+ |      |             |      |──── shared-clips.ahk
+ |      |             |      └──── shared-clips-item.ahk
+ |      |             └──── listener-hub/
+ |      |                    |──── listener-hub.ahk
+ |      |                    └──── listener-controller.ahk
  |      └──── modules/
  |             |──── index.ahk
  |             |──── profile-modify-next/
- |             |      |──── index.ahk
+ |             |      |──── profile-modify-next.ahk
  |             |      |──── components/
  |             |      |      |──── pmn-app.ahk
  |             |      |      |──── guest-profile-details.ahk
@@ -25,7 +30,7 @@ ClipFlow/
  |             |             |──── fill-in.ahk
  |             |             └──── waterfall.ahk
  |             |──── profile-modify-group/
- |             |      |──── index.ahk
+ |             |      |──── profile-modify-group.ahk
  |             |      |──── components/
  |             |      |      |──── pmg-app.ahk
  |             |      |      |──── on-day-groups.ahk
@@ -34,7 +39,7 @@ ClipFlow/
  |             |             |──── data-handler.ahk
  |             |             └──── modify-group.ahk
  |             |──── reservation-handler/
- |             |      |──── index.ahk
+ |             |      |──── reservation-handler.ahk
  |             |      |──── components/
  |             |      |      |──── rh-app.ahk
  |             |      |      |──── reservation-details.ahk
@@ -52,7 +57,7 @@ ClipFlow/
  |             |             |──── fedex-entry.ahk
  |             |             └──── ota-entry.ahk
  |             └──── unified-server-agent/
- |                    |──── index.ahk
+ |                    |──── unified-server-agent.ahk
  |                    |──── components/
  |                    |      |──── clipboard-listeners.ahk
  |                    |      |──── service-configs.ahk
@@ -80,7 +85,7 @@ ClipFlow/
  |      |──── index.ahk/
  |      |──── svaner/
  |      |──── system-icon/
- |      |──── use-dics/
+ |      |──── use-dict/
  |      |──── use-json-config.ahk
  |      |──── use-server-agent.ahk
  |      └──── utils.ahk
