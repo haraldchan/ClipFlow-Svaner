@@ -1,5 +1,5 @@
 #Include features\flow-modes\flow-modes.ahk
-#Include features\clipboard-history\clipboard-history.ahk
+#Include features\control-center\control-center.ahk
 #Include modules\index.ahk
 
 /**
@@ -7,7 +7,6 @@
  */
 App(App) {
     onTop := signal(false)
-    generalTabs := ["插件模式", "剪贴板历史"]
 
     keepOnTop(*) {
         onTop.set(onTop => !onTop)
@@ -35,20 +34,22 @@ App(App) {
 	curModule := CONFIG.read("moduleSelected") <= modules.entries().Length ? CONFIG.read("moduleSelected") : 1
 	curModuleProps := modules.values()[curModule]
 
+	global clbListeners := ListenerController()
+
     return (
-		App.AddTab3("vtabs x15" . " Choose" . CONFIG.read("tabPos"), generalTabs.append(curModuleProps.tabs))
+		App.AddTab3("vtabs x15" . " Choose" . CONFIG.read("tabPos"), ["插件模式", curModuleProps.tabs*].append("控制中心"))
 		   .onChange((ctrl, _) => CONFIG.write("tabPos", ctrl.Value)),
 
 		App["tabs"].UseTab("插件模式"), 
 		FlowModes(App, modules.keys()),	
 
-		App["tabs"].UseTab("剪贴板历史"),
-		ClipboardHistory(App),
-
 		curModuleProps.components.map(component => (
-			App["tabs"].UseTab(generalTabs.Length + A_Index), 
+			App["tabs"].UseTab(1 + A_Index), 
 			component(App)
 		)),
+
+		App["tabs"].UseTab("控制中心"),
+		ControlCenter(App),
 
 		App["tabs"].UseTab()
     )
