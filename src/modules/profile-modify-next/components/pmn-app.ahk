@@ -100,7 +100,12 @@ PMN_App(App, moduleTitle, db, identifier) {
 
     ; incoming data handling
     currentGuest := signal(Map("idNum", 0))
-    OnClipboardChange (*) => handleCaptured(identifier)
+    clbListeners.addListener({
+        description: "旅业证件信息捕获",
+        isOn: true,
+        type: "module",
+        callback: (*) => handleCaptured(identifier)
+    })
     handleCaptured(identifier) {
         if (!InStr(A_Clipboard, identifier)) {
             return

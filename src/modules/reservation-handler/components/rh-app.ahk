@@ -4,6 +4,13 @@ RH_App(App, moduleTitle, identifier) {
     curResv := signal(RH_Models.otaListFields.keys().map(key => r.DefineProp(key, { Value: "" })))
     resvSource := signal("")
     OnClipboardChange (*) => handleCaptured(identifier)
+    clbListeners.addListener({
+        description: "OTA 预订信息捕获",
+        isOn: true,
+        type: "module",
+        callback: (*) => handleCaptured(identifier)
+    })
+
     handleCaptured(identifier) {
         if (!A_Clipboard.includes(identifier)) {
             return
