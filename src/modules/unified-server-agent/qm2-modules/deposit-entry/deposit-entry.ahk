@@ -62,8 +62,8 @@ class DepositEntry {
     /**
      * @param {Gui.CheckBox} controlCheckBox 
      */
-    static copyFromMipay(controlCheckBox) {
-        if (controlCheckBox.Value == false || !RegExMatch(A_Clipboard, "^;\d+=\d+\?$")) {
+    static copyFromMipay() {
+        if (!RegExMatch(A_Clipboard, "^;\d+=\d+\?$")) {
             return
         }
         cardInfoCopied := A_Clipboard
