@@ -36,7 +36,6 @@ QM2_Panel(props) {
         }
     }
 
-    form := {}
     delegateQmActions(module) {
         form := App.Submit()
         agent.delegate({
@@ -45,7 +44,7 @@ QM2_Panel(props) {
             profiles: p.selectedGuests
         })
 
-        return 0
+        return form
     }
 
     handleBlankShareDelegate(*) {
@@ -53,10 +52,10 @@ QM2_Panel(props) {
             return 0
         }
 
-        delegateQmActions("BlankShare")
+        form := delegateQmActions("BlankShare")
 
         if (App["send-pm-post"].Value) {
-            handleTriggerPmPost()
+            handleTriggerPmPost(form)
         }
 
         SetTimer((*) => (App.Destroy(), WinHide(POPUP_TITLE)), -100)
@@ -64,26 +63,22 @@ QM2_Panel(props) {
         return 0
     }
 
+    dbConfig := CONFIG.read("dbConfig")
     db := useFileDB({
-            ; main: dbConfig["host"] . "\" . dbConfig["main"],
-            ; archive: dbConfig["host"] . "\" . dbConfig["archive"],
-            ; backup: dbConfig["host"] . "\" . dbConfig["backup"],
-            main: "",
-            archive: "",
-            backup: "",
+            main: dbConfig["host"] . "\" . dbConfig["main"],
+            archive: dbConfig["host"] . "\" . dbConfig["archive"],
+            backup: dbConfig["host"] . "\" . dbConfig["backup"],
+            ; main: "",
+            ; archive: "",
+            ; backup: "",
     })
-    handleTriggerPmPost() {
+    handleTriggerPmPost(form) {
         roomNums := form.shareRoomNums.trim()
         profiles := p.selectedGuests.Length == 0
             ? db.load(,, agent.collectRange).filter(guest => roomNums.includes(!guest["roomNum"] ? "null" : guest["roomNum"]))
             : p.selectedGuests
 
-        SetTimer(() => (
-            post := agent.delegate({
-                rooms: roomNums.split(" "),
-                profiles: profiles
-            })
-        ), -300)
+        SetTimer(() => agent.delegate({ rooms: roomNums.split(" "), profiles: profiles}), -300)
     }
     
     handlePaymentRelationDelegate(*) {
@@ -120,9 +115,9 @@ QM2_Panel(props) {
     }
 
     App.defineDirectives(
-        "@use:box-x", "x10",
-        "@use:box-w", "w350",
-        "@use:box", "@use:box-x @relative[y+10]:op-radio-group @use:box-w",
+        ; "@use:box-x", "x10",
+        ; "@use:box-w", "w350",
+        ; "@use:box", "@use:box-x @relative[y+10]:op-radio-group @use:box-w",
         "@use:form-text", "xs10 yp+30 w100 h25 0x200",
         "@use:form-edit", "x+10 w200 h25 0x200"
     )
