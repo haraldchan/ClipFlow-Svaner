@@ -1,9 +1,9 @@
 /**
  * @param {Svaner} App
- * @param {signal} serverConnection
+ * @param {signal} isDelegate
  * @param {signal} listContent
  */
-SentPosts(App, ServerConnection, listContent) {
+SentPosts(App, isDelegate, listContent) {
     comp := Component(App, A_ThisFunc)
 
     postQueue := signal([{ status: "", time: "", id: "" }])
@@ -21,9 +21,13 @@ SentPosts(App, ServerConnection, listContent) {
         "ONLINE", "在线"
     )
 
-    effect(listContent, handlePostListUpdate)
-    handlePostListUpdate(curListContent) {
-        if (curListContent[1]["roomNum"] == "Loading...") {
+    effect([isDelegate, listContent], handlePostListUpdate)
+    handlePostListUpdate(curIsDelegate, curListContent) {
+        if (!curIsDelegate) {
+            return
+        }
+
+        if (curListContent.Length && curListContent[1]["roomNum"] == "Loading...") {
             return
         }
 
@@ -34,11 +38,6 @@ SentPosts(App, ServerConnection, listContent) {
         loop files (agent.pool . "\*.json") {
             if (A_LoopFileName.includes("PING") || A_LoopFileName.includes("ONLINE")) {
                 continue
-            }
-
-            if (A_LoopFileName.includes("ABORTED")) {
-                ServerConnection.set("后台错误停止")
-                App["connection-status"].Visible := true
             }
 
             if (showMyOwnPosts && !A_LoopFileName.includes(A_ComputerName)) {
@@ -129,7 +128,7 @@ SentPosts(App, ServerConnection, listContent) {
                 },
             },
             () => [
-                App.AddCheckBox("vsent-posts-show-my-own-posts Checked xp+120 h15 w60", "本机发送"),
+                App.AddCheckBox("vsent-posts-show-my-own-posts Checked xp+120 h15 w60", "本机"),
                 App.AddListView(
                     {
                         lvOptions: "vsent-post-list Grid -Multi LV0x4000 w168 h280 xs10 yp+25"
