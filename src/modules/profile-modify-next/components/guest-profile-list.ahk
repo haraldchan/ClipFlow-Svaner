@@ -9,19 +9,8 @@
  * @param {Func} fillPmsProfile 
  */
 GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile) {
-    columnDetails := {
-        keys: ["roomNum","name", "gender", "idType", "idNum", "addr"],
-        titles: ["房号", "姓名", "性别", "类型", "证件号码", "地址"],
-        widths: [70, 120, 45, 80, 180, 150]
-    }
-
-    options := {
-        lvOptions: "vguest-profile-list Grid -ReadOnly -Multi @lv:label-tip @align[x]:date y+10 w658 h320",
-        itemOptions: ""
-    }
-
     getSelectedCell(LV, row, key) {
-        return LV.GetText(row, columnDetails.keys.findIndex(item => item == key))
+        return LV.GetText(row, App["guest-profile-list"].svanerWrapper.titleKeys.findIndex(item => item == key))
     }
 
     copyIdNumber(LV, row) {
@@ -63,9 +52,20 @@ GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile) {
     }
 
     return (    
-        App.AddListView(options, columnDetails, listContent)
-           .onContextMenu(showProfileDetails)
-           .onDoubleClick(markAsPrimary)
-           .onItemEdit(handleUpdateItem)
+        App.AddListView(
+            {
+                lvOptions: "vguest-profile-list Grid -ReadOnly -Multi @lv:label-tip @align[x]:date y+10 w658 h320",
+                itemOptions: ""
+            },
+            {
+                keys: ["roomNum","name", "gender", "idType", "idNum", "addr"],
+                titles: ["房号", "姓名", "性别", "类型", "证件号码", "地址"],
+                widths: [70, 120, 45, 80, 180, 150]
+            }, 
+            listContent
+        ).SetFont("s10")
+         .onContextMenu(showProfileDetails)
+         .onDoubleClick(markAsPrimary)
+         .onItemEdit(handleUpdateItem)
     )
 }
