@@ -6,15 +6,15 @@
  */
 PMN_App(App, moduleTitle, db, identifier) {
     ; server agent delegate/ enable QM2 panel
-    delegate := signal(false)
+    isDelegate := signal(false)
     serverConnection := signal("")
 
     handleDelegateActivate(ctrl, _) {
         App["guest-profile-list"].GetPos(,, &W)
-        App["guest-profile-list"].Move(,, ctrl.Value ? W*0.7 : W/0.7)
+        App["guest-profile-list"].Move(,, isDelegate.Value ? W/0.7 : W*0.7)
         App["component:SentPosts"].visible(ctrl.Value)
         
-        delegate.set(ctrl.Value)
+        isDelegate.set(ctrl.Value)
         if (ctrl.Value == false) {
             return
         }
@@ -27,7 +27,7 @@ PMN_App(App, moduleTitle, db, identifier) {
             agent.PING()
                 ? serverConnection.set("后台服务在线")
                 : (
-                    delegate.set(false), 
+                    isDelegate.set(false), 
                     ctrl.Value := false, 
                     serverConnection.set("超时无响应")
                 )
@@ -57,7 +57,7 @@ PMN_App(App, moduleTitle, db, identifier) {
     ; settings
     settings := signal({ fillOverwrite: false }, { asMap: true })
     fillBtnText := computed(
-        [delegate, settings], 
+        [isDelegate, settings], 
         (curDelegate, curSettings) => handleFillInBtnTextUpdate(curDelegate, curSettings)
     )
     handleFillInBtnTextUpdate(curDelegate, curSettings) {
@@ -93,7 +93,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         App["party-num"].Visible := cur == "waterfall"
         if (cur != "waterfall") {
             App["delegate-check-box"].Value := false
-            delegate.set(false)
+            isDelegate.set(false)
         }
     }
     
@@ -346,7 +346,7 @@ PMN_App(App, moduleTitle, db, identifier) {
                 groupedSelectedGuests.Push(Map(room, grouped))
             }
 
-            if (delegate.value) {
+            if (isDelegate.value) {
                 SetTimer(() => (
                     agent.delegate({
                         mode: "waterfall",
@@ -360,7 +360,7 @@ PMN_App(App, moduleTitle, db, identifier) {
                 PMN_Waterfall.cascade(groupedSelectedGuests, settings.value["fillOverwrite"], party)
             }
         } else {
-            targetId := LV.GetText(LV.GetNext(), LV.arcWrapper.titleKeys.findIndex(key => key == "idNum"))
+            targetId := LV.GetText(LV.GetNext(), LV.svanerWrapper.titleKeys.findIndex(key => key == "idNum"))
             PMN_Fillin.fill(listContent.value.find(item => item["idNum"] == targetId), settings.value["fillOverwrite"])
         }
     }
@@ -404,6 +404,14 @@ PMN_App(App, moduleTitle, db, identifier) {
         QM2_Panel({ selectedGuests: groupedSelectedGuests })
     }
 
+    handleGuestProfileListSelectAll(ctrl, _) {
+        if (searchBy.value != "waterfall") {
+            return
+        }
+
+        lvIsCheckedAll.set(ctrl.Value)
+    }
+
     onMount() {
         ; hotkey setup
         HotIfWinActive(POPUP_TITLE)
@@ -412,7 +420,6 @@ PMN_App(App, moduleTitle, db, identifier) {
         Hotkey "!Right", (*) => toggleDate("+")
         Hotkey "!Up", (*) => toggleRange("+")
         Hotkey "!Down", (*) => toggleRange("-")
-        Hotkey "!a", (*) => toggleSelectAll()
 
         toggleDate(direction) {
             diff := direction == "-" ? -1 : 1
@@ -439,16 +446,8 @@ PMN_App(App, moduleTitle, db, identifier) {
             handleListContentUpdate()
         }
 
-        toggleSelectAll() {
-            if (searchBy.value != "waterfall") {
-                return
-            }
-
-            lvIsCheckedAll.set(c => !c)
-        }
-
         ; bind check status
-        shareCheckStatus(App["selecti-all-btn"], App["guest-profile-list"], lvIsCheckedAll)
+        shareCheckStatus(App["selecti-all-btn"], App["guest-profile-list"])
     }
 
 
@@ -492,10 +491,11 @@ PMN_App(App, moduleTitle, db, identifier) {
         GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile),
 
         ; sent posts
-        SentPosts(App, serverConnection, listContent),
+        SentPosts(App, isDelegate, listContent),
 
         ; waterfall controls
-        App.AddCheckBox("vselecti-all-btn Hidden w80 h20 @align[x]:date y+5", "全选 (&A)"),
+        App.AddCheckBox("vselecti-all-btn Hidden w80 h20 @align[x]:date y+5", "全选 (&A)")
+           .onClick(handleGuestProfileListSelectAll),
         App.AddText("Hidden h20 x+15 0x200", "Party: "),
         App.AddEdit("vparty-num Hidden x+1 w100 h20", ""),
 
