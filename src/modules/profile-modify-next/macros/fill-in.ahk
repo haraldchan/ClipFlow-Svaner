@@ -235,7 +235,8 @@ class PMN_FillIn {
                 ? currentGuest["name"].split("·").map(namePart => namePart.split("").map(hanzi => this.dict.getPinyin(hanzi)).join(" ")) 
                 : this.dict.getFullnamePinyin(currentGuest["name"], isTaiwanese)
 
-            unpack([&nameLast , &nameFirst], fullName)
+            nameLast := fullName[1]
+            nameFirst := fullName[2]
         } else {
             nameLast := currentGuest["nameLast"]
             nameFirst := currentGuest["nameFirst"]
