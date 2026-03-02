@@ -106,7 +106,6 @@ class Svaner {
 
                 case StringExt.startsWith(ctrlSearchCondition, "component:"):
                     ; search component
-                    ; return GuiExt.getComponent(this, StrReplace(ctrlSearchCondition, "component:"))
                     return this.components[StrReplace(ctrlSearchCondition, "component:")]
 
                 default:
@@ -181,11 +180,28 @@ class Svaner {
      */
     Hide() => this.gui.Hide()
 
+
+    /**
+     * Destroy Gui window.
+     */
+    Destroy() => this.gui.Destroy()
+
+
     /**
      * Collect values from named controls and combine them into an object, optionally hiding the window.
      * @param {true | false} hide 
+     * @param {"camel" | "pascal" | "kebab" | "snake" | "constant"} keyCasing
      */
-    Submit(hide := true) => this.gui.Submit(hide)
+    Submit(hide := true, keyCasing := "camel") {
+        form := this.gui.Submit(hide)
+        fmtForm := {}
+
+        for key, val in form.OwnProps() {
+            fmtForm.defineProp(StringExt.toCase(key, keyCasing), { value: val })
+        }
+
+        return fmtForm
+    }
 
 
     /**
