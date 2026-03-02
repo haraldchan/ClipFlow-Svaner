@@ -7,14 +7,11 @@ ListenerHub(App) {
     persistListeners := computed(clbListeners.listeners, ls => ls.filter(l => l.type == "persist"))
     moduleListeners := computed(clbListeners.listeners, ls => ls.filter(l => l.type == "module"))
     
-    effect([persistListeners, moduleListeners], handleIsOnUpdate)
-    handleIsOnUpdate(curPersistListeners, curModuleListeners) {
-        for listener in curPersistListeners {
-            App["persist-listeners"].modify(A_Index, listener.isOn ? "+Check" : "-Check")
-        }
-
+    effect(persistListeners, (cur) => handleIsOnUpdate("persist", cur))
+    effect(moduleListeners, (cur) => handleIsOnUpdate("module", cur))
+    handleIsOnUpdate(listenerType, curModuleListeners) {
         for listener in curModuleListeners {
-            App["module-listeners"].modify(A_Index, listener.isOn ? "+Check" : "-Check")
+            App[listenerType . "-listeners"].modify(A_Index, listener.isOn ? "+Check" : "-Check")
         }
     }
 
