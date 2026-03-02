@@ -1,7 +1,11 @@
 PostDetails_Profile(post) {
-    App := Gui(, "Post Details - " . post["id"])
-    App.SetFont(, "微软雅黑")
-    App.OnEvent("Close", (*) => App.Destroy())
+    App := Svaner({
+        gui: { title: "Post Details - " . post["id"] },
+        font: { name: "微软雅黑" },
+        events: {
+            close: (thisGui) => thisGui.Destroy()
+        }
+    })
     
     profilesList := []
     for groupedProfiles in post["content"]["profiles"] {
@@ -10,17 +14,6 @@ PostDetails_Profile(post) {
         }        
     }
     profiles := signal(profilesList)
-
-    columnDetails := {
-        keys: ["roomNum","name", "gender", "idType", "idNum", "addr"],
-        titles: ["房号", "姓名", "性别", "类型", "证件号码", "地址"],
-        widths: [60, 90, 40, 80, 145, 120]
-    }
-
-    options := {
-        lvOptions: "vguestProfileList Grid NoSortHdr ReadOnly -Multi LV0x4000 w550 r8 y+10",
-        itemOptions: ""
-    }
 
     handleRepost(*) {
         SetTimer(() => (
@@ -48,7 +41,7 @@ PostDetails_Profile(post) {
     }
 
     getSelectedCell(LV, row, key) {
-        return LV.GetText(row, columnDetails.keys.findIndex(item => item == key))
+        return LV.GetText(row, App["guest-profile-list"].svanerWrapper.titleKeys.findIndex(item => item == key))
     }
 
     handleProfilesUpdate(LV, row, *) {
@@ -65,10 +58,21 @@ PostDetails_Profile(post) {
         App.AddText("xs10 w200 yp+30" , "客人资料").SetFont("Bold s10"),
         
         ; post guest list
-        App.ARListView(options, columnDetails, profiles).OnEvent("ItemEdit", handleProfilesUpdate),
+        App.AddListView(
+            {
+                lvOptions: "vguest-profile-list Grid NoSortHdr ReadOnly -Multi LV0x4000 w550 r8 y+10",
+                itemOptions: ""
+            },
+            {
+                keys: ["roomNum","name", "gender", "idType", "idNum", "     addr"],
+                titles: ["房号", "姓名", "性别", "类型", "证件号码", "      地址"],
+                widths: [60, 90, 40, 80, 145, 120]
+            }, 
+            profiles
+        ).onItemEdit(handleProfilesUpdate),
         
         ; repost btn
-        App.AddButton("w120 h30 y+25", "重新发送代行").OnEvent("Click", handleRepost),
+        App.AddButton("w120 h30 y+25", "重新发送代行").onClick(handleRepost),
         
         App.Show()
     )
