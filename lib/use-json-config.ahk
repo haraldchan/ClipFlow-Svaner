@@ -2,7 +2,7 @@ class useJsonConfig {
     __New(configTemplateSrc, configFileName, configDest := A_MyDocuments) {
         this.configTemplateSrc := configTemplateSrc
         this.configFilename := configFilename
-        this.configDest := DirExist(configDest) ? configDest : DirCreate(configDest)
+        this.configDest := configDest
         this.path := this.createLocal()
 
         curConfig := useJsonConfig.JSON.parse(FileRead(this.path, "UTF-8"))
@@ -30,6 +30,10 @@ class useJsonConfig {
     }
 
     createLocal() {
+        if (!DirExist(this.configDest)) {
+            DirCreate(this.configDest)
+        }
+
         if (!FileExist(this.configDest . "\" . this.configFileName)) {
             FileCopy(this.configTemplateSrc, this.configDest)
         }
