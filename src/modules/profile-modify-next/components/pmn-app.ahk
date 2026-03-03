@@ -72,7 +72,6 @@ PMN_App(App, moduleTitle, db, identifier) {
 
 
     ; list UI states/effect
-    lvIsCheckedAll := signal(true)
     searchBy := signal("nameRoom")
     searchByMap := OrderedMap(
         "瀑流模式", "waterfall",
@@ -204,7 +203,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         useListPlaceholder(listContent, colTitles, "Loading...")
 
         App["range"].Enabled := (queryFilter.value["date"] == FormatTime(A_Now, "yyyyMMdd"))
-        loadedItems := db.load(, queryFilter.value["date"], queryFilter.value["range"]) 
+        loadedItems := db.load(, queryFilter.value["date"], queryFilter.value["range"])
 
         if (!loadedItems.Length) {
             useListPlaceholder(listContent, colTitles, "No Data")
@@ -212,7 +211,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         }
 
         listContent.set(handleSearchResultFilter(loadedItems))
-        lvIsCheckedAll.set(false)
+        App["selecti-all-btn"].Value := false
     }
 
     handleSearchResultFilter(loadedItems) {
@@ -328,7 +327,7 @@ PMN_App(App, moduleTitle, db, identifier) {
                 return 
             }
 
-            for row in LV.checkedRows {
+            for row in checkedRows {
                 selectedGuests.Push(listContent.value[row])
             }
 
@@ -402,14 +401,6 @@ PMN_App(App, moduleTitle, db, identifier) {
         }
 
         QM2_Panel({ selectedGuests: groupedSelectedGuests })
-    }
-
-    handleGuestProfileListSelectAll(ctrl, _) {
-        if (searchBy.value != "waterfall") {
-            return
-        }
-
-        lvIsCheckedAll.set(ctrl.Value)
     }
 
     onMount() {
@@ -494,8 +485,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         SentPosts(App, isDelegate, listContent),
 
         ; waterfall controls
-        App.AddCheckBox("vselecti-all-btn Hidden w80 h20 @align[x]:date y+5", "全选 (&A)")
-           .onClick(handleGuestProfileListSelectAll),
+        App.AddCheckBox("vselecti-all-btn Hidden w80 h20 @align[x]:date y+5", "全选 (&A)"),
         App.AddText("Hidden h20 x+15 0x200", "Party: "),
         App.AddEdit("vparty-num Hidden x+1 w100 h20", ""),
 
