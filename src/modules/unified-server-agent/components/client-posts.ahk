@@ -84,18 +84,6 @@ ClientPosts(App, enabled) {
             App["post-list"].ModifyCol(3, "SortDesc")
         }
     }
-
-    lvSettings := {
-        columnDetails: {
-            keys: ["status", "action", "time", "id"],
-            titles: ["当前状态", "代行类型", "发送时间", "POST ID"],
-            widths: [60, 100, 150, 170]
-        },
-        options: {
-            lvOptions: "vpost-list Grid -Multi LV0x4000 w320 r14 xs20 yp+25",
-            itemOptions: ""
-        }
-    }
     
     showPostDetails(LV, row, *) {
         if (row == 0 || row > 10000 || LV.GetText(row, 1) == "连接中") {
@@ -142,7 +130,7 @@ ClientPosts(App, enabled) {
             {
                 name: "client-posts-stackbox",
                 groupbox: {
-                    options: "vsap-agent-gb Section x350 @align[y]:service-configs w350 r18"
+                    options: "vsap-agent-gb Section x350 @align[y]:service-configs w350 h400"
                 },
                 checkbox: {
                     title: "客户端（前台）选项",
@@ -164,8 +152,15 @@ ClientPosts(App, enabled) {
                    .onClick(handlePostUpdate)
                    .SetFont("Bold"),
                 App.AddCheckBox("vshow-my-own-posts Checked x+140 h20", "本机发送"),
-                App.AddListView(lvSettings.options, lvSettings.columnDetails, postQueue)
-                   .onContextMenu(showPostDetails)
+                App.AddListView(
+                    { lvOptions: "vpost-list Grid -Multi LV0x4000 w320 r10 xs20 yp+25" }, 
+                    {
+                        keys: ["status", "action", "time", "id"],
+                        titles: ["当前状态", "代行类型", "发送时间", "POST ID"],
+                        widths: [60, 100, 150, 170]
+                    }, 
+                    postQueue
+                ).onContextMenu(showPostDetails)
             ]
         )
     )
