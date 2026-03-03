@@ -16,6 +16,11 @@ PaymentRelation(App, props := {}) {
         pbName: ""
     })
 
+    ( !props.hasOwnProp("style") && props.style := {} )
+    s := useProps(props.style, {
+        xyPos: "@align[xy]:bs-stackbox"
+    })
+
     comp := Component(App, A_ThisFunc, props)
 
     getPayFor(*) {
@@ -65,7 +70,7 @@ PaymentRelation(App, props := {}) {
                 font: { options: "bold" },
                 groupbox: {
                     title: "P/F房(支付人)",
-                    options: "vpayfor-panel Section @use:box-x @relative[y+10]:op-radio-group w170 h130"
+                    options: "vpayfor-panel Section w170 h130 " . s.xyPos
                 } 
             },
             () => [
