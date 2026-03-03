@@ -86,7 +86,7 @@ PostDetails_QM2(post, moduleName, props) {
         App.AddGroupBox("Section w370 h300", "代行详情").SetFont("Bold"),
         App.AddText("xs10 yp+20", "发送状态: " . post["status"]),
         App.AddText("xs10 yp+20", "发送时间: " . post["time"]),
-        App.AddText("xs10 w200 h35 yp+30", qmModules[moduleName].desc).SetFont("bold s10"),
+        App.AddText("xs10 w200 h20 yp+30", qmModules[moduleName].desc).SetFont("bold s10"),
         qmModules[moduleName].module.Call(App, props).render(),
         onMount(),
         App.Show()
