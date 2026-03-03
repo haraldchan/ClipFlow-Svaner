@@ -24,13 +24,14 @@ BlankShare(App, props := {}) {
     }
 
     comp.render := (this) => this.Add(
-        StackBox(App,
+        StackBox(
+            App,
             {
                 name: "blank-share-stack-box",
                 font: { options: "bold" },
                 groupbox: {
                     title: "生成空白(NRR) Share",
-                    options: "vbs-stackbox Section h165 xs10 yp+25 w350",
+                    options: "vbs-stackbox Section h165 xs10 y+5 w350",
                 }
             },
             () => [
@@ -42,7 +43,7 @@ BlankShare(App, props := {}) {
                 App.AddEdit("vshare-qty @use:form-edit", f.shareQty),
                 ; is checkin
                 App.AddCheckBox("vcheck-in xs10 h20 yp+30 0x200 " . (f.checkIn ? "Checked" : ""), "是否 Check In"),
-                App.AddCheckBox("vsendPmPost h20 x+20 yp 0x200 Checked", "Share Check-in 后录入 Profile"),
+                App.AddCheckBox("vsend-pm-post h20 x+20 yp 0x200 Checked", "Share Check-in 后录入 Profile"),
                 App.AddButton("vblank-share-action xs10 y+20 w100", "生成 Share").onClick(action)
             ]
         )
