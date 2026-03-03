@@ -118,30 +118,20 @@ SentPosts(App, isDelegate, listContent) {
     }
 
     comp.render := this => this.Add(
-        StackBox(
-            App,
+        App.AddText("vsent-posts-title x520 @align[y]:guest-profile-list h20 0x200", "已发送代行")
+           .SetFont("bold"),
+        App.AddCheckBox("vsent-posts-show-my-own-posts Checked xp+120 h20 w60", "本机"),
+        App.AddListView(
             {
-                name: "sent-posts-stackbox",
-                groupbox: {
-                    title: "已发送代行",
-                    options: "vsent-posts-gb Section x510 @align[yh]:guest-profile-list w190"
-                },
+                lvOptions: "vsent-post-list Grid -Multi LV0x4000 @align[x]:sent-posts-title yp+25 w170 h295"
             },
-            () => [
-                App.AddCheckBox("vsent-posts-show-my-own-posts Checked xp+120 h15 w60", "本机"),
-                App.AddListView(
-                    {
-                        lvOptions: "vsent-post-list Grid -Multi LV0x4000 w168 h280 xs10 yp+25"
-                    },
-                    {
-                        keys: ["status", "action", "time", "id"],
-                        titles: ["当前状态", "代行类型", "发送时间", "POST ID"],
-                        widths: [60, 100, 150, 170]
-                    }, 
-                    postQueue
-                ).onContextMenu(showPostDetails)
-            ]
-        )
+            {
+                keys: ["status", "action", "time", "id"],
+                titles: ["当前状态", "代行类型", "发送时间", "POST ID"],
+                widths: [60, 100, 150, 170]
+            }, 
+            postQueue
+        ).onContextMenu(showPostDetails)
     )
 
     return comp.render().visible(false)
