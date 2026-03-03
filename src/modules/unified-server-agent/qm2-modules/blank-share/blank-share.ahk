@@ -30,7 +30,7 @@ BlankShare(App, props := {}) {
                 font: { options: "bold" },
                 groupbox: {
                     title: "生成空白(NRR) Share",
-                    options: "vbs-stackbox Section h165 @use:box",
+                    options: "vbs-stackbox Section h165 xs10 yp+25 w350",
                 }
             },
             () => [
