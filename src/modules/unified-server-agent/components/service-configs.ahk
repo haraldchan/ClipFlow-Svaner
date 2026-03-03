@@ -81,7 +81,7 @@ ServiceConfigs(App, enabled, isListening) {
             {
                 name: "services-config-stackbox",
                 groupbox: {
-                    options: "vservice-configs Section x30 y+5 w300 r7"
+                    options: "vservice-configs Section x30 y+5 w300 h200"
                 },
                 checkbox: {
                     title: "服务端（后台）选项",
