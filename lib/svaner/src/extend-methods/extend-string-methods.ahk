@@ -232,6 +232,7 @@ class StringExt {
                 for word in splitted {
                     if (A_Index == 1) {
                         changed := StrLower(word)
+                        continue
                     }
                     changed .= StrTitle(word)
                 }
