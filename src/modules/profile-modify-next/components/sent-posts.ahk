@@ -71,9 +71,11 @@ SentPosts(App, isDelegate, listContent) {
             posts.InsertAt(1, post)
         }     
 
-        if (posts.Length > 0) {
+        if (posts.Length != 0) {
             postQueue.set(posts)
             App["sent-post-list"].ModifyCol(3, "SortDesc")
+        } else {
+            postQueue.reset()
         }
     }
     
@@ -90,6 +92,7 @@ SentPosts(App, isDelegate, listContent) {
             case "PayBy PayFor":
                 form := selectedPost["content"]["form"]
                 PostDetails_QM2(selectedPost, "PaymentRelation", {
+                    style: { xyPos: "xs10 y+10" },
                     form : {
                         pfRoom: form["pfRoom"],
                         pfName: form["pfName"],
@@ -102,15 +105,11 @@ SentPosts(App, isDelegate, listContent) {
             case "Share": 
                 form := selectedPost["content"]["form"]
                 PostDetails_QM2(selectedPost, "BlankShare", {
-                    styles: {
-                        useCopyBtn: false
-                    },
                     form : {
                         shareRoomNums: form["shareRoomNums"],
                         shareQty: form["shareQty"],
                         checkIn: form["checkIn"]
-                    },
-                    children: App => App.AddCheckBox("Checked vsendPmPost h20 x+20 yp 0x200", "Share Check-in 后录入 Profile")
+                    }                
                 })
             default:
                 return
