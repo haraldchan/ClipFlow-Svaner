@@ -30,9 +30,7 @@ class useFileDB {
 	 */
 	add(jsonString, date := FormatTime(A_Now, "yyyyMMdd"), saveName := "") {
 		if (!saveName) {
-			/** @type {Map | Error} */
 			res := JSON.parse(jsonString)
-
 			if (res is Error) {
 				MsgBox("Unable to add data.`nError: " . res.Message,, "0x10")
 				return
