@@ -43,7 +43,7 @@ ListenerHub(App) {
             description: "绿云复制卡号",
             type: "persist",
             isOn: true,
-            callback: (*) => DepositEntry.copyFromMipay()
+            callback: (*) => DepositEntry_Action.copyFromMipay()
         })
     }
 

@@ -1,6 +1,6 @@
 #Include ..\qm2-modules\blank-share\blank-share-action.ahk
 #Include ..\qm2-modules\payment-relation\payment-relation-action.ahk
-#Include ..\qm2-modules\deposit-entry\deposit-entry.ahk
+#Include ..\qm2-modules\deposit-entry\deposit-entry-action.ahk
 
 class UnifiedAgent extends useServerAgent {
     __New(serverSettings) {
@@ -17,7 +17,7 @@ class UnifiedAgent extends useServerAgent {
         this.qmModules := Map(
             "BlankShare", BlankShare_Action,
             "PaymentRelation", PaymentRelation_Action,
-            "DepositEntry", DepositEntry
+            "DepositEntry", DepositEntry_Action
         )
 
         ; delete expired posts
