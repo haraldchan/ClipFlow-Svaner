@@ -74,14 +74,16 @@ ClientPosts(App, enabled) {
             post["action"] := match(post["content"]["module"], Map(
                 "BlankShare", "Share",
                 "PaymentRelation", "PayBy PayFor",
-                "DepositEntry", "Deposit/Auth"
+                "DepositEntry", "Auth"
             ))
             posts.InsertAt(1, post)
         }     
 
-        if (posts.Length > 0) {
+        if (posts.Length != 0) {
             postQueue.set(posts)
             App["post-list"].ModifyCol(3, "SortDesc")
+        } else {
+            postQueue.reset()
         }
     }
     
@@ -116,8 +118,13 @@ ClientPosts(App, enabled) {
                         shareRoomNums: form["shareRoomNums"],
                         shareQty: form["shareQty"],
                         checkIn: form["checkIn"]
-                    },
-                    children: App => App.AddCheckBox("Checked vsendPmPost h20 x+20 yp 0x200", "Share Check-in 后录入 Profile")
+                    }
+                })
+            case "Auth":
+                form := JSON.parse(JSON.stringify(selectedPost["content"]["form"]),, false)
+                PostDetails_QM2(selectedPost, "DepositEntry",{
+                    depositInfo: form,
+                    style: { xyPos: "xs10 y+10" },
                 })
             default:
                 return
@@ -150,10 +157,10 @@ ClientPosts(App, enabled) {
                 App.AddText("xs20 yp+50 h20 0x200", "已发送代行状态").SetFont("Bold"),
                 App.AddButton("x+5 h20 w20 +Center", "↻")
                    .onClick(handlePostUpdate)
-                   .SetFont("Bold"),
+                   .SetFont("bold"),
                 App.AddCheckBox("vshow-my-own-posts Checked x+140 h20", "本机发送"),
                 App.AddListView(
-                    { lvOptions: "vpost-list Grid -Multi LV0x4000 w320 r10 xs20 yp+25" }, 
+                    { lvOptions: "vpost-list Grid -Multi LV0x4000 w320 h280 xs20 yp+25" }, 
                     {
                         keys: ["status", "action", "time", "id"],
                         titles: ["当前状态", "代行类型", "发送时间", "POST ID"],

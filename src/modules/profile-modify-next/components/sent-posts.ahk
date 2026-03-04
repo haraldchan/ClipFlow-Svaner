@@ -66,7 +66,7 @@ SentPosts(App, isDelegate, listContent) {
             post["action"] := match(post["content"]["module"], Map(
                 "BlankShare", "Share",
                 "PaymentRelation", "PayBy PayFor",
-                "DepositEntry", "Deposit/Auth"
+                "DepositEntry", "Auth"
             ))
             posts.InsertAt(1, post)
         }     
@@ -93,7 +93,7 @@ SentPosts(App, isDelegate, listContent) {
                 form := selectedPost["content"]["form"]
                 PostDetails_QM2(selectedPost, "PaymentRelation", {
                     style: { xyPos: "xs10 y+10" },
-                    form : {
+                    form: {
                         pfRoom: form["pfRoom"],
                         pfName: form["pfName"],
                         party:  form["party"],
@@ -105,11 +105,17 @@ SentPosts(App, isDelegate, listContent) {
             case "Share": 
                 form := selectedPost["content"]["form"]
                 PostDetails_QM2(selectedPost, "BlankShare", {
-                    form : {
+                    form: {
                         shareRoomNums: form["shareRoomNums"],
                         shareQty: form["shareQty"],
                         checkIn: form["checkIn"]
-                    }                
+                    }
+                })
+            case "Auth":
+                form := JSON.parse(JSON.stringify(selectedPost["content"]["form"]),, false)
+                PostDetails_QM2(selectedPost, "DepositEntry",{
+                    depositInfo: form,
+                    style: { xyPos: "xs10 y+10" },
                 })
             default:
                 return
