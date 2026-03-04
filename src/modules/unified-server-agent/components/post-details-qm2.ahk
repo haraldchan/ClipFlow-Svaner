@@ -10,6 +10,7 @@ PostDetails_QM2(post, moduleName, props) {
     qmModules := Map(
         "BlankShare",      { desc: "Share 详情", module: BlankShare },
         "PaymentRelation", { desc: "Payment 关系", module: PaymentRelation },
+        "DepositEntry",    { desc: "授权押金", module: DepositEntry }
     )
 
     handleRepost(*) {
@@ -46,19 +47,20 @@ PostDetails_QM2(post, moduleName, props) {
         }
 
         App.Destroy()
-        return 0 
+        return 0
     }
 
-    dbConfig := CONFIG.read("dbConfig")
-    db := useFileDB({
-            main: dbConfig["host"] . "\" . dbConfig["main"],
-            archive: dbConfig["host"] . "\" . dbConfig["archive"],
-            backup: dbConfig["host"] . "\" . dbConfig["backup"],
-            ; main: "",
-            ; archive: "",
-            ; backup: "",
-    })
     handleTriggerPmPost(form) {
+        dbConfig := CONFIG.read("dbConfig")
+        db := useFileDB({
+                main: dbConfig["host"] . "\" . dbConfig["main"],
+                archive: dbConfig["host"] . "\" . dbConfig["archive"],
+                backup: dbConfig["host"] . "\" . dbConfig["backup"],
+                ; main: "",
+                ; archive: "",
+                ; backup: "",
+        })
+
         roomNums := form.shareRoomNums.trim()
         ; selectedGuests can only pass by GuestProfileList
         ; if no selectedGuest, then filter results in db by room number(request from ServerAgent_Panel)
@@ -78,8 +80,10 @@ PostDetails_QM2(post, moduleName, props) {
     )
 
     onMount() {
-        App[moduleName.toCase("kebab") . "-action"].OnEvent("Click", handleModuleEventDelegate, -1)
-        App[moduleName.toCase("kebab") . "-action"].Opt("+Default")
+        if (moduleName != "DepositEntry") {
+            App[moduleName.toCase("kebab") . "-action"].OnEvent("Click", handleModuleEventDelegate, -1)
+            App[moduleName.toCase("kebab") . "-action"].Opt("+Default")
+        }
     }
 
     return (
