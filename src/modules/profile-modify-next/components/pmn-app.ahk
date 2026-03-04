@@ -302,7 +302,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         App.Hide() 
         Sleep 500 
         
-        LV := App["type:ListView"]
+        LV := App["guest-profile-list"]
         if (!LV.GetNext()) {
             return
         }
@@ -314,7 +314,7 @@ PMN_App(App, moduleTitle, db, identifier) {
                 return
             }
 
-            rooms := StrSplit(queryFilter.value["search"], " ")
+            rooms := StrSplit(queryFilter.value["search"].trim(), " ")
             party := App["party-num"].Text
             App["party-num"].Text := ""
 
@@ -385,7 +385,7 @@ PMN_App(App, moduleTitle, db, identifier) {
             selectedGuests.Push(listContent.value[checkedRow])
         }
 
-        rooms := StrSplit(queryFilter.value["search"], " ")
+        rooms := StrSplit(queryFilter.value["search"].trim(), " ")
         groupedSelectedGuests := []
         for room in rooms {
             r := room
