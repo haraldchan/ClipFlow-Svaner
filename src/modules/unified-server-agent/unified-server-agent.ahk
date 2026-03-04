@@ -8,6 +8,7 @@
 ; qm2 moduels
 #Include qm2-modules\blank-share\blank-share.ahk
 #Include qm2-modules\payment-relation\payment-relation.ahk
+#Include qm2-modules\deposit-entry\deposit-entry.ahk
 ; server
 #Include server\unified-agent.ahk
 
