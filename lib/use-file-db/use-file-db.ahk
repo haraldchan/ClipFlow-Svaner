@@ -82,21 +82,20 @@ class useFileDB {
 	 * @return {Array<Map>}
 	 */
 	load(db := this.main, queryDate := FormatTime(A_Now, "yyyyMMdd"), queryPeriodInput := 60) {
-		; if (queryDate == FormatTime(A_Now, "yyyyMMdd")) {
-		; 	return this.loadOneDay(db, queryDate, queryPeriodInput)
-		; }
-		; else if (FileExist(this.archive . "\" . queryDate . " - archive.json")) {
-		; 	return this.loadArchiveOneDay(queryDate)
-		; }
-		; else {
-		; 	if (!FileExist(this.archive . "\" . queryDate . " - archive.json")) {
-		; 		if (DateDiff(A_Now, queryDate, "Days") > 0) {
-		; 			SetTimer(() => this.createArchive(queryDate), -100)
-		; 		}
-		; 		return this.loadOneDay(db, queryDate, 60 * 24 * this.cleanPeriodDays)
-		; 	}
-		; }
-		return this.loadOneDay(db, queryDate, queryPeriodInput)
+		if (queryDate == FormatTime(A_Now, "yyyyMMdd")) {
+			return this.loadOneDay(db, queryDate, queryPeriodInput)
+		}
+		else if (FileExist(this.archive . "\" . queryDate . " - archive.json")) {
+			return this.loadArchiveOneDay(queryDate)
+		}
+		else {
+			if (!FileExist(this.archive . "\" . queryDate . " - archive.json")) {
+				if (DateDiff(A_Now, queryDate, "Days") > 0) {
+					SetTimer(() => this.createArchive(queryDate), -100)
+				}
+				return this.loadOneDay(db, queryDate, 60 * 24 * this.cleanPeriodDays)
+			}
+		}
 	}
 
 	/**
