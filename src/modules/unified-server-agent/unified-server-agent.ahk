@@ -5,13 +5,8 @@
 #Include components\post-details-profile.ahk
 #Include components\post-details-qm2.ahk
 #Include components\qm2-panel.ahk
-; qm2 moduels
-#Include qm2-modules\blank-share\blank-share.ahk
-#Include qm2-modules\payment-relation\payment-relation.ahk
-#Include qm2-modules\deposit-entry\deposit-entry.ahk
 ; server
 #Include server\unified-agent.ahk
-
 
 /**
  * @param {Svnaer} App 
@@ -19,11 +14,10 @@
 ServerAgentPanel(App) {
     isListening := signal("离线")
 
+    serverConfig := CONFIG.read("serverConfig")
     global agent := UnifiedAgent({
-        ; pool: A_ScriptDir . "\src\Servers\pmn-pool",
-        ; qmPool: A_ScriptDir . "\src\Servers\qm-pool",
-        pool: "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow\src\Servers\pmn-pool",
-        qmPool: "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow\src\Servers\qm-pool",
+        pool: serverConfig["host"] . serverConfig["pmnPool"],
+        qmPool: serverConfig["host"] . serverConfig["qmPool"],
         interval: 3000,
         expiration: 480,
         collectRange: 15,

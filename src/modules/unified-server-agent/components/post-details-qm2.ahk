@@ -53,12 +53,9 @@ PostDetails_QM2(post, moduleName, props) {
     handleTriggerPmPost(form) {
         dbConfig := CONFIG.read("dbConfig")
         db := useFileDB({
-                main: dbConfig["host"] . "\" . dbConfig["main"],
-                archive: dbConfig["host"] . "\" . dbConfig["archive"],
-                backup: dbConfig["host"] . "\" . dbConfig["backup"],
-                ; main: "",
-                ; archive: "",
-                ; backup: "",
+                main: dbConfig["host"] . dbConfig["main"],
+                archive: dbConfig["host"] . dbConfig["archive"],
+                backup: dbConfig["host"] . dbConfig["backup"],
         })
 
         roomNums := form.shareRoomNums.trim()

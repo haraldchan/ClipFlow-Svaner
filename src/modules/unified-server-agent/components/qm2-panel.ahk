@@ -63,16 +63,13 @@ QM2_Panel(props) {
         return 0
     }
 
-    dbConfig := CONFIG.read("dbConfig")
-    db := useFileDB({
-            main: dbConfig["host"] . "\" . dbConfig["main"],
-            archive: dbConfig["host"] . "\" . dbConfig["archive"],
-            backup: dbConfig["host"] . "\" . dbConfig["backup"],
-            ; main: "",
-            ; archive: "",
-            ; backup: "",
-    })
     handleTriggerPmPost(form) {
+        dbConfig := CONFIG.read("dbConfig")
+        db := useFileDB({
+                main: dbConfig["host"] . dbConfig["main"],
+                archive: dbConfig["host"] . dbConfig["archive"],
+                backup: dbConfig["host"] . dbConfig["backup"],
+        })
         roomNums := form.shareRoomNums.trim()
         profiles := p.selectedGuests.Length == 0
             ? db.load(,, agent.collectRange).filter(guest => roomNums.includes(!guest["roomNum"] ? "null" : guest["roomNum"]))
