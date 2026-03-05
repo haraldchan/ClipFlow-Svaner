@@ -1,11 +1,7 @@
-#Include ..\qm2-modules\blank-share\blank-share-action.ahk
-#Include ..\qm2-modules\payment-relation\payment-relation-action.ahk
-#Include ..\qm2-modules\deposit-entry\deposit-entry-action.ahk
-
 class UnifiedAgent extends useServerAgent {
     __New(serverSettings) {
         super.__New(serverSettings)
-        this.qmPool := serverSettings.HasOwnProp("qmPool") ? serverSettings.qmPool : A_ScriptDir . "\Servers\qm-pool"
+        this.qmPool := serverSettings.HasOwnProp("qmPool") ? serverSettings.qmPool : ""
         this.popupTitle := "Unified Agent"
 
         effect(this.isListening, cur => this.listen(cur))
@@ -125,7 +121,7 @@ class UnifiedAgent extends useServerAgent {
         }
         
         this.keepAlive()
-        this.resetPostsToPending()
+        ; this.resetPostsToPending()
 
         qmPosts := this.COLLECT("PENDING", this.qmPool)
         pmnPosts := this.COLLECT("PENDING")
