@@ -26,9 +26,7 @@ DepositEntry(App, props := {}) {
     }
 
     sendQmPost(depositInfo) {
-        serverConfig := CONFIG.read("serverConfig")
-        agent := useServerAgent({ pool: serverConfig["host"] . serverConfig["qmPool"] })
-        agent.POST({
+        agent.delegate({
             module: "DepositEntry",
             form: depositInfo
         })
