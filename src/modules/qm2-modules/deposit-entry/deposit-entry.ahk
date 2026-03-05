@@ -26,8 +26,8 @@ DepositEntry(App, props := {}) {
     }
 
     sendQmPost(depositInfo) {
-        ; agent := useServerAgent({ pool: "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow\src\Servers\qm-pool" })
-        agent := useServerAgent({ pool: A_ScriptDir . "\src\Servers\qm-pool" })
+        serverConfig := CONFIG.read("serverConfig")
+        agent := useServerAgent({ pool: serverConfig["host"] . serverConfig["qmPool"] })
         agent.POST({
             module: "DepositEntry",
             form: depositInfo
