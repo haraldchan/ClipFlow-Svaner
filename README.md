@@ -56,30 +56,27 @@ ClipFlow/
  |             |      └──── macros/
  |             |             |──── fedex-entry.ahk
  |             |             └──── ota-entry.ahk
- |             └──── unified-server-agent/
- |                    |──── unified-server-agent.ahk
- |                    |──── components/
- |                    |      |──── clipboard-listeners.ahk
- |                    |      |──── service-configs.ahk
- |                    |      |──── client-posts.ahk
- |                    |      |──── post-details-profile.ahk
- |                    |      |──── post-details-qm2.ahk
- |                    |      |──── qm2-panel.ahk
- |                    |      └──── modal.ahk
- |                    |──── qm2-modules/
- |                    |      |──── blank-share/
- |                    |      |      |──── blank-share.ahk
- |                    |      |      └──── blank-share-action.ahk
- |                    |      |──── payment-relation/
- |                    |      |      |──── payment-relation.ahk
- |                    |      |      └──── payment-relation-action.ahk
- |                    |      └──── deposit-entry/
- |                    |             └──── deposit-entry.ahk
- |                    └──── server/
- |                           |──── qm-pool/
- |                           |──── pmn-pool/
- |                           |──── test-pool/
- |                           └──── unified-agent.ahk
+ |             |──── unified-server-agent/
+ |             |      |──── unified-server-agent.ahk
+ |             |      |──── components/
+ |             |      |      |──── service-configs.ahk
+ |             |      |      |──── client-posts.ahk
+ |             |      |      |──── post-details-profile.ahk
+ |             |      |      |──── post-details-qm2.ahk
+ |             |      |      |──── qm2-panel.ahk
+ |             |      |      └──── modal.ahk
+ |             |      └──── server/
+ |             |             └──── unified-agent.ahk
+ |             └──── qm2-modules/
+ |                           |──── blank-share/
+ |                           |      |──── blank-share.ahk
+ |                           |      └──── blank-share-action.ahk
+ |                           |──── payment-relation/
+ |                           |      |──── payment-relation.ahk
+ |                           |      └──── payment-relation-action.ahk
+ |                           └──── deposit-entry/
+ |                                  └──── deposit-entry.ahk
+ |                                  └──── deposit-entry-action.ahk
  |──── assets/
  |──── lib/
  |      |──── index.ahk/
