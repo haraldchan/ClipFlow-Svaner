@@ -4,14 +4,18 @@
 		"tabPos": 1
 	},
 	"sendToSharedClips": false,
-	"//sharedClipsDir": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本\\clipflow-sharedclips",
-	"sharedClipsDir": "c:\\Users\\haraldchan\\Desktop\\clipflow-sharedclips",
 	"dbConfig": {
 		"host": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本",
-		"main": "GuestProfilesDB\\GuestProfiles",
-		"archive": "GuestProfilesDB\\GuestProfilesArchive",
-		"backup": "GuestProfilesBackup",
+		"main": "\\GuestProfilesDB\\GuestProfiles",
+		"archive": "\\GuestProfilesDB\\GuestProfilesArchive",
+		"backup": "\\GuestProfilesBackup",
 		"cleanPeriodDays": 180
+	},
+	"serverConfig": {
+		"host": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本\\ClipFlow-server-posts",
+		"pmnPool": "\\pmn-pool",
+		"qmPool": "\\qm-pool",
+		"testPool": "\\test-pool"
 	},
 	"resvHandler": {
 		"currentReservation": "",
