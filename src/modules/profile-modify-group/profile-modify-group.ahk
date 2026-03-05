@@ -16,9 +16,9 @@ class ProfileModify_Group {
     static USE(App) {
         dbConfig := CONFIG.read("dbConfig")
         this.db := useFileDB({
-            main: dbConfig["host"] . "\" . dbConfig["main"],
-            archive: dbConfig["host"] . "\" . dbConfig["archive"],
-            backup: dbConfig["host"] . "\" . dbConfig["backup"],
+            main: dbConfig["host"] . dbConfig["main"],
+            archive: dbConfig["host"] . dbConfig["archive"],
+            backup: dbConfig["host"] . dbConfig["backup"],
         })
 
         PMG_App(App, this.title, this.db)

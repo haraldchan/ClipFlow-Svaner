@@ -19,12 +19,9 @@ class ProfileModifyNext {
     static USE(App) {
         dbConfig := CONFIG.read("dbConfig")
         this.db := useFileDB({
-            main: dbConfig["host"] . "\" . dbConfig["main"],
-            archive: dbConfig["host"] . "\" . dbConfig["archive"],
-            backup: dbConfig["host"] . "\" . dbConfig["backup"],
-            ; main: "",
-            ; archive: "",
-            ; backup: "",
+            main: dbConfig["host"] . dbConfig["main"],
+            archive: dbConfig["host"] . dbConfig["archive"],
+            backup: dbConfig["host"] . dbConfig["backup"],
         })
 
         yesterday := A_Now.yesterday().toFormat("yyyyMMdd")
