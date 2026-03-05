@@ -7,13 +7,29 @@
 PMN_App(App, moduleTitle, db, identifier) {
     ; server agent delegate/ enable QM2 panel
     isDelegate := signal(false)
+    effect(isDelegate, curIsDelegate => (
+        App["guest-profile-list"].Move(,, curIsDelegate ? 470 : 658),
+        App["component:SentPosts"].visible(curIsDelegate)
+    ))
+
     serverConnection := signal("")
+    effect(serverConnection, handleConnStatus)
+    handleConnStatus(curServerConnection) {
+        connStatusText := App["connection-status"]
+        connStatusText.Visible := true
+
+        switch curServerConnection {
+            case "尝试连接中...":
+                connStatusText.SetFont("norm cBlack")
+            case "后台服务在线":
+                connStatusText.SetFont("bold cGreen")
+                SetTimer(() => connStatusText.Visible := false, -2000)
+            default: 
+                connStatusText.SetFont("bold cRed")
+        }
+    }
 
     handleDelegateActivate(ctrl, _) {
-        App["guest-profile-list"].GetPos(,, &W)
-        App["guest-profile-list"].Move(,, isDelegate.Value ? W/0.7 : W*0.7)
-        App["component:SentPosts"].visible(ctrl.Value)
-        
         isDelegate.set(ctrl.Value)
         if (ctrl.Value == false) {
             return
@@ -31,26 +47,7 @@ PMN_App(App, moduleTitle, db, identifier) {
                     ctrl.Value := false, 
                     serverConnection.set("超时无响应")
                 )
-        ), ctrl.Enabled := true) , -100)
-    }
-
-    effect(serverConnection, handleConnStatus)
-    handleConnStatus(curServerConnection) {
-        connStatusText := App["connection-status"]
-        connStatusText.Visible := true
-
-        switch curServerConnection {
-            case "尝试连接中...":
-                connStatusText.SetFont("norm cBlack")
-            case "后台服务在线":
-                connStatusText.SetFont("bold cGreen")
-                SetTimer(() => connStatusText.Visible := false, -2000)
-            default: 
-                connStatusText.SetFont("bold cRed")
-                App["guest-profile-list"].GetPos(,, &W)
-                App["guest-profile-list"].Move(,, W/0.7)
-                App["component:SentPosts"].visible(false)
-        }
+        ), isDelegate.value && ctrl.Enabled := true) , -100)
     }
 
 
@@ -85,7 +82,7 @@ PMN_App(App, moduleTitle, db, identifier) {
 
     effect(searchBy, handleSearchByChange)
     handleSearchByChange(cur) {
-        App["type:ListView"].Opt(cur == "waterfall" ? "+Checked +Multi" : "-Checked -Multi")
+        App["guest-profile-list"].Opt(cur == "waterfall" ? "+Checked +Multi" : "-Checked -Multi")
         App["delegate-check-box"].Enabled := cur == "waterfall"
         App["selecti-all-btn"].Visible := cur == "waterfall"
         App["Party: "].Visible := cur == "waterfall"
