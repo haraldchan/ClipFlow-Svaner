@@ -1,7 +1,7 @@
 PMG_App(App, popupTitle, db) {
     selectedGroup := signal(Map())
     currentGroupRooms := signal([])
-    fetchPeriod := signal(5)
+    fetchPeriod := signal(10)
     loadedGuests := signal([])
 
     effect(selectedGroup, handleGroupSelect)
@@ -29,7 +29,7 @@ PMG_App(App, popupTitle, db) {
     }
 
     performModify(*) {
-        checkedRows := App.getCtrlByType("ListView").getCheckedRowNumbers()
+        checkedRows := App["group-guest-list"].getCheckedRowNumbers()
         selectedGuests := []
         for row in checkedRows {
             selectedGuests.Push(loadedGuests.value[row])
@@ -39,16 +39,23 @@ PMG_App(App, popupTitle, db) {
     }
 
     return (
-        App.AddGroupBox("R16 y+20 w685", " "),
-        App.AddText("xp15 ", popupTitle . " ⓘ ")
-           .OnEvent("Click", (*) => PMG_Settings(fetchPeriod)),
-
-        ; shows due in groups
-        OnDayGroups(App, selectedGroup),
-        App.AddButton("x40 y470 w115 h35", "获取旅客").OnEvent("Click", handleListInitialize),
-        App.AddButton("x+15 w115 h35", "开始录入").OnEvent("Click", performModify),
-
-        ; matching guests
-        GroupGuestList(App, loadedGuests)
+        StackBox(
+            App,
+            {
+                groupbox: {
+                    title: popupTitle . " ⓘ ",
+                    options: "Section y+20 w685 h410",
+                }
+            },
+            () => [
+                ; due in groups
+                OnDayGroups(App, selectedGroup),
+                ; btns
+                App.AddButton("@align[x]:block-list y+5 w145 h35", "获取旅客").onClick(handleListInitialize),
+                App.AddButton("x+10 w145 h35", "开始录入").onClick(performModify),
+                ; matched guests
+                GroupGuestList(App, loadedGuests)
+            ]
+        )
     )
 }
