@@ -19,11 +19,11 @@ App(App) {
 			tabs: ["后台服务"], 
 			components: [ServerAgentPanel] 
 		},
-		; ProfileModifyNext_Group, { 
-		; 	name: ProfileModifyNext_Group.name, 
-		; 	tabs: ["后台服务"], 
-		; 	components: [ServerAgentPanel] 
-		; },
+		ProfileModify_Group, { 
+			name: ProfileModify_Group.name, 
+			tabs: ["后台服务"], 
+			components: [ServerAgentPanel] 
+		},
 		ReservationHandler, { 
 			name: ReservationHandler.name, 
 			tabs: ["更多设置"], 
