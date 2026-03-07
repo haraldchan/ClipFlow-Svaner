@@ -6,8 +6,7 @@
 SentPosts(App, isDelegate, listContent) {
     comp := Component(App, A_ThisFunc)
 
-    postQueue := signal([{ status: "", time: "", id: "" }])
-    
+    postQueue := signal([{ status: "", time: "", id: "" }])    
     postStatus := Map(
         "PENDING", "已发送",
         "COLLECTED", "处理中",
@@ -123,7 +122,7 @@ SentPosts(App, isDelegate, listContent) {
     }
 
     comp.render := this => this.Add(
-        App.AddText("vsent-posts-title x520 @align[y]:guest-profile-list h20 0x200", "已发送代行")
+        App.AddText("vsent-posts-title x530 @align[y]:guest-profile-list h20 0x200", "已发送代行")
            .SetFont("bold"),
         App.AddCheckBox("vsent-posts-show-my-own-posts Checked xp+120 h20 w60", "本机"),
         App.AddListView(
