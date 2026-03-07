@@ -3,8 +3,10 @@ PMG_Settings(fetchPeriod) {
         return
     }
 
-    Settings := Gui(, "PMG Settings")
-    Settings.SetFont(, "微软雅黑")
+    Settings := Svaner({
+        gui: { title: "PMG Settings" },
+        font: { name: "微软雅黑" }
+    })
 
     helpInfo := "
     (
@@ -30,7 +32,7 @@ PMG_Settings(fetchPeriod) {
 
         ; fetchPeriod setting
         Settings.AddText("x10 w150 h25 0x200", "获取旅客时间范围（小时）："),
-        Settings.AddReactiveEdit("vfp w80 h25 x+10", "{1}", fetchPeriod),
+        Settings.AddEdit("vfp w80 h25 x+10", "{1}", fetchPeriod),
         
         ; btns
         Settings.AddButton("x10 y+15 w120 h35", "取 消(&C)").onClick((*) => Settings.Hide()),
