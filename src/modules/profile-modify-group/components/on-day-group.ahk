@@ -10,7 +10,7 @@ OnDayGroups(App, selectedGroup) {
         }
     }
 
-    if (XL_FILE_PATH == "") {
+    if (!XL_FILE_PATH) {
         MsgBox("未找到 OnDayGroup Excel 文件，请手动添加", POPUP_TITLE, "4096 T1")
         App.Opt("+OwnDialogs") 
         XL_FILE_PATH := FileSelect(3, , "请选择 OnDayGroup Excel 文件")
@@ -46,13 +46,27 @@ OnDayGroups(App, selectedGroup) {
         selectedGroup.set(blockInfo[1])
         return blockInfo
     }
+
+    handleGroupSelect(lv, row) {
+        if (!row) {
+            return
+        }
+
+        selectedGroup.set(arrvingGroups.value[row])
+    }
+
     return (
-        App.AddLink("w100 h20 0x200", '<a href="' . XL_FILE_PATH . '"> 今日团队 </a>').SetFont("bold s11 q4"),
-        
-        ; group selector radios
-        arrvingGroups.value.map(group => 
-            App.AddRadio((A_Index = 1 ? "Checked " : "") . "h28 w280 y+10", Format("{1} - {2}", group["blockName"], group["blockCode"]))
-               .OnEvent("Click", (*) => selectedGroup.set(group))
-        )
+        App.AddLink("xs20 yp+30 w100 h20 0x200", '<a href="' . XL_FILE_PATH . '"> 今日团队 </a>').SetFont("bold s11 q4"),
+        App.AddListView(
+            {
+                lvOptions: "vblock-list xs20 y+10 w300 h300 Grid NoSortHdr @lv:label-tip"
+            },
+            {
+                keys: ["blockCode", "blockName"],
+                titles: ["BlockCode", "Block 名称"],
+                widths: [100, 200]
+            },
+            arrvingGroups
+        ).onClick(handleGroupSelect)
     )
 }
