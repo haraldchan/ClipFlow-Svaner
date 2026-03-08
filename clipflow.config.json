@@ -10,12 +10,6 @@
 		"backup": "\\GuestProfilesBackup",
 		"cleanPeriodDays": 180
 	},
-	"serverConfig": {
-		"host": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本\\ClipFlow-server-posts",
-		"pmnPool": "\\pmn-pool",
-		"qmPool": "\\qm-pool",
-		"testPool": "\\test-pool"
-	},
 	"profileModifyGroup": {
 		"onDayGroupFolder": "\\\\10.0.2.13\\fd\\9-ON DAY GROUP DETAILS",
 		"matchRangeHour": 8
@@ -121,6 +115,12 @@
 	},
 	"serverAgent": {
 		"serviceEnabled": false,
-		"clientEnabled": true
+		"clientEnabled": true,
+		"serverConfig": {
+			"host": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本\\ClipFlow-server-posts",
+			"pmnPool": "\\pmn-pool",
+			"qmPool": "\\qm-pool",
+			"testPool": "\\test-pool"
+		}
 	}
 }
