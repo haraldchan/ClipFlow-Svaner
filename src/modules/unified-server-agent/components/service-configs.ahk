@@ -87,7 +87,7 @@ ServiceConfigs(App, enabled, isListening) {
                     title: "服务端（后台）选项",
                     options: (enabled ? "Checked" : "") . " xs10 yp",
                     events: {
-                        click: (ctrl, _) => (CONFIG.write("agentEnabled", ctrl.Value), !ctrl.Value && isListening.set("离线"))
+                        click: (ctrl, _) => (CONFIG.write("serviceEnabled", ctrl.Value), !ctrl.Value && isListening.set("离线"))
                     }
                 }, 
             },

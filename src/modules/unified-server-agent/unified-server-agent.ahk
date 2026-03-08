@@ -29,7 +29,7 @@ ServerAgentPanel(App) {
         App.AddText("x30 y+10 h40 w580", "ProfileModifyNext Server").SetFont("s13 q5 Bold"),
         
         ; server
-        ServiceConfigs(App, CONFIG.read("agentEnabled"), isListening),
+        ServiceConfigs(App, CONFIG.read("serviceEnabled"), isListening),
         
         ; client
         ClientPosts(App, CONFIG.read("clientEnabled")) 
