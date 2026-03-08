@@ -1,7 +1,7 @@
 PMG_App(App, popupTitle, db) {
     selectedGroup := signal(Map())
     currentGroupRooms := signal([])
-    fetchPeriod := signal(10)
+    fetchPeriod := signal(CONFIG.read("matchRangeHour"))
     loadedGuests := signal([])
 
     effect(selectedGroup, handleGroupSelect)

@@ -1,5 +1,5 @@
 OnDayGroups(App, selectedGroup) {
-    monthFolder := Format("\\10.0.2.13\fd\9-ON DAY GROUP DETAILS\{1}\{1}{2}", A_Year, A_MM)
+    monthFolder := Format("{1}\{2}\{2}{3}", CONFIG.read("onDayGroupFolder"), A_Year, A_MM)
     XL_FILE_PATH := ""
     arrvingGroups := signal([])
 
@@ -14,7 +14,7 @@ OnDayGroups(App, selectedGroup) {
         MsgBox("未找到 OnDayGroup Excel 文件，请手动添加", POPUP_TITLE, "4096 T1")
         App.Opt("+OwnDialogs") 
         XL_FILE_PATH := FileSelect(3, , "请选择 OnDayGroup Excel 文件")
-        if (XL_FILE_PATH == "") {
+        if (!XL_FILE_PATH) {
             CONFIG.write("moduleSelected", 1)
             utils.cleanReload(WIN_GROUP)
         }
@@ -29,7 +29,7 @@ OnDayGroups(App, selectedGroup) {
         loop {
             blockCodeReceived := OnDayGroupDetails.Cells(A_Index + 3, 1).Text
             blockNameReceived := OnDayGroupDetails.Cells(A_Index + 3, 2).Text
-            if (blockCodeReceived = "" || blockCodeReceived = "Group StayOver") {
+            if (!blockCodeReceived || blockCodeReceived = "Group StayOver") {
                 break
             }
 
@@ -56,7 +56,7 @@ OnDayGroups(App, selectedGroup) {
     }
 
     return (
-        App.AddLink("xs20 yp+30 w100 h20 0x200", '<a href="' . XL_FILE_PATH . '"> 今日团队 </a>').SetFont("bold s11 q4"),
+        App.AddLink("xs20 yp+30 w100 h20 0x200", "{1}", { text: "今日团队", href: XL_FILE_PATH}).SetFont("bold s11 q4"),
         App.AddListView(
             {
                 lvOptions: "vblock-list xs20 y+10 w300 h300 Grid NoSortHdr @lv:label-tip"
