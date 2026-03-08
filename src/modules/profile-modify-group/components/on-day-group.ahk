@@ -1,3 +1,8 @@
+/**
+ * 
+ * @param {Svaner} App 
+ * @param {signal} selectedGroup 
+ */
 OnDayGroups(App, selectedGroup) {
     monthFolder := Format("{1}\{2}\{2}{3}", CONFIG.read("onDayGroupFolder"), A_Year, A_MM)
     XL_FILE_PATH := ""

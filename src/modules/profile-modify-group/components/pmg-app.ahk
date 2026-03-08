@@ -1,3 +1,8 @@
+/**
+ * @param {Svaner} App 
+ * @param {String} popupTitle 
+ * @param {useFileDB} db 
+ */
 PMG_App(App, popupTitle, db) {
     selectedGroup := signal(Map())
     currentGroupRooms := signal([])

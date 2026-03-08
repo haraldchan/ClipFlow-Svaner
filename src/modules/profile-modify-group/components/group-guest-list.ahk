@@ -1,3 +1,7 @@
+/**
+ * @param {Svaner} App 
+ * @param {signal} loadedGuests 
+ */
 GroupGuestList(App, loadedGuests) {
     onMount() {
         shareCheckStatus(App["check-all"], App["group-guest-list"])

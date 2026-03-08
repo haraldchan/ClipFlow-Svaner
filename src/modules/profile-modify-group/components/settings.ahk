@@ -1,3 +1,6 @@
+/**
+ * @param {signal} fetchPeriod
+ */
 PMG_Settings(fetchPeriod) {
     if (WinExist("PMG Settings")) {
         return
