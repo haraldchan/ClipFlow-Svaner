@@ -21,7 +21,7 @@ GuestProfileDetails(selectedGuest, fillIn) {
     )
 
     listInitialize(selectedGuest, fieldIndex) {
-        LV := Profile.getCtrlByType("ListView")
+        LV := Profile["profile"]
 
         for key, field in fieldIndex {
             val := selectedGuest.has(key) ? selectedGuest[key] : ""
@@ -39,17 +39,29 @@ GuestProfileDetails(selectedGuest, fillIn) {
         MsgBox(Format("已复制信息: `n`n{1} : {2}", key, A_Clipboard), POPUP_TITLE, "4096 T1")
     }
 
+    handleClose(*) {
+        Profile.Destroy()
+        SetTimer(handleClose, 0)
+    }
+
     fillInPms(*){
-        profile.Destroy()
+        handleClose()
         fillIn()
     }
 
-    return (
-        Profile.AddListView("vguestProfile Grid w230 r10", ["信息字段", "证件信息"]).onDoubleClick(copyListField),
-        listInitialize(selectedGuest, fieldIndex),
-        
-        Profile.AddButton("h30 w110", "关 闭 (&C)").onClick((*) => profile.Destroy()),
-        Profile.AddButton("x+10 h30 w110 Default", "填   入").onClick(fillInPms),
+    onMount() {
+        listInitialize(selectedGuest, fieldIndex)
         Profile.Show()
+        ; windows closes after 1min
+        SetTimer(handleClose, -1000 * 60)
+    }
+
+    return (
+        Profile.AddListView("vprofile Grid w230 r10", ["信息字段", "证件信息"]).onDoubleClick(copyListField),
+        
+        Profile.AddButton("h30 w110", "关 闭 (&C)").onClick(handleClose),
+        Profile.AddButton("x+10 h30 w110 Default", "填   入").onClick(fillInPms),
+        
+        onMount()
     )
 }
