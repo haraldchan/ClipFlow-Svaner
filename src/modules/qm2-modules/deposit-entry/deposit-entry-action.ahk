@@ -68,15 +68,15 @@ class DepositEntry_Action {
         }
         cardInfoCopied := A_Clipboard
         ; dismiss success popup
-        if (WinActive("ahk_exe oHotel.exe")) {
+        if (WinActive("ahk_exe SPayPOS.exe")) {
             BlockInput true
-            Send "{Enter}"
-            Sleep 200
+            WinRestore("ahk_exe SPayPOS.exe")
+            WinMove(,, 1200,800,"ahk_exe SPayPOS.exe")
 
-            CoordMode "Mouse", "Client"
-            MouseMove 231, 78
+            CoordMode "Mouse", "Window"
+            MouseMove 527, 191
             Sleep 100
-            Click 3
+            Click 2
             Sleep 100
             Send "^c"
             Sleep 100
@@ -93,9 +93,37 @@ class DepositEntry_Action {
         exp := parsedCard[2].substr(3, 4) . parsedCard[2].substr(1, 2)
         auth := cardType == "UP" && (cardNum.startsWith(1) || cardNum.startsWith(2)) ? cardNum.substr(1, 1) . cardNum.substr(-5) : ""
 
-        if (cardType != "UP" && InStr(cardNum, "000000",, 7)) {
-            MsgBox("外卡卡号不完整，请手动录入。", "Deposit Entry", "4096 T2")
-            return
+        ; if cardNum is not complete
+        if (
+            (cardType != "UP" && InStr(cardNum, "00000",, 7))
+            && (!cardNum.startsWith("1") || !cardNum.startsWith(2))
+        ) {
+            BlockInput true
+            WinRestore("ahk_exe SPayPOS.exe")
+            WinMove(,, 1200,800,"ahk_exe SPayPOS.exe")
+            CoordMode "Mouse", "Window"
+
+            MouseMove 368, 115
+            ; Sleep 100
+            Click 
+            Sleep 100
+            Send "{Text}123456"
+            ; Sleep 100
+            Send "{Enter}"
+            Sleep 500
+            MouseMove 368, 479
+            Click
+            ; Sleep 200
+            MouseMove 544, 707
+            Click 2
+            ; Sleep 100
+            Send "^c"
+            Sleep 100
+            cardNum := A_Clipboard
+            Send "{Esc}"
+
+            BlockInput false
+            CoordMode "Mouse", "Screen"
         }
 
         depositInfo := {
