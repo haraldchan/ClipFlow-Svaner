@@ -40,7 +40,7 @@ ListenerHub(App) {
         })
 
         clbListeners.addListener({
-            description: "绿云复制卡号",
+            description: "SPayPos 复制卡号",
             type: "persist",
             isOn: true,
             callback: (*) => DepositEntry_Action.copyFromMipay()
