@@ -72,18 +72,32 @@ class DepositEntry_Action {
             BlockInput true
             WinRestore("ahk_exe SPayPOS.exe")
             WinMove(,, 1200,800,"ahk_exe SPayPOS.exe")
-
+            WinActivate("ahk_exe SPayPOS.exe")
             CoordMode "Mouse", "Window"
+
+            ; copy room num
             MouseMove 527, 191
-            Sleep 100
             Click 2
-            Sleep 100
             Send "^c"
-            Sleep 100
+            Sleep 10
+            room := StrLen(A_Clipboard) == 3 ? "0" . A_Clipboard : A_Clipboard
+
+            ; copy auth num
+            MouseMove 465, 358
+            Click 2
+            Send "^c"
+            Sleep 10
+            auth := A_Clipboard
+
+            ; copy amount
+            MouseMove 950, 355
+            Click 2
+            Send "^c"
+            Sleep 10
+            amount := A_Clipboard
+
             CoordMode "Mouse", "Screen"
             BlockInput false
-
-            room := StrLen(A_Clipboard) == 3 ? "0" . A_Clipboard : A_Clipboard
         }
 
         parsedCard := cardInfoCopied.replaceThese([";", "?"]).split("=")
@@ -91,7 +105,6 @@ class DepositEntry_Action {
         cardType := this.validateType(parsedCard[1])
         cardNum := parsedCard[1]
         exp := parsedCard[2].substr(3, 4) . parsedCard[2].substr(1, 2)
-        auth := cardType == "UP" && (cardNum.startsWith(1) || cardNum.startsWith(2)) ? cardNum.substr(1, 1) . cardNum.substr(-5) : ""
 
         ; if cardNum is not complete
         if (
@@ -101,6 +114,7 @@ class DepositEntry_Action {
             BlockInput true
             WinRestore("ahk_exe SPayPOS.exe")
             WinMove(,, 1200,800,"ahk_exe SPayPOS.exe")
+            WinActivate("ahk_exe SPayPOS.exe")
             CoordMode "Mouse", "Window"
 
             MouseMove 368, 115
@@ -130,7 +144,7 @@ class DepositEntry_Action {
             cardType: cardType,
             cardNum: cardNum,
             exp: exp,
-            amount: "",
+            amount: amount,
             auth: auth,
             room: IsSet(room) ? room : ""
         }
