@@ -15,6 +15,8 @@ class DepositEntry_Action {
         WinActivate("ahk_class SunAwtFrame")
         WinSetAlwaysOnTop(true, "ahk_class SunAwtFrame")
         BlockInput(true)
+        CoordMode("Mouse", "Screen")
+        CoordMode("Pixel", "Screen")
 
         Hotkey("F12", (*) => this.end(), "On")
         this.isRunning := true
@@ -23,17 +25,19 @@ class DepositEntry_Action {
     static end() {
         BlockInput(false)
         WinSetAlwaysOnTop(false, "ahk_class SunAwtFrame")
+        CoordMode("Mouse", "Screen")
+        CoordMode("Pixel", "Screen")
 
         Hotkey("F12", (*) => {}, "Off")
         this.isRunning := false
     }
 
-    static regex := {
-        visa: "^4\d{12}(\d{3})?$",
-        master: "^(5[1-5]\d{14}|2(2[2-9]\d{12}|[3-6]\d{13}|7[01]\d{12}|720\d{12}))$",
-        amex: "^3[47]\d{13}$",
-        jcb: "^35(2[89]|[3-8]\d)\d{12}$"
-    }
+    ; static regex := {
+    ;     visa: "^4\d{12}(\d{3})?$",
+    ;     master: "^(5[1-5]\d{14}|2(2[2-9]\d{12}|[3-6]\d{13}|7[01]\d{12}|720\d{12}))$",
+    ;     amex: "^3[47]\d{13}$",
+    ;     jcb: "^35(2[89]|[3-8]\d)\d{12}$"
+    ; }
 
     /**
      * @param {String} cardInfo 
@@ -41,19 +45,14 @@ class DepositEntry_Action {
      */
     static validateType(cardInfo) {
         switch {
-            ; Visa
-            case RegExMatch(cardInfo, this.regex.visa):
+            case cardInfo.includes("VISA"):
                 return "VS"
-                ; MasterCard
-            case RegExMatch(cardInfo, this.regex.master):
+            case cardInfo.includes("MASTER"):
                 return "MC"
-                ; Amex
-            case RegExMatch(cardInfo, this.regex.amex):
+            case cardInfo.includes("AMEX"):
                 return "AE"
-                ; JCB
-            case RegExMatch(cardInfo, this.regex.jcb):
-                return "JC"
-                ; Union Pay
+            case cardInfo.includes("JCB"):
+                return "JCB"
             default:
                 return "UP"
         }
@@ -62,7 +61,7 @@ class DepositEntry_Action {
     /**
      * @param {Gui.CheckBox} controlCheckBox 
      */
-    static copyFromSPosPay() {
+    static copyFromSPayPos() {
         if (!RegExMatch(A_Clipboard, "^;\d+=\d+\?$") || !WinExist("ahk_exe SPayPOS.exe")) {
             return
         }
@@ -77,12 +76,12 @@ class DepositEntry_Action {
 
         cardInfoCopied := A_Clipboard
         parsedCard := cardInfoCopied.replaceThese([";", "?"]).split("=")
-        cardType := this.validateType(parsedCard[1])
         cardNum := parsedCard[1]
         exp := parsedCard[2].substr(3, 4) . parsedCard[2].substr(1, 2)
 
         ; copy room num
         MouseMove 527, 191
+        Sleep 10
         Click 2
         Send "^c"
         Sleep 10
@@ -90,6 +89,7 @@ class DepositEntry_Action {
 
         ; copy auth num
         MouseMove 465, 358
+        Sleep 10
         Click 2
         Send "^c"
         Sleep 10
@@ -97,10 +97,19 @@ class DepositEntry_Action {
 
         ; copy amount
         MouseMove 950, 355
+        Sleep 10
         Click 2
         Send "^c"
         Sleep 10
         amount := A_Clipboard
+
+        ; copy card type
+        MouseMove 1245, 345
+        Sleep 10
+        Click 3
+        Send "^c"
+        Sleep 10
+        cardType := this.validateType(A_Clipboard)
 
         ; get full card num
         if (!cardNum.startsWith("1") || !cardNum.startsWith("2")) {
@@ -134,7 +143,7 @@ class DepositEntry_Action {
         BlockInput false
         WinRestore("ahk_exe SPayPOS.exe")
         WinMove(prevX, prevY, prevW, prevH, "ahk_exe SPayPOS.exe")
-        CoordMode("Mouse", "Screen")        
+        CoordMode("Mouse", "Screen")
 
         this.promptCompleteInfo({
             cardType: cardType,
