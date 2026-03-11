@@ -11,18 +11,18 @@ class DepositEntry_Action {
     static isRunning := false
 
     static start() {
-        WinMaximize "ahk_class SunAwtFrame"
-        WinActivate "ahk_class SunAwtFrame"
-        WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
-        BlockInput true
+        WinMaximize("ahk_class SunAwtFrame")
+        WinActivate("ahk_class SunAwtFrame")
+        WinSetAlwaysOnTop(true, "ahk_class SunAwtFrame")
+        BlockInput(true)
 
         Hotkey("F12", (*) => this.end(), "On")
         this.isRunning := true
     }
 
     static end() {
-        BlockInput false
-        WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
+        BlockInput(false)
+        WinSetAlwaysOnTop(false, "ahk_class SunAwtFrame")
 
         Hotkey("F12", (*) => {}, "Off")
         this.isRunning := false
@@ -62,64 +62,57 @@ class DepositEntry_Action {
     /**
      * @param {Gui.CheckBox} controlCheckBox 
      */
-    static copyFromMipay() {
-        if (!RegExMatch(A_Clipboard, "^;\d+=\d+\?$")) {
+    static copyFromSPosPay() {
+        if (!RegExMatch(A_Clipboard, "^;\d+=\d+\?$") || !WinExist("ahk_exe SPayPOS.exe")) {
             return
         }
+
+        ; set window
+        BlockInput(true)
+        WinRestore("ahk_exe SPayPOS.exe")
+        WinGetPos(&prevX, &prevY, &prevW, &prevH, "ahk_exe SPayPOS.exe")
+        WinMove(0, 200, 1200, 800, "ahk_exe SPayPOS.exe")
+        WinActivate("ahk_exe SPayPOS.exe")
+        CoordMode("Mouse", "Window")
+
         cardInfoCopied := A_Clipboard
-        ; dismiss success popup
-        if (WinActive("ahk_exe SPayPOS.exe")) {
-            BlockInput true
-            WinRestore("ahk_exe SPayPOS.exe")
-            WinMove(,, 1200,800,"ahk_exe SPayPOS.exe")
-            WinActivate("ahk_exe SPayPOS.exe")
-            CoordMode "Mouse", "Window"
-
-            ; copy room num
-            MouseMove 527, 191
-            Click 2
-            Send "^c"
-            Sleep 10
-            room := StrLen(A_Clipboard) == 3 ? "0" . A_Clipboard : A_Clipboard
-
-            ; copy auth num
-            MouseMove 465, 358
-            Click 2
-            Send "^c"
-            Sleep 10
-            auth := A_Clipboard
-
-            ; copy amount
-            MouseMove 950, 355
-            Click 2
-            Send "^c"
-            Sleep 10
-            amount := A_Clipboard
-
-            CoordMode "Mouse", "Screen"
-            BlockInput false
-        }
-
         parsedCard := cardInfoCopied.replaceThese([";", "?"]).split("=")
-
         cardType := this.validateType(parsedCard[1])
         cardNum := parsedCard[1]
         exp := parsedCard[2].substr(3, 4) . parsedCard[2].substr(1, 2)
 
-        ; if cardNum is not complete
-        if (
-            (cardType != "UP" && InStr(cardNum, "00000",, 7))
-            && (!cardNum.startsWith("1") || !cardNum.startsWith(2))
-        ) {
+        ; copy room num
+        MouseMove 527, 191
+        Click 2
+        Send "^c"
+        Sleep 10
+        room := StrLen(A_Clipboard) == 3 ? "0" . A_Clipboard : A_Clipboard
+
+        ; copy auth num
+        MouseMove 465, 358
+        Click 2
+        Send "^c"
+        Sleep 10
+        auth := A_Clipboard
+
+        ; copy amount
+        MouseMove 950, 355
+        Click 2
+        Send "^c"
+        Sleep 10
+        amount := A_Clipboard
+
+        ; get full card num
+        if (!cardNum.startsWith("1") || !cardNum.startsWith("2")) {
             BlockInput true
             WinRestore("ahk_exe SPayPOS.exe")
-            WinMove(,, 1200,800,"ahk_exe SPayPOS.exe")
+            WinMove(0, 100, 1200, 800, "ahk_exe SPayPOS.exe")
             WinActivate("ahk_exe SPayPOS.exe")
             CoordMode "Mouse", "Window"
 
             MouseMove 368, 115
             ; Sleep 100
-            Click 
+            Click
             Sleep 100
             Send "{Text}123456"
             ; Sleep 100
@@ -135,21 +128,22 @@ class DepositEntry_Action {
             Sleep 100
             cardNum := A_Clipboard
             Send "{Esc}"
-
-            BlockInput false
-            CoordMode "Mouse", "Screen"
         }
 
-        depositInfo := {
+        ; reset window
+        BlockInput false
+        WinRestore("ahk_exe SPayPOS.exe")
+        WinMove(prevX, prevY, prevW, prevH, "ahk_exe SPayPOS.exe")
+        CoordMode("Mouse", "Screen")        
+
+        this.promptCompleteInfo({
             cardType: cardType,
             cardNum: cardNum,
             exp: exp,
             amount: amount,
             auth: auth,
             room: IsSet(room) ? room : ""
-        }
-
-        this.promptCompleteInfo(depositInfo)
+        })
     }
 
     /**
@@ -279,7 +273,7 @@ class DepositEntry_Action {
 
     static USE(depositInfo) {
         if (depositInfo is Map) {
-            depositInfo := JSON.parse(JSON.stringify(depositInfo),, false)
+            depositInfo := JSON.parse(JSON.stringify(depositInfo), , false)
         }
 
         ; clear form
