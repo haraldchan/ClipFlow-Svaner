@@ -27,19 +27,14 @@ ClipboardHistory(App) {
     clipHistoryPage := signal(1)
     clipHistoryDisplay := computed([clipHistory, clipHistoryPage], (curHistory, curPage) => curHistory.slice(curPage * CLIP_HISTORY_PAGE_LENGTH - (CLIP_HISTORY_PAGE_LENGTH - 1), curPage * CLIP_HISTORY_PAGE_LENGTH + 1))
     
-    clbListeners.addListener({
-        description: "剪贴板历史追踪",
-        isOn: true,
-        type: "persist",
-        callback: (*) => (handleClipHistoryUpdate(), handleLocalClipsCleaning())
-    })
     handleClipHistoryUpdate() {
-        if (clipHistory.value.find(c => c.text == A_Clipboard)) {
-            return
-        }
-
         newHistory := [clipHistory.value*]
-        newHistory.InsertAt(1, handleContentSplit(true))
+        if (index := newHistory.findIndex(c => c.text == A_Clipboard)) {
+            newHistory.InsertAt(1, newHistory.RemoveAt(index))
+        }
+        else {
+            newHistory.InsertAt(1, handleContentSplit(true))
+        }
 
         if (newHistory.Length > CLIP_HISTORY_LENGTH) {
             newHistory.Pop()
@@ -52,7 +47,7 @@ ClipboardHistory(App) {
         SplitPath(StrLower(A_Clipboard), &fileName, &dir, &ext, &fileNameNoExt, &drive)
 
         capturedType := match(dir, OrderedMap(
-            (*) => dir.slice(1,5) == "http", "URL",
+            (*) => dir.startsWith("http://") || dir.startsWith("https://"), "Link",
             (*) => drive && IMG_EXTS.find(e => e == ext), "Image",
             (*) => !drive, "Text",
             (*) => drive && !ext, "Folder"
@@ -108,12 +103,22 @@ ClipboardHistory(App) {
         "@use:ch-btn", "w40 h40"
     )
 
+    onMount() {
+        clbListeners.addListener({
+            description: "剪贴板历史追踪",
+            isOn: true,
+            type: "persist",
+            callback: (*) => (handleClipHistoryUpdate(), handleLocalClipsCleaning())
+        })
+    }
+
     return (
         App.AddText("vclb-his-title @align[y]:persist-listeners-gb @relative[x+20]:persist-listeners-gb w100 h20", "剪贴板历史")
            .SetFont("bold s10"),
         App.AddButton("x+10 w70 h20", "上一页").onClick(handleHistoryPageFlip),
         App.AddEdit("x+10 w30 h20", "{1}", clipHistoryPage),
         App.AddButton("x+10 w70 h20", "下一页").onClick(handleHistoryPageFlip),
-        CLIP_HISTORY_PAGE_LENGTH.times(() => ClipHistoryItem(App, clipHistoryDisplay, A_Index))
+        CLIP_HISTORY_PAGE_LENGTH.times(() => ClipHistoryItem(App, clipHistoryDisplay, A_Index)),
+        onMount()
     )
 }
