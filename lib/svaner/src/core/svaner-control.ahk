@@ -180,6 +180,11 @@ class SvanerListView extends Svaner.Control {
         super.__New(GuiObject, "ListView", options, columnDetails, depend, key)
     }
 
+    focusOnUpdate(state := true) {
+        super.isFocusOnUpdate := state
+    }
+
+
     /**
      * Applies new options to columns
      * @param {Object} newColumnDetails 
