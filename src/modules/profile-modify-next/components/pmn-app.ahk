@@ -113,8 +113,6 @@ PMN_App(App, moduleTitle, db, identifier) {
         if (currentGuest.value["idNum"] == incomingGuest["idNum"] && !incomingGuest["isMod"]) {
             handleGuestInfoUpdateFromAdd(incomingGuest)
             MsgBox(Format("已更新信息：{1}", incomingGuest["name"]), POPUP_TITLE, "T1.5")
-
-        
         } 
         ; updating from saved guest modal
         else if (incomingGuest["isMod"]) {
@@ -169,7 +167,7 @@ PMN_App(App, moduleTitle, db, identifier) {
 
     handleGuestInfoUpdateFromMod(updater) {
         recentGuests := db.load(, , 60 * 24)
-        matchedGuest := signal(Map())
+        matchedGuest := Map()
         items := updater.keys()
 
         for guest in recentGuests {
@@ -180,23 +178,23 @@ PMN_App(App, moduleTitle, db, identifier) {
                     }
                     guest[item] := updater[item]
                 }
-                matchedGuest.set(guest)
+                matchedGuest := guest
                 break
             }
         }
 
         try {
-            db.updateOne(JSON.stringify(matchedGuest.value), queryFilter.value["date"], matchedGuest.value["fileName"])
+            db.updateOne(JSON.stringify(matchedGuest), queryFilter["date"], matchedGuest["fileName"])
         } catch {
             MsgBox("无匹配目标...", POPUP_TITLE, "4096 T1.5")
             return
         }
 
-        return matchedGuest.value
+        return matchedGuest
     }
 
     handleListContentUpdate(*) {
-        colTitles := App["type:ListView"].svanerWrapper.titleKeys
+        colTitles := App["guest-profile-list"].svanerWrapper.titleKeys
         useListPlaceholder(listContent, colTitles, "Loading...")
 
         App["range"].Enabled := (queryFilter.value["date"] == FormatTime(A_Now, "yyyyMMdd"))
