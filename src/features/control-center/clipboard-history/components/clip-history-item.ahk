@@ -38,7 +38,7 @@ ClipHistoryItem(App, clipHistory, index) {
                 t => t.startsWith(".ppt"), i.ICON_PPT,
                 t => t.endsWith("file"), i.ICON_FILE,
                 "Folder", i.ICON_FOLDER,
-                "URL", i.ICON_URL,
+                "Link", i.ICON_URL,
             ))
 
             curIcon := iconIndex
