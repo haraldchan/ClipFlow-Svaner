@@ -689,6 +689,7 @@ class Svaner {
                 }
             }
             else if (controlType == "ListView") {
+                this.isFocusOnUpdate := false
                 this.titleKeys := this.content.keys
                 this.formattedContent := this.content.HasOwnProp("titles")
                     ? this.content.titles
@@ -918,7 +919,9 @@ class Svaner {
             }
 
             this.ctrl.Modify(1, "Select")
-            this.ctrl.Focus()
+            if (this.isFocusOnUpdate) {
+                this.ctrl.Focus()
+            }
         }
         _listview_getExactMatch(keys, item, index) {
             if !(item is Map || item.base == Object.Prototype) {
