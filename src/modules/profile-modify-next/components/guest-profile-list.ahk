@@ -67,5 +67,6 @@ GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile) {
          .onContextMenu(showProfileDetails)
          .onDoubleClick(markAsPrimary)
          .onItemEdit(handleUpdateItem)
+         .focusOnUpdate()
     )
 }
