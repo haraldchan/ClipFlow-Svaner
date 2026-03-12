@@ -70,7 +70,7 @@ class DepositEntry_Action {
         BlockInput(true)
         WinRestore("ahk_exe SPayPOS.exe")
         WinGetPos(&prevX, &prevY, &prevW, &prevH, "ahk_exe SPayPOS.exe")
-        WinMove(0, 200, 1200, 800, "ahk_exe SPayPOS.exe")
+        WinMove(0, 200, 1300, 800, "ahk_exe SPayPOS.exe")
         WinActivate("ahk_exe SPayPOS.exe")
         CoordMode("Mouse", "Window")
 
@@ -80,7 +80,7 @@ class DepositEntry_Action {
         exp := parsedCard[2].substr(3, 4) . parsedCard[2].substr(1, 2)
 
         ; copy room num
-        MouseMove 527, 191
+        MouseMove 547, 191
         Sleep 10
         Click 2
         Send "^c"
@@ -112,10 +112,10 @@ class DepositEntry_Action {
         cardType := this.validateType(A_Clipboard)
 
         ; get full card num
-        if (!cardNum.startsWith("1") || !cardNum.startsWith("2")) {
+        if (!cardNum.startsWith("1") && !cardNum.startsWith("2")) {
             BlockInput true
             WinRestore("ahk_exe SPayPOS.exe")
-            WinMove(0, 100, 1200, 800, "ahk_exe SPayPOS.exe")
+            WinMove(0, 100, 1300, 800, "ahk_exe SPayPOS.exe")
             WinActivate("ahk_exe SPayPOS.exe")
             CoordMode "Mouse", "Window"
 
