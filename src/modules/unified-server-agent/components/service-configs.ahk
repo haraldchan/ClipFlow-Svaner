@@ -6,13 +6,6 @@
 ServiceConfigs(App, enabled, isListening) {
     comp := Component(App, A_ThisFunc)
 
-    onlineTextStyles := Map(
-        "离线", "cRed Bold",
-        "处理中...", "cBlack Norm",
-        "在线", "cGreen Bold",
-        "default", "cBlack Norm"
-    )
-
     agentConfig := signal({
         interval: agent.interval,
         expiration: agent.expiration,
@@ -33,27 +26,30 @@ ServiceConfigs(App, enabled, isListening) {
         agent.qmPool := curConfig.serverConfig.host . curConfig.serverConfig.qmPool
     }
 
-    effect(isListening, cur => App["service-activator"].Value := cur != "离线")
+    effect(isListening, cur => (
+        App["service-activator"].Value := cur == "在线",
+        App["service-activator"].Enabled := cur == "离线",
+        App["online-text"].SetFont(cur == "在线" ? "cgreen bold" : "cred bold")
+    ))
 
     handleServiceStart(ctrl, _) {
-        if (MsgBox("服务将启动，请确保 Opera 处于 InHouse 界面", "Server Agent", "4096 OKCancel") == "Cancel") {
+        if (ctrl.Value == true && MsgBox("服务将启动，请确保 Opera 处于 InHouse 界面", "Server Agent", "4096 OKCancel") == "Cancel") {
             ctrl.Value := false
             return
         }
 
-        isListening.set(ctrl.Value ? "在线" : "离线")
-
+        isListening.set("在线")
         ; SetTimer(handleInHouseWindowReset)
     }
 
     handleServerHostDirSelect(*) {
         dir := FileSelect("D",, "选择代行任务池文件夹")
+        if (!dir) {
+            return
+        }
+
         agentConfig.update(["serverConfig", "host"], dir)
         CONFIG.write(["serverAgent", "serverConfig", "host"], dir)
-    }
-
-    handleServerHostUpdate(*) {
-
     }
 
     handleInHouseWindowReset(*) {
@@ -116,8 +112,7 @@ ServiceConfigs(App, enabled, isListening) {
                 ; service state
                 App.AddText("xs15 h30 yp+20 0x200", "当前服务状态: "),
                 App.AddText("vonline-text w150 h30 x+1 0x200", "{1}", isListening)
-                   .SetFont("cRed Bold")
-                   .SetFontStyles(onlineTextStyles),
+                   .SetFont("bold cred"),
                 ; configs
                 App.AddText("@use:sc-text h30 yp+40", "服务配置").setFont("bold s10"),
                 ; collect interval
