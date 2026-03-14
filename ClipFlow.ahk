@@ -5,7 +5,7 @@
 #Include src\App.ahk
 
 ; global consts
-VERSION := "1.8.1"
+VERSION := "1.8.2"
 POPUP_TITLE := "ClipFlow " . VERSION
 WIN_GROUP := ["ahk_class SunAwtFrame"]
 IMAGES := useImages(A_ScriptDir . "\assets")
