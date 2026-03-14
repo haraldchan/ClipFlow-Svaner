@@ -47,6 +47,48 @@ class useServerAgent {
         }
     }
 
+    setOnlineStatus(on) {
+        if (!FileExist(this.pool . "\OFFLINE")) {
+            FileAppend("OFFLINE", this.pool . "\OFFLINE")
+        }
+
+        if (on) {
+            if (FileExist(this.pool . "\ONLINE")) {
+                return
+            }
+
+            FileMove(this.pool . "\OFFLINE", this.pool . "\ONLINE", true)
+        }
+        else {
+            FileMove(this.pool . "\ONLINE", this.pool . "\OFFLINE", true)
+                
+            DetectHiddenWindows(true)
+            if (WinExist("responder.ahk")) {
+                WinKill("responder.ahk")
+            }
+            FileDelete(this.pool . "\responder.ahk")
+        }
+    }
+
+    spawnResponder(scriptPath) {
+        scriptContent := Format("
+            (
+                #Include {1}
+
+                responder := useServerAgent({ pool: "{2}" })
+                SetTimer(ObjBindMethod(responder, "RESPONSE"), 3000)
+            )", 
+            scriptPath,
+            this.pool
+        )
+        if (FileExist(this.pool . "\responder.ahk")) {
+            FileDelete(this.pool . "\responder.ahk")
+        }
+
+        FileAppend(scriptContent, this.pool . "\responder.ahk", "utf-8")
+        Run(this.pool . "\responder.ahk")
+    }
+
     PING() {
         ; send
         message := { method: "PING", sender: A_ComputerName, id: A_Now . A_MSec . Random(1, 100) }
@@ -104,7 +146,7 @@ class useServerAgent {
         if (this.safePost) {
             if (!this.PING()) {
                 MsgBox("Service offline.",, "4096 T2")
-                return { status: "failed" }
+                return false
             }
         }
 
