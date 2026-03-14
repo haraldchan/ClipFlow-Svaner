@@ -81,34 +81,38 @@ class DepositEntry_Action {
 
         ; copy room num
         MouseMove 547, 191
-        Sleep 10
+        Sleep 100
         Click 2
-        Sleep 10
+        Sleep 100
         Send "^c"
+        Sleep 100
         room := StrLen(A_Clipboard) == 3 ? "0" . A_Clipboard : A_Clipboard
 
         ; copy auth num
         MouseMove 465, 358
-        Sleep 10
+        Sleep 100
         Click 2
-        Sleep 10
+        Sleep 100
         Send "^c"
+        Sleep 100
         auth := A_Clipboard
 
         ; copy amount
         MouseMove 950, 355
-        Sleep 10
+        Sleep 100
         Click 2
-        Sleep 10
+        Sleep 100
         Send "^c"
+        Sleep 100
         amount := A_Clipboard
 
         ; copy card type
         MouseMove 1245, 345
-        Sleep 10
+        Sleep 100
         Click 3
-        Sleep 10
+        Sleep 100
         Send "^c"
+        Sleep 100
         cardType := this.validateType(A_Clipboard)
 
         ; get full card num
