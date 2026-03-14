@@ -21,7 +21,7 @@ ServerAgentPanel(App) {
         interval: 3000,
         expiration: 480,
         collectRange: 15,
-        safePost: false,
+        safePost: true,
         isListening: isListening
     })
 

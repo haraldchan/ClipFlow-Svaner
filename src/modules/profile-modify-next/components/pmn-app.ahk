@@ -289,12 +289,12 @@ PMN_App(App, moduleTitle, db, identifier) {
 
     ; fill in profile by actions
     fillPmsProfile(*) {
-        if (!WinExist("ahk_class SunAwtFrame")) {
-            MsgBox("Opera 未启动！ ", "Profile Modify Next", "T1")
-            return
-        }
+        ; if (!WinExist("ahk_class SunAwtFrame")) {
+        ;     MsgBox("Opera 未启动！ ", "Profile Modify Next", "T1")
+        ;     return
+        ; }
         
-        App.Hide() 
+        ; App.Hide() 
         Sleep 500 
         
         LV := App["guest-profile-list"]
@@ -342,13 +342,15 @@ PMN_App(App, moduleTitle, db, identifier) {
 
             if (isDelegate.value) {
                 SetTimer(() => (
-                    agent.delegate({
+                    isOnline := agent.delegate({
                         mode: "waterfall",
                         overwrite: settings.value["fillOverwrite"],
                         rooms: rooms,
                         party: party,
                         profiles: groupedSelectedGuests
-                    })
+                    }),
+                    isDelegate.set(isOnline ? true : false),
+                    App["delegate-check-box"].Value := isOnline ? true : false
                 ), -250)
             } else {
                 PMN_Waterfall.cascade(groupedSelectedGuests, settings.value["fillOverwrite"], party)
