@@ -289,12 +289,12 @@ PMN_App(App, moduleTitle, db, identifier) {
 
     ; fill in profile by actions
     fillPmsProfile(*) {
-        ; if (!WinExist("ahk_class SunAwtFrame")) {
-        ;     MsgBox("Opera 未启动！ ", "Profile Modify Next", "T1")
-        ;     return
-        ; }
+        if (!WinExist("ahk_class SunAwtFrame")) {
+            MsgBox("Opera 未启动！ ", "Profile Modify Next", "T1")
+            return
+        }
         
-        ; App.Hide() 
+        App.Hide()
         Sleep 500 
         
         LV := App["guest-profile-list"]
