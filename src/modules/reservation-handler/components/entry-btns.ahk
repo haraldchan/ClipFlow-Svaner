@@ -1,7 +1,7 @@
 EntryBtns(App, curResv) {
     effect(curResv, handleEntryBtnUpdate)
     handleEntryBtnUpdate(cur) {
-        entryBtns := [App.getCtrlByName("entry1"), App.getCtrlByName("entry2")]
+        entryBtns := [App["entry1"], App["entry2"]]
 
         if (cur["agent"] == "fedex") {
             crewLastNames := cur["crewNames"].map(name => name.split(" ")[2])
@@ -32,16 +32,16 @@ EntryBtns(App, curResv) {
             OTA_Formatter.USE(
                 curResv.value,
                 ctrl.name == "entry2" ? true : false,
-                App["withRemarks"].Value,
-                App["withTrace"].Value,
-                App["extraPackages"].Value.trim(),
-                App["overridenRateCode"].Value.trim()
+                App["with-remarks"].Value,
+                App["with-trace"].Value,
+                App["extra-packages"].Value.trim(),
+                App["overriden-ratecode"].Value.trim()
             )
 
-            App["withRemarks"].Value := false
-            App["withTrace"].Value := false
-            App["extraPackages"].Value := ""
-            App["overridenRateCode"].Value := ""
+            App["with-remarks"].Value := false
+            App["with-trace"].Value := false
+            App["extra-packages"].Value := ""
+            App["overriden-ratecode"].Value := ""
         }
     }
 

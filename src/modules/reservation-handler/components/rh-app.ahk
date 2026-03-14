@@ -59,20 +59,20 @@ RH_App(App, moduleTitle, identifier) {
         App.AddText("xp10 w80 h35 0x1", "设置选项").SetFont("s10.5 Bold"),
 
         ; add remarks to comment
-        App.AddCheckbox("vwithRemarks xs10 yp+30 h25", "将备注添加到 Comment"),
+        App.AddCheckbox("vwith-remarks xs10 yp+30 h25", "将备注添加到 Comment"),
 
         ; add remarks to trace
-        App.AddCheckbox("vwithTrace xs10 yp+30 h25", "将备注添加到 Trace"),
+        App.AddCheckbox("vwith-trace xs10 yp+30 h25", "将备注添加到 Trace"),
         
         ; add extra packages
         App.AddText("xs10 y+5 h25 0x200", "需添加的额外 Package (不包括早餐；以空格分隔)"),
         App.AddText("xs10 y+1 h25 0x200", "Pkg Code.").SetFont("Bold"),
-        App.AddEdit("vextraPackages x+5 w200 h25"),
+        App.AddEdit("vextra-packages x+5 w200 h25"),
 
         ; override ratecode
         App.AddText("xs10 y+5 h25 0x200", "覆盖 RateCode (不使用默认)"),
         App.AddText("xs10 y+1 h25 0x200", "RateCode.").SetFont("Bold"),
-        App.AddEdit("voverridenRateCode x+5 w200 h25", ""),
+        App.AddEdit("voverriden-ratecode x+5 w200 h25", ""),
         
         ; reservation details
         App.AddText("x380 @align[y]:readme w300 h25", "订单详情  {1}", resvSource).SetFont("s13 q5 Bold"),

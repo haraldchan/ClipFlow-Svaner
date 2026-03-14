@@ -103,7 +103,7 @@ class OTA_Formatter {
                     pmsGuestNames.Push([lastName, splittedName.join(" ")])
                 }
             } else {
-                unpack([&lastName, &firstName], this.dict.getFullnamePinyin(curGuestName))
+                unpack(this.dict.getFullnamePinyin(curGuestName), [&lastName, &firstName])
                 pmsGuestNames.Push([lastName, firstName, curGuestName])
             }
         }
