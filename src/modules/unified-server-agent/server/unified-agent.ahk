@@ -4,7 +4,7 @@ class UnifiedAgent extends useServerAgent {
         this.qmPool := serverSettings.HasOwnProp("qmPool") ? serverSettings.qmPool : ""
         this.popupTitle := "Unified Agent"
 
-        effect(this.isListening, cur => this.listen(cur))
+        effect(this.isListening, cur => SetTimer(() => this.listen(cur), -100))
 
         ; ongoing post
         this.currentHandlingPost := ""
@@ -69,9 +69,7 @@ class UnifiedAgent extends useServerAgent {
                 Send "!r"
                 utils.waitLoading()
             }
-        }
-        
-        SetTimer(() => this.RESPONSE(), -1)
+        }        
     }
 
     /**
@@ -80,15 +78,19 @@ class UnifiedAgent extends useServerAgent {
      */
     listen(status) {
         if (status == "在线") {
+            this.setOnlineStatus(true)
+            this.spawnResponder(A_ScriptDir . "\lib\index.ahk")
             loop {
                 ; block input
                 this.blockInput()
 
                 ; handle post
                 this.handlePosts()
-
                 Sleep this.interval
             } until (this.isListening.value == "离线")
+        }
+        else {
+            this.setOnlineStatus(false)
         }
     }
 
@@ -151,8 +153,6 @@ class UnifiedAgent extends useServerAgent {
         unboxedPosts := posts.map(postPath => JSON.parse(FileRead(postPath, "UTF-8"))).reverse()
 
         for post in unboxedPosts {
-            this.RESPONSE()
-
             this.currentHandlingPost := post
             c := post["content"]
             res := PMN_Waterfall.cascade(c["profiles"], c["overwrite"], c["party"])
@@ -174,8 +174,6 @@ class UnifiedAgent extends useServerAgent {
         unboxedPosts := posts.map(postPath => JSON.parse(FileRead(postPath, "UTF-8"))).reverse()
 
         for post in unboxedPosts {
-            this.RESPONSE()
-
             this.currentHandlingPost := post
             ; call QM action module
             ObjBindMethod(this.qmModules[post["content"]["module"]], "USE", post["content"]["form"]).Call()
