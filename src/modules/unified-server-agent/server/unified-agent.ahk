@@ -79,7 +79,7 @@ class UnifiedAgent extends useServerAgent {
     listen(status) {
         if (status == "在线") {
             this.setOnlineStatus(true)
-            this.spawnResponder(A_ScriptDir . "\lib\index.ahk")
+            this.spawnRespondent(A_ScriptDir . "\lib\index.ahk", "ua-respondent")
             loop {
                 ; block input
                 this.blockInput()

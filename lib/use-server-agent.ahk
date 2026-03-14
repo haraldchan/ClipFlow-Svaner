@@ -15,6 +15,7 @@ class useServerAgent {
         this.collectRange := s.collectRange
         this.safePost := s.safePost
         this.isListening := s.isListening
+        this.respondentFileName := ""
 
         if (!DirExist(this.pool)) {
             DirCreate(this.pool)
@@ -47,6 +48,10 @@ class useServerAgent {
         }
     }
 
+    /**
+     * Creates/changes service status
+     * @param {true | false} on on/off flag
+     */
     setOnlineStatus(on) {
         if (!FileExist(this.pool . "\OFFLINE")) {
             FileAppend("OFFLINE", this.pool . "\OFFLINE")
@@ -56,37 +61,43 @@ class useServerAgent {
             if (FileExist(this.pool . "\ONLINE")) {
                 return
             }
-
             FileMove(this.pool . "\OFFLINE", this.pool . "\ONLINE", true)
         }
         else {
             FileMove(this.pool . "\ONLINE", this.pool . "\OFFLINE", true)
                 
             DetectHiddenWindows(true)
-            if (WinExist("responder.ahk")) {
-                WinKill("responder.ahk")
+            if (WinExist(this.respondent . ".ahk")) {
+                WinKill(this.respondent . ".ahk")
             }
-            FileDelete(this.pool . "\responder.ahk")
+            FileDelete(this.pool . "\" . this.respondent . ".ahk")
         }
     }
 
-    spawnResponder(scriptPath) {
+    /**
+     * Creates a respondent script and runs it
+     * @param {String} selfIncludePath filepath of lib
+     * @param {String} scriptName filename of respondent script
+     */
+    spawnRespondent(selfIncludePath, scriptName) {
+        this.respondent := scriptName
+        respondentFilePath := this.pool . "\" . scriptName . ".ahk"
         scriptContent := Format("
             (
                 #Include {1}
 
-                responder := useServerAgent({ pool: "{2}" })
-                SetTimer(ObjBindMethod(responder, "RESPONSE"), 3000)
+                respondent := useServerAgent({ pool: "{2}" })
+                SetTimer(ObjBindMethod(respondent, "RESPONSE"), 3000)
             )", 
-            scriptPath,
+            selfIncludePath,
             this.pool
         )
-        if (FileExist(this.pool . "\responder.ahk")) {
-            FileDelete(this.pool . "\responder.ahk")
+        if (FileExist(respondentFilePath)) {
+            FileDelete(respondentFilePath)
         }
 
-        FileAppend(scriptContent, this.pool . "\responder.ahk", "utf-8")
-        Run(this.pool . "\responder.ahk")
+        FileAppend(scriptContent, respondentFilePath, "utf-8")
+        Run(respondentFilePath)
     }
 
     PING() {
