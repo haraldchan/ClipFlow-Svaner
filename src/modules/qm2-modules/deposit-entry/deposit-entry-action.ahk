@@ -32,13 +32,6 @@ class DepositEntry_Action {
         this.isRunning := false
     }
 
-    ; static regex := {
-    ;     visa: "^4\d{12}(\d{3})?$",
-    ;     master: "^(5[1-5]\d{14}|2(2[2-9]\d{12}|[3-6]\d{13}|7[01]\d{12}|720\d{12}))$",
-    ;     amex: "^3[47]\d{13}$",
-    ;     jcb: "^35(2[89]|[3-8]\d)\d{12}$"
-    ; }
-
     /**
      * @param {String} cardInfo 
      * @returns {"VS" | "MC" | "AE" | "JC" | "UP"} 
@@ -52,15 +45,12 @@ class DepositEntry_Action {
             case cardInfo.includes("AMEX"):
                 return "AE"
             case cardInfo.includes("JCB"):
-                return "JCB"
+                return "JC"
             default:
                 return "UP"
         }
     }
 
-    /**
-     * @param {Gui.CheckBox} controlCheckBox 
-     */
     static copyFromSPayPos() {
         if (!RegExMatch(A_Clipboard, "^;\d+=\d+\?$") || !WinExist("ahk_exe SPayPOS.exe")) {
             return
@@ -117,12 +107,6 @@ class DepositEntry_Action {
 
         ; get full card num
         if (!cardNum.startsWith("1") && !cardNum.startsWith("2")) {
-            BlockInput true
-            WinRestore("ahk_exe SPayPOS.exe")
-            WinMove(0, 0, 1300, 800, "ahk_exe SPayPOS.exe")
-            WinActivate("ahk_exe SPayPOS.exe")
-            CoordMode "Mouse", "Window"
-
             MouseMove 368, 115
             Sleep 100
             Click
@@ -155,7 +139,7 @@ class DepositEntry_Action {
             exp: exp,
             amount: amount,
             auth: auth,
-            room: IsSet(room) ? room : ""
+            room: room
         })
     }
 
