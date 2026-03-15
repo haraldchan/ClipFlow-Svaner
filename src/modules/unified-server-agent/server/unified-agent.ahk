@@ -126,7 +126,7 @@ class UnifiedAgent extends useServerAgent {
         ; this.resetPostsToPending()
 
         qmPosts := this.COLLECT("PENDING", this.qmPool)
-        pmnPosts := this.COLLECT("PENDING")
+        pmnPosts := this.COLLECT("PENDING", this.pool)
 
         if (pmnPosts.Length || qmPosts.Length) {
             WinHide(this.popupTitle)
@@ -176,7 +176,11 @@ class UnifiedAgent extends useServerAgent {
         for post in unboxedPosts {
             this.currentHandlingPost := post
             ; call QM action module
-            ObjBindMethod(this.qmModules[post["content"]["module"]], "USE", post["content"]["form"]).Call()
+            res := ObjBindMethod(this.qmModules[post["content"]["module"]], "USE", post["content"]["form"]).Call()
+            if (res is Error) {
+                this.updatePostStatus(posts[A_Index], "NOTFOUND")
+                continue
+            }
 
             this.updatePostStatus(posts[A_Index], "MODIFIED")
         }
