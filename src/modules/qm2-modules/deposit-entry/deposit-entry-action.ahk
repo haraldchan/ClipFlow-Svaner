@@ -70,7 +70,7 @@ class DepositEntry_Action {
         BlockInput(true)
         WinRestore("ahk_exe SPayPOS.exe")
         WinGetPos(&prevX, &prevY, &prevW, &prevH, "ahk_exe SPayPOS.exe")
-        WinMove(0, 200, 1300, 800, "ahk_exe SPayPOS.exe")
+        WinMove(0, 0, 1300, 800, "ahk_exe SPayPOS.exe")
         WinActivate("ahk_exe SPayPOS.exe")
         CoordMode("Mouse", "Window")
 
@@ -81,64 +81,64 @@ class DepositEntry_Action {
 
         ; copy room num
         MouseMove 547, 191
-        Sleep 100
+        Sleep 50
         Click 2
-        Sleep 100
+        Sleep 10
         Send "^c"
-        Sleep 100
+        Sleep 10
         room := StrLen(A_Clipboard) == 3 ? "0" . A_Clipboard : A_Clipboard
 
         ; copy auth num
         MouseMove 465, 358
-        Sleep 100
+        Sleep 10
         Click 2
-        Sleep 100
+        Sleep 10
         Send "^c"
-        Sleep 100
+        Sleep 10
         auth := A_Clipboard
 
         ; copy amount
         MouseMove 950, 355
-        Sleep 100
+        Sleep 10
         Click 2
-        Sleep 100
+        Sleep 10
         Send "^c"
-        Sleep 100
+        Sleep 10
         amount := A_Clipboard
 
         ; copy card type
         MouseMove 1245, 345
-        Sleep 100
+        Sleep 10
         Click 3
-        Sleep 100
+        Sleep 10
         Send "^c"
-        Sleep 100
+        Sleep 10
         cardType := this.validateType(A_Clipboard)
 
         ; get full card num
         if (!cardNum.startsWith("1") && !cardNum.startsWith("2")) {
             BlockInput true
             WinRestore("ahk_exe SPayPOS.exe")
-            WinMove(0, 100, 1300, 800, "ahk_exe SPayPOS.exe")
+            WinMove(0, 0, 1300, 800, "ahk_exe SPayPOS.exe")
             WinActivate("ahk_exe SPayPOS.exe")
             CoordMode "Mouse", "Window"
 
             MouseMove 368, 115
-            ; Sleep 100
+            Sleep 100
             Click
             Sleep 100
-            Send "{Text}123456"
-            ; Sleep 100
+            Send "123456"
+            Sleep 100
             Send "{Enter}"
             Sleep 500
             MouseMove 368, 479
             Click
-            ; Sleep 200
+            Sleep 200
             MouseMove 544, 707
             Click 2
-            ; Sleep 100
+            Sleep 10
             Send "^c"
-            Sleep 100
+            Sleep 10
             cardNum := A_Clipboard
             Send "{Esc}"
         }
