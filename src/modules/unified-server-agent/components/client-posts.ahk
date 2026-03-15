@@ -100,6 +100,7 @@ ClientPosts(App, enabled) {
             case "PayBy PayFor":
                 form := selectedPost["content"]["form"]
                 PostDetails_QM2(selectedPost, "PaymentRelation", {
+                    style: { xyPos: "xs10 y+10" },
                     form : {
                         pfRoom: form["pfRoom"],
                         pfName: form["pfName"],
