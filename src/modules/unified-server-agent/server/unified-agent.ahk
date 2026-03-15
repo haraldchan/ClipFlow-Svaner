@@ -43,6 +43,8 @@ class UnifiedAgent extends useServerAgent {
                 this.updatePostStatus(A_LoopFileFullPath, "ABORTED")
             }
         }
+
+        this.setOnlineStatus(false)
     }
 
     /**
@@ -69,7 +71,7 @@ class UnifiedAgent extends useServerAgent {
                 Send "!r"
                 utils.waitLoading()
             }
-        }        
+        }
     }
 
     /**
@@ -121,7 +123,7 @@ class UnifiedAgent extends useServerAgent {
             this.isListening.set("离线")
             return
         }
-        
+
         this.keepAlive()
         ; this.resetPostsToPending()
 
@@ -131,7 +133,7 @@ class UnifiedAgent extends useServerAgent {
         if (pmnPosts.Length || qmPosts.Length) {
             WinHide(this.popupTitle)
         }
-        
+
         if (qmPosts.Length) {
             this.executeQmPostedActions(qmPosts)
         }
@@ -144,25 +146,29 @@ class UnifiedAgent extends useServerAgent {
         WinShow(this.popupTitle)
         this.isListening.set("在线")
     }
-    
+
     /**
      * <Agent>
      * @param {String[]} posts 
-    */
-   modifyPostedProfiles(posts) {
+     */
+    modifyPostedProfiles(posts) {
         unboxedPosts := posts.map(postPath => JSON.parse(FileRead(postPath, "UTF-8"))).reverse()
 
         for post in unboxedPosts {
             this.currentHandlingPost := post
             c := post["content"]
             res := PMN_Waterfall.cascade(c["profiles"], c["overwrite"], c["party"])
-            if (res == "Ended Unexpectedly") {
-                this.updatePostStatus(posts[A_Index], "RETRY")
-            } else if (res == "Room not found") {
-                this.updatePostStatus(posts[A_Index], "NOTFOUND")
-            } else {
-                this.updatePostStatus(posts[A_Index], "MODIFIED")
+            if (res is Error) {
+                switch res.Message {
+                    case "Ended Unexpectedly":
+                        this.updatePostStatus(posts[A_Index], "RETRY")
+                    case "Room not found":
+                        this.updatePostStatus(posts[A_Index], "NOTFOUND")
+                }
+                continue
             }
+
+            this.updatePostStatus(posts[A_Index], "MODIFIED")
         }
     }
 
@@ -191,8 +197,8 @@ class UnifiedAgent extends useServerAgent {
      * @param content post content to send
      */
     delegate(content) {
-        c := useProps(content, 
-            content.HasOwnProp("form") 
+        c := useProps(content,
+            content.HasOwnProp("form")
                 ? { ; QM post
                     module:   content.module, ; QM2 module name
                     form:     content.form,   ; form data from module component
@@ -201,7 +207,7 @@ class UnifiedAgent extends useServerAgent {
                     mode:      "waterfall", ; single/waterfall/group
                     overwrite: false,       ; isOverwrite value
                     rooms:     [],          ; waterfall/group room numbers
-                    party:     "",          ; optional party number for confinement 
+                    party:     "",          ; optional party number for confinement
                     profiles:  [],          ; json object in single, array in waterfall/group
                 }
         )
