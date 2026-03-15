@@ -299,16 +299,25 @@ class DepositEntry_Action {
         Sleep 100
         Send "!h"
         utils.waitLoading()
-
         CoordMode "Pixel", "Screen"
         CoordMode "Mouse", "Screen"
-        if (ImageSearch(&outX, &outY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["info.PNG"])) {
+        if (ImageSearch(&outX, &outY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["error.PNG"])) {
             Send "{Enter}"
-            return
+            utils.waitLoading()
+            Send "{Enter}"
+            utils.waitLoading()
+            return Error("room not found")
         }
 
         ; get main-profile
         ImageSearch(&outX, &outY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["opera-active-win.PNG"])
+        if (!outX || !outY) {
+            Send "{Enter}"
+            utils.waitLoading()
+            Send "{Enter}"
+            utils.waitLoading()
+            return Error("room not found")
+        }
         Click outX + 672, outY + 222, "Right"
         Sleep 100
         Send "{Down}"
