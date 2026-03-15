@@ -45,6 +45,10 @@ SentPosts(App, isDelegate, listContent) {
 
             status := StrSplit(A_LoopFileName, "==")[1]
             post := JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8"))
+            if (post is Error) {
+                continue
+            }
+
             post["status"] := postStatus[status]
             post["time"] := FormatTime(post["id"].substr(1, 14), "yyyy/MM/dd HH:mm")
             post["action"] := "Profile"
@@ -60,6 +64,10 @@ SentPosts(App, isDelegate, listContent) {
 
             status := StrSplit(A_LoopFileName, "==")[1]
             post := JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8"))
+            if (post is Error) {
+                continue
+            }
+
             post["status"] := postStatus[status]
             post["time"] := FormatTime(post["id"].substr(1, 14), "yyyy/MM/dd HH:mm")
             post["action"] := match(post["content"]["module"], Map(
@@ -70,7 +78,7 @@ SentPosts(App, isDelegate, listContent) {
             posts.InsertAt(1, post)
         }     
 
-        if (posts.Length != 0) {
+        if (posts.Length) {
             postQueue.set(posts)
             App["sent-post-list"].ModifyCol(3, "SortDesc")
         } else {
