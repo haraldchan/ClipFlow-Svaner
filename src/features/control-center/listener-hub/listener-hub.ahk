@@ -32,17 +32,17 @@ ListenerHub(App) {
     }
 
     onMount() {
-        clbListeners.addListener({
-            description: "hello world(测试用)",
-            type: "persist",
-            isOn: false,
-            callback: (*) => MsgBox("Hello World!`n`nClipped:`n" . A_Clipboard)
-        })
+        ; clbListeners.addListener({
+        ;     description: "hello world(测试用)",
+        ;     type: "persist",
+        ;     isOn: false,
+        ;     callback: (*) => MsgBox("Hello World!`n`nClipped:`n" . A_Clipboard)
+        ; })
 
         clbListeners.addListener({
             description: "SPayPos 复制卡号",
             type: "persist",
-            isOn: true,
+            isOn: false,
             callback: (*) => DepositEntry_Action.copyFromSPayPos()
         })
     }
