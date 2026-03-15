@@ -84,6 +84,8 @@ class useServerAgent {
         respondentFilePath := this.pool . "\" . scriptName . ".ahk"
         scriptContent := Format("
             (
+                #Requires AutoHotkey v2.0
+                #SingleInstance Force
                 #Include {1}
 
                 respondent := useServerAgent({ pool: "{2}" })
