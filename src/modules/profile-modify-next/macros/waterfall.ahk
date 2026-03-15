@@ -6,12 +6,12 @@ class PMN_Waterfall {
             for guest in roomProfiles.values()[1] {
                 res := this.search(guest["roomNum"], A_Index, party)
                 if (res == "not found") {
-                    return "Room not found"
+                    return Error("Room not found")
                 }
 
                 if (!PMN_FillIn.isRunning) {
                     msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
-                    return "Ended Unexpectedly"
+                    return Error("Ended Unexpectedly")
                 }
 
                 this.modify(guest, isOverwrite)
@@ -19,7 +19,7 @@ class PMN_Waterfall {
 
                 if (!PMN_FillIn.isRunning) {
                     msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
-                    return "Ended Unexpectedly"
+                    return Error("Ended Unexpectedly")
                 }
             }
         }
