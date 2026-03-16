@@ -244,7 +244,7 @@ class PMN_FillIn {
         
         ; fallback for incomplete info(hk/mo)
         if (currentGuest["guestType"] == "港澳台旅客" && !isTaiwanese && nameLast == " " && nameFirst == " ") {
-            unpack([&nameLast, &nameFirst], this.dict.getFullnamePinyinCantonese(currentGuest["name"]))
+            unpack(this.dict.getFullnamePinyinCantonese(currentGuest["name"]), [&nameLast, &nameFirst])
         }
         
         ; address
