@@ -157,7 +157,7 @@ class useServerAgent {
      */
     POST(content, pool := this.pool) {
         if (this.safePost) {
-            if (!this.PING()) {
+            if (!FileExist(this.pool . "\ONLINE")) {
                 MsgBox("Service offline.",, "4096 T2")
                 return false
             }
