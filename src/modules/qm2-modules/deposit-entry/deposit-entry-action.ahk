@@ -80,7 +80,7 @@ class DepositEntry_Action {
 
         ; copy auth num
         MouseMove 465, 358
-        Sleep 10
+        Sleep 50
         Click 2
         Sleep 10
         Send "^c"
@@ -89,7 +89,7 @@ class DepositEntry_Action {
 
         ; copy amount
         MouseMove 950, 355
-        Sleep 10
+        Sleep 50
         Click 2
         Sleep 10
         Send "^c"
@@ -98,7 +98,7 @@ class DepositEntry_Action {
 
         ; copy card type
         MouseMove 1245, 345
-        Sleep 10
+        Sleep 50
         Click 3
         Sleep 10
         Send "^c"
