@@ -229,9 +229,9 @@ PMN_App(App, moduleTitle, db, identifier) {
             else {
                 ; searching by name fragment
                 for item in loadedItems {
-                    if (!item.satisfies(ProfileMainland) || !item.satisfies(ProfileAbroad) || !item.satisfies(ProfileHkMoTw)) {
-                        continue
-                    }
+                    ; if (!item.satisfies(ProfileMainland) || !item.satisfies(ProfileAbroad) || !item.satisfies(ProfileHkMoTw)) {
+                    ;     continue
+                    ; }
 
                     ; from mainland
                     if (item["guestType"] == "内地旅客") {
