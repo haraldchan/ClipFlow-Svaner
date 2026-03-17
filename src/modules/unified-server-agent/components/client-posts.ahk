@@ -53,8 +53,10 @@ ClientPosts(App, enabled) {
             }
 
             status := StrSplit(A_LoopFileName, "==")[1]
-            post := JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8"))
-            if (post is Error) {
+            try {
+                post := JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8"))
+            }
+            catch {
                 continue
             }
             post["status"] := postStatus[status]
@@ -71,8 +73,10 @@ ClientPosts(App, enabled) {
             }                
 
             status := StrSplit(A_LoopFileName, "==")[1]
-            post := JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8"))
-            if (post is Error) {
+            try {
+                post := JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8"))
+            }
+            catch {
                 continue
             }
             post["status"] := postStatus[status]
