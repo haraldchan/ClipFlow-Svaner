@@ -40,7 +40,7 @@ PMG_Settings(fetchPeriod) {
         ; btns
         Settings.AddButton("x10 y+15 w120 h35", "取 消(&C)").onClick((*) => Settings.Hide()),
         Settings.AddButton("x+5 w120 h35", "保 存(&S)").onClick((*) => (
-            fetchPeriod.set(Settings.getCtrlByName("fp").Value),
+            fetchPeriod.set(Settings["fp"].Value),
             Sleep(200),
             Settings.Hide()
         )),

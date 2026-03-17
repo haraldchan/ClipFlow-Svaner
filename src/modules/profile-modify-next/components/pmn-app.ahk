@@ -143,7 +143,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         ; uodate date if not today
         if (queryFilter.value["date"] != FormatTime(A_Now, "yyyyMMdd")) {
             queryFilter.update("date", FormatTime(A_Now, "yyyyMMdd"))
-            App.getCtrlByName("date").Value := FormatTime(A_Now, "yyyyMMdd")
+            App["date"].Value := FormatTime(A_Now, "yyyyMMdd")
         }
 
         handleListContentUpdate()
