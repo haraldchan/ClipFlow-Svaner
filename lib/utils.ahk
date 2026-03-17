@@ -15,6 +15,10 @@ class utils {
         if (quit = "quit") {
             ExitApp
         }
+        ; clear agent
+        if (IsSet(agent)) {
+            agent.abort()
+        }
         Reload
     }
 
