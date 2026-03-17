@@ -198,15 +198,19 @@ class DepositEntry_Action {
             return
         }
 
-        loop {
-            if (ImageSearch(&outX, &outY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["opera-active-win.PNG"])) {
-                break
-            }
-            Sleep 200
-        } until (A_Index > 5)
+        ; loop {
+        ;     if (ImageSearch(&outX, &outY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["opera-active-win.PNG"])) {
+        ;         break
+        ;     }
+        ;     Sleep 200
+        ; } until (A_Index > 5)
+        found := PmsImageFinder.find("opera-active-win.PNG")
+        if (found is Error) {
+            utils.cleanReload(WIN_GROUP)
+        }
 
         ; move to payment field
-        MouseMove outX + 447, outY + 257
+        MouseMove found.outX + 447, found.outY + 257
         Sleep 100
         Click 3
         Sleep 100
@@ -221,19 +225,24 @@ class DepositEntry_Action {
 
         ; dismiss pre-exist card select
         CoordMode("Pixel", "Screen")
-        if (PixelGetColor(outX + 130, outY + 164) == "0x000080") {
+        if (PixelGetColor(found.outX + 130, found.outY + 164) == "0x000080") {
             Send "!c"
             utils.waitLoading()
         }
 
         ; attach card to profile prompt, choose "No"
-        loop {
-            if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["alert.PNG"])) {
-                break
-            }
+        ; loop {
+        ;     if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["alert.PNG"])) {
+        ;         break
+        ;     }
 
-            Sleep 200
-        } until (A_Index > 5)
+        ;     Sleep 200
+        ; } until (A_Index > 5)
+        found := PmsImageFinder.find("alert.png")
+        if (found is Error) {
+            utils.cleanReload(WIN_GROUP)
+        }
+
         Send "{Esc}"
         utils.waitLoading()
         if (!this.isRunning) {
@@ -285,7 +294,33 @@ class DepositEntry_Action {
         utils.waitLoading()
         CoordMode "Pixel", "Screen"
         CoordMode "Mouse", "Screen"
-        if (ImageSearch(&outX, &outY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["error.PNG"])) {
+        ; if (ImageSearch(&outX, &outY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["error.PNG"])) {
+        ;     Send "{Enter}"
+        ;     utils.waitLoading()
+        ;     Send "{Enter}"
+        ;     utils.waitLoading()
+        ;     return Error("room not found")
+        ; }
+        errorIconFound := PmsImageFinder.find("error.png")
+        if !(errorIconFound is Error) {
+            Send "{Enter}"
+            utils.waitLoading()
+            Send "{Enter}"
+            utils.waitLoading()
+            return Error("room not found") 
+        }
+
+        ; get main-profile
+        ; ImageSearch(&outX, &outY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["opera-active-win.PNG"])
+        ; if (!outX || !outY) {
+        ;     Send "{Enter}"
+        ;     utils.waitLoading()
+        ;     Send "{Enter}"
+        ;     utils.waitLoading()
+        ;     return Error("room not found")
+        ; }
+        found := PmsImageFinder.find("opera-active-win.PNG")
+        if (found is Error) {
             Send "{Enter}"
             utils.waitLoading()
             Send "{Enter}"
@@ -293,16 +328,7 @@ class DepositEntry_Action {
             return Error("room not found")
         }
 
-        ; get main-profile
-        ImageSearch(&outX, &outY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["opera-active-win.PNG"])
-        if (!outX || !outY) {
-            Send "{Enter}"
-            utils.waitLoading()
-            Send "{Enter}"
-            utils.waitLoading()
-            return Error("room not found")
-        }
-        Click outX + 672, outY + 222, "Right"
+        Click found.outX + 672, found.outY + 222, "Right"
         Sleep 100
         Send "{Down}"
         Sleep 100

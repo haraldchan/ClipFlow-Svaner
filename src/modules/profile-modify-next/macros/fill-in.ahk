@@ -38,14 +38,30 @@ class PMN_FillIn {
         WinActivate "ahk_class SunAwtFrame"
         Sleep 300
 
-        if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["error.png"])) {
+        ; if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["error.png"])) {
+        ;     Send "!o"
+        ;     utils.waitLoading()
+        ;     Send "!c"
+        ;     utils.waitLoading()
+
+        ;     return true
+        ; } else {
+        ;     Send "{BackSpace}"
+        ;     utils.waitLoading()
+        ;     Send "^v"
+        ;     utils.waitLoading()
+        ;     return false
+        ; }
+
+        found := PmsImageFinder.find("error.png")
+        if (found is Error) {
             Send "!o"
             utils.waitLoading()
             Send "!c"
             utils.waitLoading()
-
-            return true
-        } else {
+            return Error
+        }
+        else {
             Send "{BackSpace}"
             utils.waitLoading()
             Send "^v"
@@ -56,8 +72,8 @@ class PMN_FillIn {
 
     static fill(currentGuest, isOverwrite := false, keepGoing := false) {
         this.start({ setOnTop: true, blockInput: true })
-        err := this.handleProfileOccupiedFallback()
-        if (err) {
+        res := this.handleProfileOccupiedFallback()
+        if (res is Error) {
             this.end()
             return
         }
@@ -126,14 +142,24 @@ class PMN_FillIn {
     static getCurrentId() {
         prevClip := A_Clipboard
 
-        if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["AltNameAnchor.png"])) {
-            anchorX := FoundX - 10
-            anchorY := FoundY
-        } else {
-            MsgBox("界面定位失败", POPUP_TITLE, "T2 4096")
+        ; if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["AltNameAnchor.png"])) {
+        ;     anchorX := FoundX - 10
+        ;     anchorY := FoundY
+        ; } else {
+        ;     MsgBox("界面定位失败", POPUP_TITLE, "T2 4096")
+        ;     agent.abort()
+        ;     utils.cleanReload(WIN_GROUP)
+        ; }
+
+        found := PmsImageFinder.find("AltNameAnchor.png")
+        if (found is Error) {
+            MsgBox("界面定位失败", POPUP_TITLE, "T2 4096 icon!")
             agent.abort()
             utils.cleanReload(WIN_GROUP)
         }
+        
+        anchorX := found.outX - 10
+        anchorY := found.outY
 
         MouseMove anchorX + 393, anchorY + 50
         utils.waitLoading()
@@ -161,21 +187,31 @@ class PMN_FillIn {
     }
 
     static matchHistory(currentGuest) {
-        loop {
-            Sleep 100
-            if (A_Index > 30) {
-                MsgBox("界面定位失败", POPUP_TITLE, "T2 4096")
-                agent.abort()
-                utils.cleanReload(WIN_GROUP)
-            }
+        ; loop {
+        ;     Sleep 100
+        ;     if (A_Index > 30) {
+        ;         MsgBox("界面定位失败", POPUP_TITLE, "T2 4096")
+        ;         agent.abort()
+        ;         utils.cleanReload(WIN_GROUP)
+        ;     }
 
-            if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["AltNameAnchor.png"])) {
-                x := Number(FoundX) + 350
-                y := Number(FoundY) + 80
-                break
-            } else {
-                continue
-            }
+        ;     if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["AltNameAnchor.png"])) {
+        ;         x := Number(FoundX) + 350
+        ;         y := Number(FoundY) + 80
+        ;         break
+        ;     } else {
+        ;         continue
+        ;     }
+        ; }
+        found := PmsImageFinder.find("AltNameAnchor.png")
+        if (found is Error) {
+            MsgBox("界面定位失败", POPUP_TITLE, "T2 4096")
+            agent.abort()
+            utils.cleanReload(WIN_GROUP)
+        }
+        else {
+            x := found.outX + 350
+            y := found.outY + 80
         }
 
         Send "!h"
@@ -304,12 +340,21 @@ class PMN_FillIn {
     }
     
     static fillAction(guestProfileMap) {
-        if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["AltNameAnchor.png"])) {
-            anchorX := FoundX - 10
-            anchorY := FoundY
-        } else {
-            msgbox("not found", , "T1")
+        ; if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["AltNameAnchor.png"])) {
+        ;     anchorX := FoundX - 10
+        ;     anchorY := FoundY
+        ; } else {
+        ;     msgbox("not found", , "T1")
+        ;     return
+        ; }
+        found := PmsImageFinder.find("AltNameAnchor.png")
+        if (found is Error) {
+            MsgBox(found.Message, "T1 icon!")
             return
+        }
+        else {
+            anchorX := found.outX - 10
+            anchorY := found.outY
         }
 
         MouseMove anchorX, anchorY
@@ -321,7 +366,7 @@ class PMN_FillIn {
         utils.waitLoading()
 
         ; check future reservation popup and resolve it
-        if (PixelSearch(&_, &_, FoundX, FoundY, FoundX + 250, FoundY + 250, "0x000080")) {
+        if (PixelSearch(&_, &_, found.outX, found.outY, found.outX + 250, found.outY + 250, "0x000080")) {
             Send "!o"
             utils.waitLoading()
         }

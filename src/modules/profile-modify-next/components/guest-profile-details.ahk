@@ -6,6 +6,8 @@
 GuestProfileDetails(selectedGuest, fillIn) {
     Profile := Gui("+AlwaysOnTop", "Profile Details")
     Profile.SetFont(, "微软雅黑")
+    timeoutCount := 0
+    TIMEOUT_MAX_SECOND := 60
 
     fieldIndex := OrderedMap(
         "roomNum", "房号",
@@ -39,21 +41,30 @@ GuestProfileDetails(selectedGuest, fillIn) {
         MsgBox(Format("已复制信息: `n`n{1} : {2}", key, A_Clipboard), POPUP_TITLE, "4096 T1")
     }
 
+    detectWindowIsActive(*) {
+        timeoutCount := !WinActive(Profile.Hwnd) ? timeoutCount + 1 : 0
+
+        if (timeoutCount >= TIMEOUT_MAX_SECOND) {
+            SetTimer(, 0)
+            Profile.Destroy()
+        }
+    }
+
     handleClose(*) {
+        SetTimer(detectWindowIsActive, 0)
         Profile.Destroy()
-        SetTimer(handleClose, 0)
     }
 
     fillInPms(*){
-        handleClose()
+        SetTimer(detectWindowIsActive, 0)
         fillIn()
     }
 
     onMount() {
         listInitialize(selectedGuest, fieldIndex)
         Profile.Show()
-        ; windows closes after 1min
-        SetTimer(handleClose, -1000 * 60)
+
+        SetTimer(detectWindowIsActive, 1000)
     }
 
     return (

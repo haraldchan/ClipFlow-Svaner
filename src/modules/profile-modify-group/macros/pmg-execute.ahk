@@ -89,12 +89,24 @@ class PMG_Execute {
         }
 
         ; sort by Prs.
-        Click 838, 378, "Right" 
-        utils.waitLoading()
-        Send "{Down}"
-        utils.waitLoading()
-        Send "{Enter}"
-        utils.waitLoading() 
+        ; Click 838, 378, "Right" 
+        ; utils.waitLoading()
+        ; Send "{Down}"
+        ; utils.waitLoading()
+        ; Send "{Enter}"
+        ; utils.waitLoading() 
+		found := PmsImageFinder.find("opera-active-win.PNG")
+		if (found is Error) {
+			this.isRunning := false
+		}
+		else {
+			Click found.outX + 672, found.outY + 222, "Right"
+			Sleep 200
+			Send "{Down}"
+			Sleep 200
+			Send "{Enter}"
+		}
+
         if (!PMN_FillIn.isRunning) {
             msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return

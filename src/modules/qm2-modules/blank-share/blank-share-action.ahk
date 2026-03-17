@@ -23,6 +23,10 @@ class BlankShare_Action {
 
 	static USE(form) {
 		form := JSON.parse(JSON.stringify(form))
+		if (form is Error) {
+			utils.cleanReload(WIN_GROUP)
+		}
+
 		roomNumsInput := Trim(form["shareRoomNums"])
 		shareQtyInput := Trim(form["shareQty"])
 		checkIn := form["checkIn"]
@@ -43,7 +47,7 @@ class BlankShare_Action {
 			}
 
 			res := this.search(room)
-			if (res == "not found") {
+			if (res is Error || !res) {
 				continue
 			}
 
@@ -52,7 +56,10 @@ class BlankShare_Action {
 
 			if (existShares < shareQty[A_Index]) {
 				sharesToMake := shareQty[A_Index] - existShares
-				this.search(room)
+				res := this.search(room)
+				if (res is Error || !res) {
+					continue
+				}
 			} else {
 				continue
 			}
@@ -90,11 +97,16 @@ class BlankShare_Action {
         Send "!h" ; alt+h => search
         utils.waitLoading()
 
-        CoordMode "Pixel", "Screen"
-        if (ImageSearch(&_, &_ ,0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["info.png"])) {
+        ; CoordMode "Pixel", "Screen"
+        ; if (ImageSearch(&_, &_ ,0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["info.png"])) {
+        ; 	Send "{Enter}"
+        ; 	return "not found"
+        ; }
+		found := PmsImageFinder.find("info.png")
+		if !(found is Error) {
         	Send "{Enter}"
-        	return "not found"
-        }
+        	return found
+		}
 
         if (!this.isRunning) {
             msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
@@ -102,12 +114,24 @@ class BlankShare_Action {
         }
 
         ; sort by Prs.
-        ImageSearch(&outX, &outY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["opera-active-win.PNG"])
-        Click outX + 672, outY + 222, "Right"
-        Sleep 200
-        Send "{Down}"
-        Sleep 200
-        Send "{Enter}"
+        ; ImageSearch(&outX, &outY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["opera-active-win.PNG"])
+        ; Click outX + 672, outY + 222, "Right"
+        ; Sleep 200
+        ; Send "{Down}"
+        ; Sleep 200
+        ; Send "{Enter}"
+		found := PmsImageFinder.find("opera-active-win.PNG")
+		if (found is Error) {
+			this.isRunning := false
+		}
+		else {
+			Click found.outX + 672, found.outY + 222, "Right"
+			Sleep 200
+			Send "{Down}"
+			Sleep 200
+			Send "{Enter}"
+		}
+
         if (!this.isRunning) {
             msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
@@ -121,15 +145,23 @@ class BlankShare_Action {
 		CoordMode "Pixel", "Screen"
 		existShareCount := 0
 
-        ImageSearch(&outX, &outY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["opera-active-win.PNG"])
-		x := outX + 635
-		y := outY + 264
+        ; ImageSearch(&outX, &outY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["opera-active-win.PNG"])
+		; x := outX + 635
+		; y := outY + 264
+		found := PmsImageFinder.find("opera-active-win.PNG")
+		if (found is Error) {
+			utils.cleanReload(WIN_GROUP)
+		}
+		else {
+			x := found.outX + 635
+			y := found.outY + 264
+		}
 
 		loop {
 			Send "{Down}"
 			utils.waitLoading()
 			if (PixelGetColor(x, y) == "0x000080") {
-				existShareCount++
+				existShareCount
 				y += 22
 			} else {
 				break
@@ -192,17 +224,32 @@ class BlankShare_Action {
 
 
 		; delete comment
-		CoordMode "Pixel"
-		ImageSearch(&x, &y, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["opera-active-win.PNG"])
-		MouseMove x + 752, y + 415
-		Click
+		; CoordMode "Pixel"
+		; ImageSearch(&x, &y, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["opera-active-win.PNG"])
+		; MouseMove x + 752, y + 415
+		; Click
+		found := PmsImageFinder.find("opera-active-win.PNG")
+		if (found is Error) {
+			utils.cleanReload(WIN_GROUP)
+		}
+		else {
+			MouseMove found.outX + 752, found.outY + 415
+			Sleep 100
+			Click
+		}
+
 		utils.waitLoading()
 		loop {
 			Send "!d"
 			utils.waitLoading()
-			if (!ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["alert.PNG"])) {
+			; if (!ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["alert.PNG"])) {
+			; 	break
+			; }
+			found := PmsImageFinder.find("alert.PNG")
+			if (found is Error) {
 				break
 			}
+
 			Send "!y"
 			utils.waitLoading()
 		}
@@ -215,7 +262,7 @@ class BlankShare_Action {
 		}
 
 		; change RateCode to NRR
-		MouseClickDrag "L", x + 131, y + 324, x + 40, y + 324 
+		MouseClickDrag "L", found.outX + 131, found.outX + 324, found.outX + 40, found.outY + 324 
 		utils.waitLoading()
 		Send "{Text}NRR"
 		utils.waitLoading()
@@ -236,11 +283,21 @@ class BlankShare_Action {
 			utils.waitLoading()
 
 			CoordMode "Pixel", "Screen"
-			if (ImageSearch(&foundX, &foundY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["alert.png"])) {
-				if (PixelGetColor(foundX + 303, foundY) == "0xD7D7D7") {
+			; if (ImageSearch(&foundX, &foundY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["alert.png"])) {
+			; 	if (PixelGetColor(foundX + 303, foundY) == "0xD7D7D7") {
+			; 		Send "!y"
+			; 		utils.waitLoading()
+			; 	} 
+			; }
+			found := PmsImageFinder.find("alert.png")
+			if (found is Error) {
+				utils.cleanReload(WIN_GROUP)
+			}
+			else {
+				if (PixelGetColor(found.outX + 303, found.outY) == "0xD7D7D7") {
 					Send "!y"
 					utils.waitLoading()
-				} 
+				}
 			}
 
 			Send "{Esc}"
@@ -285,8 +342,18 @@ class BlankShare_Action {
 					utils.waitLoading()
 		
 					CoordMode "Pixel", "Screen"
-					if (ImageSearch(&foundX, &foundY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["alert.PNG"])) {
-						if (PixelGetColor(foundX + 303, foundY) == "0xD7D7D7") {
+					; if (ImageSearch(&foundX, &foundY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["alert.PNG"])) {
+					; 	if (PixelGetColor(foundX + 303, foundY) == "0xD7D7D7") {
+					; 		Send "!y"
+					; 		utils.waitLoading()
+					; 	} 
+					; }
+					found := PmsImageFinder.find("alert.png")
+					if (found is Error) {
+						utils.cleanReload(WIN_GROUP)
+					}
+					else {
+						if (PixelGetColor(found.outX + 303, found.outY) == "0xD7D7D7") {
 							Send "!y"
 							utils.waitLoading()
 						} 
