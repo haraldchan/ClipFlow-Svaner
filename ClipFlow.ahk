@@ -36,6 +36,39 @@ ClipFlowApp := Svaner({
 App(ClipFlowApp)
 ClipFlowApp.Show()
 
+OnError(logError)
+logError(err, *) {
+	if (!DirExist(A_ScriptDir . "\error-log")) {
+		DirCreate(A_ScriptDir . "\error-log")
+	}
+
+	errTxt := A_ScriptDir . "\error-log\" . FormatTime(A_Now, "yyyyMMdd") . "txt"
+	errLog := Format("
+		(
+			{1} line: {2}
+			message: {3}
+			error:   {4}
+		)", 
+		FormatTime(A_Now, "yyyy/MM/dd HH:mm"),
+		err.Line,
+		err.Message,
+		err.Extra
+	)
+
+	FileAppend(errLog, errTxt, "utf-8")
+
+	if (DirExist(APP_DATA_DIR . "\clipflow-clips")) {
+		DirDelete(APP_DATA_DIR . "\clipflow-clips", true)
+	}
+
+	if (FileExist(CONFIG.path)) {
+		FileDelete(CONFIG.path)
+	}
+	CONFIG.createLocal()
+	
+	utils.cleanReload(WIN_GROUP)
+}
+
 ; hotkeys setup
 Pause:: ClipFlowApp.Show()
 F11:: utils.cleanReload(WIN_GROUP)
