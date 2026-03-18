@@ -5,21 +5,21 @@ class utils {
         ; Windows set default
         loop winGroup.Length {
             if (WinExist(winGroup[A_Index])) {
-                WinSetAlwaysOnTop false, winGroup[A_Index]
+                WinSetAlwaysOnTop(false, winGroup[A_Index])
             }
         }
         ; Key/Mouse state set default
-        BlockInput false
-        SetCapsLockState false
-        CoordMode "Mouse", "Screen"
+        BlockInput(false)
+        SetCapsLockState(false)
+        CoordMode("Mouse", "Screen")
         if (quit = "quit") {
-            ExitApp
+            ExitApp()
         }
         ; clear agent
         if (IsSet(agent)) {
             agent.abort()
         }
-        Reload
+        Reload()
     }
 
     ; Exit app with clean reload.
@@ -34,8 +34,8 @@ class utils {
     ; Insert text at the beginning of file.
     static filePrepend(textToInsert, fileToPrepend) {
         textOrigin := FileRead(fileToPrepend)
-        FileDelete fileToPrepend
-        FileAppend textToInsert . textOrigin, fileToPrepend
+        FileDelete(fileToPrepend)
+        FileAppend(textToInsert . textOrigin, fileToPrepend)
     }
 
     ; Type checking with error msg.
@@ -74,7 +74,7 @@ class utils {
 
     static waitLoading(interval := 150) {
         loop {
-            sleep interval
+            sleep(interval)
             if (A_Cursor != "Wait") {
                 break
             }
@@ -84,14 +84,14 @@ class utils {
     static checkClearWin(msgboxTitle, operaLogo){
         isFound := ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, operaLogo)
         if (isFound = false) {
-            WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
-            BlockInput false
+            WinSetAlwaysOnTop(false, "ahk_class SunAwtFrame")
+            BlockInput(false)
             clearWin := MsgBox("请先清空 Opera 界面中的子窗口。", msgboxTitle, "OKCancel 4096")
             if (clearWin = "Cancel") {
                 return "Cancel"
             } else {
-                WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
-                BlockInput "SendAndMouse"
+                WinSetAlwaysOnTop(true, "ahk_class SunAwtFrame")
+                BlockInput("SendAndMouse")
                 return "OK"
             }
         }

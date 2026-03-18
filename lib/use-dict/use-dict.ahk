@@ -64,7 +64,7 @@ class useDict {
         whr.Send()
         whr.WaitForResponse()
         page := whr.ResponseText
-        Sleep 500
+        Sleep(500)
         pinyinWithPhonetic := page.split('<span class="pinyin">')[2].split("</span>")[1].replaceThese(["[", "]"], "").trim()
 
         for char, charsWithPhonetic in this.phoneticMap {
@@ -124,9 +124,9 @@ class useDict {
 
     URIEncode(Url, Flags := 0x000C3000) {
         Local CC := 4096, Esc := "", Result := ""
-        Loop
+        Loop {
             VarSetStrCapacity(&Esc, CC), Result := DllCall("Shlwapi.dll\UrlEscapeW", "Str", Url, "Str", &Esc, "UIntP", &CC, "UInt", Flags, "UInt")
-        Until Result != 0x80004003 ; E_POINTER
+        } Until Result != 0x80004003 ; E_POINTER
         Return Esc
     }
 

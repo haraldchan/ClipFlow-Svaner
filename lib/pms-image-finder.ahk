@@ -20,7 +20,7 @@ class PmsImageFinder {
             }
 
             timeoutCount++
-            Sleep 250
+            Sleep(250)
         } until (timeoutCount > 10)
 
         return false

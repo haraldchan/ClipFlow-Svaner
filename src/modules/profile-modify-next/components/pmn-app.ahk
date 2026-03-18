@@ -295,7 +295,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         }
         
         App.Hide()
-        Sleep 500 
+        Sleep(500) 
         
         LV := App["guest-profile-list"]
         if (!LV.GetNext()) {
@@ -403,11 +403,11 @@ PMN_App(App, moduleTitle, db, identifier) {
     onMount() {
         ; hotkey setup
         HotIfWinActive(POPUP_TITLE)
-        Hotkey "!f", (*) => App["searchBox"].Focus()
-        Hotkey "!Left", (*) => toggleDate("-")
-        Hotkey "!Right", (*) => toggleDate("+")
-        Hotkey "!Up", (*) => toggleRange("+")
-        Hotkey "!Down", (*) => toggleRange("-")
+        Hotkey("!f", (*) => App["searchBox"].Focus())
+        Hotkey("!Left", (*) => toggleDate("-"))
+        Hotkey("!Right", (*) => toggleDate("+"))
+        Hotkey("!Up", (*) => toggleRange("+"))
+        Hotkey("!Down", (*) => toggleRange("-"))
 
         toggleDate(direction) {
             diff := direction == "-" ? -1 : 1

@@ -15,7 +15,7 @@ class PMN_Waterfall {
                 }
 
                 this.modify(guest, isOverwrite)
-                Sleep 1000
+                Sleep(1000)
 
                 if (!PMN_FillIn.isRunning) {
                     msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
@@ -32,21 +32,21 @@ class PMN_Waterfall {
         PMN_FillIn.end()
         ; clear err popup
         loop 2 {
-            Send "!o"
+            Send("!o")
             utils.waitLoading()
         }
 
         ; close all windows
         loop {
-            Send "!w"
-            Sleep 100
-            Send "{Up}"
-            Sleep 100
-            Send "{Enter}"
-            Sleep 100
-            Send "!c"
+            Send("!w")
+            Sleep(100)
+            Send("{Up}")
+            Sleep(100)
+            Send("{Enter}")
+            Sleep(100)
+            Send("!c")
             utils.waitLoading()
-            Send "{Esc}"
+            Send("{Esc}")
             utils.waitLoading()
 
             if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-logo.PNG"])) {
@@ -55,42 +55,42 @@ class PMN_Waterfall {
         }
 
         ; restore In-house window
-        Send "!f"
+        Send("!f")
         utils.waitLoading()
-        Send "{Down}"
-        Sleep 100
-        Send "{Enter}"
+        Send("{Down}")
+        Sleep(100)
+        Send("{Enter}")
         utils.waitLoading()
     }
 
     static search(roomNum, index, party := 0) {
         formattedRoom := StrLen(roomNum) = 3 ? "0" . roomNum : roomNum
 
-        Send "!r"
+        Send("!r")
         utils.waitLoading()
         if (!PMN_FillIn.isRunning) {
             msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 
-        Send formattedRoom
+        Send(formattedRoom)
         utils.waitLoading()
 
         if (party) {
             loop 16 {
-                Send "{Tab}"
-                Sleep 10
+                Send("{Tab}")
+                Sleep(10)
             }
-            Send "{Text}" . party
+            Send("{Text}" . party)
             utils.waitLoading()
         }
 
-        Send "!h" ; alt+h => search
+        Send("!h") ; alt+h => search
         utils.waitLoading()
 
-        CoordMode "Pixel", "Screen"
+        CoordMode("Pixel", "Screen")
         if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["info.PNG"])) {
-            Send "{Enter}"
+            Send("{Enter}")
             PMN_FillIn.end()
             return "not found"
         }
@@ -102,11 +102,11 @@ class PMN_Waterfall {
 
         ; sort by Prs.
         ImageSearch(&outX, &outY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["opera-active-win.PNG"])
-        Click outX + 672, outY + 222, "Right"
-        Sleep 200
-        Send "{Down}"
-        Sleep 200
-        Send "{Enter}"
+        Click(outX + 672, outY + 222, "Right")
+        Sleep(200)
+        Send("{Down}")
+        Sleep(200)
+        Send("{Enter}")
         utils.waitLoading()
         if (!PMN_FillIn.isRunning) {
             msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
@@ -118,7 +118,7 @@ class PMN_Waterfall {
 
         ; choose resv
         loop (index - 1) {
-            Send "{Down}"
+            Send("{Down}")
             utils.waitLoading()
         }
 
@@ -126,15 +126,15 @@ class PMN_Waterfall {
     }
 
     static modify(guest, isOverwrite) {
-        Send "!p" ; open profile
+        Send("!p") ; open profile
         utils.waitLoading()
 
         PMN_FillIn.fill(guest, isOverwrite, true)
         utils.waitLoading()
         ; Sleep 1000
 
-        Send "!o" ; ok
+        Send("!o") ; ok
         utils.waitLoading()
-        sleep 1000
+        sleep(1000)
     }
 }

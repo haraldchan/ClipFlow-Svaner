@@ -30,7 +30,7 @@ class PMG_Execute {
                         msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
                         return
                     }
-                    Send "!r" ; clear
+                    Send("!r") ; clear
                 }
 
                 if (guest["roomNum"] == room) {
@@ -52,36 +52,36 @@ class PMG_Execute {
         }
 
         PMN_FillIn.end()
-        Sleep 1000
+        Sleep(1000)
         MsgBox("Group Modify 已完成。")
     }
 
     static openInHouse() {
-        WinActivate "ahk_class SunAwtFrame"
-        Send "!f"
+        WinActivate("ahk_class SunAwtFrame")
+        Send("!f")
         utils.waitLoading()
-        Send "{Text}i"
+        Send("{Text}i")
         utils.waitLoading()
-        Sleep 500
+        Sleep(500)
     }
 
     static search(roomNum, index, isNewShare) {
         formattedRoom := StrLen(roomNum) == 3 ? "0" . roomNum : roomNum
 
-        Send "!r" ; room number field
+        Send("!r") ; room number field
         utils.waitLoading()
         
-        Send formattedRoom
+        Send(formattedRoom)
         utils.waitLoading()
 
         if (isNewShare) {
-            Send "{Tab}"
+            Send("{Tab}")
             utils.waitLoading()
-            Send "{Text}1"
+            Send("{Text}1")
             utils.waitLoading()
         }
 
-        Send "!h" ; alt+h => search
+        Send("!h") ; alt+h => search
         utils.waitLoading()
         if (!PMN_FillIn.isRunning) {
             msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
@@ -100,11 +100,11 @@ class PMG_Execute {
 			this.isRunning := false
 		}
 		else {
-			Click found.outX + 672, found.outY + 222, "Right"
-			Sleep 200
-			Send "{Down}"
-			Sleep 200
-			Send "{Enter}"
+			Click(found.outX + 672, found.outY + 222, "Right")
+			Sleep(200)
+			Send("{Down}")
+			Sleep(200)
+			Send("{Enter}")
 		}
 
         if (!PMN_FillIn.isRunning) {
@@ -114,51 +114,51 @@ class PMG_Execute {
 
         ; choose resv
         loop (index - 1) {
-            Send "{Down}"
+            Send("{Down}")
             utils.waitLoading()
         }
     }
 
     static modify(guest) {
-        Send "!p" ; open profile
+        Send("!p") ; open profile
         utils.waitLoading()
         ; sleep 1000
 
         PMN_FillIn.fill(guest, false, true)
-        Sleep 1100
-        Send "!o" ; ok
+        Sleep(1100)
+        Send("!o") ; ok
 
         utils.waitLoading()
         ; sleep 1000
-        Send "!r" ; clear
+        Send("!r") ; clear
     }
 
     static makeShare(initX := 949, initY := 599) {
-        Send "!t"
+        Send("!t")
         utils.waitLoading()
-        Send "!s"
+        Send("!s")
         utils.waitLoading()
-        Send "!m"
+        Send("!m")
         utils.waitLoading()
-        Send "{Esc}"
+        Send("{Esc}")
         utils.waitLoading()
-        Send "{Text}1"
+        Send("{Text}1")
         utils.waitLoading()
         loop 4 {
-            Send "{Tab}"
+            Send("{Tab}")
             utils.waitLoading()
         }
         if (!PMN_FillIn.isRunning) {
             msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
-        Send "{Text}0"
+        Send("{Text}0")
         utils.waitLoading()
-        Send "{Tab}"
+        Send("{Tab}")
         utils.waitLoading()
-        Send "{Tab}"
+        Send("{Tab}")
         utils.waitLoading()
-        Send "{Text}6"
+        Send("{Text}6")
         utils.waitLoading()
         if (!PMN_FillIn.isRunning) {
             msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
@@ -167,35 +167,35 @@ class PMG_Execute {
 
         ; TODO: change the flow, keep no post
 
-        Send "!o"
+        Send("!o")
         utils.waitLoading()
-        Send "!r"
+        Send("!r")
         utils.waitLoading()
-        MouseMove initX, initY ; 949, 599
+        MouseMove(initX, initY) ; 949, 599
         utils.waitLoading()
-        Click
+        Click()
         utils.waitLoading()
-        Send "!d"
-        MouseMove initX - 338, initY - 53 ; 611, 546
+        Send("!d")
+        MouseMove(initX - 338, initY - 53) ; 611, 546
         utils.waitLoading()
-        Click
+        Click()
         utils.waitLoading()
-        Send "!c"
-        MouseMove initX - 625, initY - 92 ; 324, 507
+        Send("!c")
+        MouseMove(initX - 625, initY - 92) ; 324, 507
         utils.waitLoading()
         if (!PMN_FillIn.isRunning) {
             msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 
-        Click "Down"
-        MouseMove initX - 737, initY - 79 ; 212, 520
+        Click("Down")
+        MouseMove(initX - 737, initY - 79) ; 212, 520
         utils.waitLoading()
-        Click "Up"
+        Click("Up")
         utils.waitLoading()
-        Send "{Text}NRR"
+        Send("{Text}NRR")
         utils.waitLoading()
-        Send "!o"
+        Send("!o")
         utils.waitLoading()
         if (!PMN_FillIn.isRunning) {
             msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
@@ -203,14 +203,14 @@ class PMG_Execute {
         }
 
         loop 4 {
-            Send "{Esc}"
+            Send("{Esc}")
             utils.waitLoading()
         }
         utils.waitLoading()
-        Send "!i"
+        Send("!i")
         utils.waitLoading()
         loop 5 {
-            Send "{Esc}"
+            Send("{Esc}")
             utils.waitLoading()
         }
         if (!PMN_FillIn.isRunning) {
@@ -219,11 +219,11 @@ class PMG_Execute {
         }
 
         utils.waitLoading()
-        Send "{Space}"
+        Send("{Space}")
         utils.waitLoading()
-        Send "!o"
+        Send("!o")
         utils.waitLoading()
-        Send "!c"
+        Send("!c")
         utils.waitLoading()
     }
 }

@@ -11,32 +11,32 @@ class PMN_FillIn {
         })
 
         this.isRunning := true
-        HotIf (*) => this.isRunning
+        HotIf((*) => this.isRunning)
         Hotkey("F12", (*) => this.end(), "On")
 
-        CoordMode "Pixel", "Screen"
-        CoordMode "Mouse", "Screen"
+        CoordMode("Pixel", "Screen")
+        CoordMode("Mouse", "Screen")
 
-        WinActivate "ahk_class SunAwtFrame"
-        WinSetAlwaysOnTop c.setOnTop, "ahk_class SunAwtFrame"
+        WinActivate("ahk_class SunAwtFrame")
+        WinSetAlwaysOnTop(c.setOnTop, "ahk_class SunAwtFrame")
 
-        BlockInput c.blockInput
+        BlockInput(c.blockInput)
     }
 
     static end() {
         this.isRunning := false
         Hotkey("F12", "Off")
 
-        WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
-        BlockInput false
+        WinSetAlwaysOnTop(false, "ahk_class SunAwtFrame")
+        BlockInput(false)
     }
 
     static handleProfileOccupiedFallback() {
-        Send "^c"
+        Send("^c")
         utils.waitLoading()
-        Send "{Space}"
-        WinActivate "ahk_class SunAwtFrame"
-        Sleep 300
+        Send("{Space}")
+        WinActivate("ahk_class SunAwtFrame")
+        Sleep(300)
 
         ; if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["error.png"])) {
         ;     Send "!o"
@@ -55,16 +55,16 @@ class PMN_FillIn {
 
         found := PmsImageFinder.find("error.png")
         if (found) {
-            Send "!o"
+            Send("!o")
             utils.waitLoading()
-            Send "!c"
+            Send("!c")
             utils.waitLoading()
             return true
         }
         else {
-            Send "{BackSpace}"
+            Send("{BackSpace}")
             utils.waitLoading()
-            Send "^v"
+            Send("^v")
             utils.waitLoading()
             return false
         }
@@ -86,7 +86,7 @@ class PMN_FillIn {
             utils.waitLoading()
             if (success) {
                 MsgBox("已完成 Profile Modify！", "Profile Modify Next", "T1 4096")
-                Send "!o"
+                Send("!o")
             }
 
             ( !keepGoing && this.end() )
@@ -97,8 +97,8 @@ class PMN_FillIn {
         ; on-screen profile matcheds
         if (currentId == guest["idNum"]) {
             MsgBox("当前 Profile 正确", "Profile Modify Next", "T1 4096")
-            Sleep 100
-            Send "!o"
+            Sleep(100)
+            Send("!o")
 
             ( !keepGoing && this.end() )
             return
@@ -106,24 +106,24 @@ class PMN_FillIn {
 
         ; matched in database
         if (this.matchHistory(guest) == this.FOUND) {
-            Send "!o"
+            Send("!o")
             utils.waitLoading()
             MsgBox("已匹配原有 Profile", "Profile Modify Next", "T1 4096")
-            Sleep 100
-            Send "!o"
+            Sleep(100)
+            Send("!o")
 
             ( !keepGoing && this.end() )
             return
         } else {
-            Send "!c"
+            Send("!c")
             utils.waitLoading()
-            sleep 100
+            sleep(100)
             if (currentId == "") {
                 success := this.fillAction(guest)
             } else {
-                Send "!n"
+                Send("!n")
                 utils.waitLoading()
-                Send "{Esc}"
+                Send("{Esc}")
                 utils.waitLoading()
                 success := this.fillAction(guest)
             }
@@ -131,8 +131,8 @@ class PMN_FillIn {
             utils.waitLoading()
             if (success) {
                 MsgBox("已完成 Profile Modify！", "Profile Modify Next", "T1 4096")
-                Sleep 100
-                Send "!o"
+                Sleep(100)
+                Send("!o")
             }
         }
 
@@ -161,23 +161,23 @@ class PMN_FillIn {
         anchorX := found.outX - 10
         anchorY := found.outY
 
-        MouseMove anchorX + 393, anchorY + 50
+        MouseMove(anchorX + 393, anchorY + 50)
         utils.waitLoading()
-        Click 2
-        Sleep 200
-        Send "^c"
+        Click(2)
+        Sleep(200)
+        Send("^c")
         utils.waitLoading()
-        Send "!s"
+        Send("!s")
         utils.waitLoading()
-        Sleep 500
+        Sleep(500)
 
         ; check if gender select modal exist
         if (PixelGetColor(517, 506) == "0xFFFFFF") {
-            Send "!o"
+            Send("!o")
             utils.waitLoading()
         }
 
-        Send "{Enter}"
+        Send("{Enter}")
         utils.waitLoading()
 
         currentId := (A_Clipboard = prevClip || A_Clipboard = "") ? "" : A_Clipboard
@@ -214,17 +214,17 @@ class PMN_FillIn {
             y := found.outY + 80
         }
 
-        Send "!h"
+        Send("!h")
         utils.waitLoading()
-        Sleep 500
+        Sleep(500)
         ; check if gender select modal exist
         if (PixelGetColor(517, 506) == "0xFFFFFF") {
-            Send "!o"
+            Send("!o")
             utils.waitLoading()
-            Sleep 500
+            Sleep(500)
         }
 
-        Send "{Esc}" ; cancel the "save changes msgbox"
+        Send("{Esc}") ; cancel the "save changes msgbox"
         utils.waitLoading()
         if (!this.isRunning) {
             msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
@@ -232,8 +232,8 @@ class PMN_FillIn {
         }
 
         loop 12 {
-            Send "{Tab}"
-            Sleep 10
+            Send("{Tab}")
+            Sleep(10)
         }
 
         if (!this.isRunning) {
@@ -241,11 +241,11 @@ class PMN_FillIn {
             return
         }
 
-        Send Format("{Text}{1}", currentGuest["idNum"])
+        Send(Format("{Text}{1}", currentGuest["idNum"]))
         utils.waitLoading()
-        Send "!h"
+        Send("!h")
         utils.waitLoading()
-        Sleep 500
+        Sleep(500)
 
         if (!this.isRunning) {
             msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
@@ -357,50 +357,50 @@ class PMN_FillIn {
             anchorY := found.outY
         }
 
-        MouseMove anchorX, anchorY
-        Click 3
+        MouseMove(anchorX, anchorY)
+        Click(3)
         utils.waitLoading()
-        Send Format("{Text}{1}", guestProfileMap["nameLast"])
+        Send(Format("{Text}{1}", guestProfileMap["nameLast"]))
 
-        Send "{Tab}"
+        Send("{Tab}")
         utils.waitLoading()
 
         ; check future reservation popup and resolve it
         if (PixelSearch(&_, &_, found.outX, found.outY, found.outX + 250, found.outY + 250, "0x000080")) {
-            Send "!o"
+            Send("!o")
             utils.waitLoading()
         }
 
-        Send Format("{Text}{1}", guestProfileMap["nameFirst"])
+        Send(Format("{Text}{1}", guestProfileMap["nameFirst"]))
 
         loop 2 {
-            Send "{Tab}"
+            Send("{Tab}")
         }
         utils.waitLoading()
-        Send Format("{Text}{1}", guestProfileMap["language"])
+        Send(Format("{Text}{1}", guestProfileMap["language"]))
 
         if (!this.isRunning) {
             msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 
-        Send "{Tab}"
+        Send("{Tab}")
         utils.waitLoading()
-        Send Format("{Text}{1}", guestProfileMap["gender"])
+        Send(Format("{Text}{1}", guestProfileMap["gender"]))
 
-        Send "{Tab}"
+        Send("{Tab}")
         utils.waitLoading()
-        Send Format("{Text}{1}", guestProfileMap["addr"])
+        Send(Format("{Text}{1}", guestProfileMap["addr"]))
 
         loop 6 {
-            Send "{Tab}"
+            Send("{Tab}")
         }
         utils.waitLoading()
-        Send Format("{Text}{1}", guestProfileMap["country"])
+        Send(Format("{Text}{1}", guestProfileMap["country"]))
 
-        Send "{Tab}"
+        Send("{Tab}")
         utils.waitLoading()
-        Send Format("{Text}{1}", guestProfileMap["province"])
+        Send(Format("{Text}{1}", guestProfileMap["province"]))
 
         if (!this.isRunning) {
             msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
@@ -408,33 +408,33 @@ class PMN_FillIn {
         }
 
         loop 9 {
-            Send "{Tab}"
+            Send("{Tab}")
         }
         utils.waitLoading()
-        Send Format("{Text}{1}", guestProfileMap["birthday"])
+        Send(Format("{Text}{1}", guestProfileMap["birthday"]))
 
-        Send "{Tab}"
+        Send("{Tab}")
         utils.waitLoading()
-        Send Format("{Text}{1}", guestProfileMap["idNum"])
+        Send(Format("{Text}{1}", guestProfileMap["idNum"]))
         utils.waitLoading()
 
-        MouseMove anchorX + 393, anchorY + 28
+        MouseMove(anchorX + 393, anchorY + 28)
         utils.waitLoading()
-        Click 3
-        Send Format("{Text}{1}", guestProfileMap["idType"])
+        Click(3)
+        Send(Format("{Text}{1}", guestProfileMap["idType"]))
         utils.waitLoading()
-        Send "{Tab}"
+        Send("{Tab}")
         utils.waitLoading()
 
         if (guestProfileMap["tel"] != " ") {
-            MouseMove anchorX + 270, anchorY + 110
+            MouseMove(anchorX + 270, anchorY + 110)
             utils.waitLoading()
-            Click 3
-            Send "{Text}MOBILE"
+            Click(3)
+            Send("{Text}MOBILE")
             utils.waitLoading()
-            Send "{Tab}"
+            Send("{Tab}")
             utils.waitLoading()
-            Send Format("{Text}{1}", guestProfileMap["tel"])
+            Send(Format("{Text}{1}", guestProfileMap["tel"]))
             utils.waitLoading()
         }
 
@@ -446,27 +446,27 @@ class PMN_FillIn {
         if (guestProfileMap["nameAlt"] != " ") {
             ; { with hanzi name
             ; fillin: nameAlt, gender(in nameAlt window)
-            MouseMove anchorX + 10, anchorY + 10 ; open alt name win
+            MouseMove(anchorX + 10, anchorY + 10) ; open alt name win
             utils.waitLoading()
-            Click 1
+            Click(1)
             utils.waitLoading()
 
-            Send Format("{Text}{1}", guestProfileMap["nameAlt"])
+            Send(Format("{Text}{1}", guestProfileMap["nameAlt"]))
             utils.waitLoading()
 
             loop 3 {
-                Send "{Tab}"
+                Send("{Tab}")
             }
             utils.waitLoading()
-            Send Format("{Text}{1}", "C")
+            Send(Format("{Text}{1}", "C"))
 
-            Send "{Tab}"
+            Send("{Tab}")
             utils.waitLoading()
-            Send Format("{Text}{1}", guestProfileMap["gender"])
+            Send(Format("{Text}{1}", guestProfileMap["gender"]))
             utils.waitLoading()
-            Send "{Tab}"
+            Send("{Tab}")
             utils.waitLoading()
-            Send "!o"
+            Send("!o")
             utils.waitLoading()
         }
 

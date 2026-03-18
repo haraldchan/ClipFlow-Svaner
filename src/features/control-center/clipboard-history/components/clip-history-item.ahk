@@ -67,7 +67,7 @@ ClipHistoryItem(App, clipHistory, index) {
             return
         }   
 
-        Sleep 200
+        Sleep(200)
         
         A_Clipboard := clipHistory.value[index].content
         btn := App["chi-function-btn" . index]

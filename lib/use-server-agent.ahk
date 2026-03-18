@@ -123,7 +123,7 @@ class useServerAgent {
                 } 
             }
 
-            Sleep 1000
+            Sleep(1000)
             ; response timeout
             if(A_Index > (this.interval / 1000 * 3 * 3)) {
                 try {

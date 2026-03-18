@@ -3,7 +3,7 @@ RH_App(App, moduleTitle, identifier) {
     r := {}
     curResv := signal(RH_Models.otaListFields.keys().map(key => r.DefineProp(key, { Value: "" })))
     resvSource := signal("")
-    OnClipboardChange (*) => handleCaptured(identifier)
+    OnClipboardChange((*) => handleCaptured(identifier))
     clbListeners.addListener({
         description: "OTA 预订信息捕获",
         isOn: true,

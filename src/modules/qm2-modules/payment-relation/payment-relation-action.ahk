@@ -3,23 +3,23 @@ class PaymentRelation_Action {
 
     static start() {
         this.isRunning := true
-        HotIf (*) => this.isRunning
+        HotIf((*) => this.isRunning)
         Hotkey("F12", (*) => this.end(), "On")
 
-        CoordMode "Pixel", "Screen"
-        CoordMode "Mouse", "Screen"
-        WinMaximize "ahk_class SunAwtFrame"
-        WinActivate "ahk_class SunAwtFrame"
-        WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
-        BlockInput true
+        CoordMode("Pixel", "Screen")
+        CoordMode("Mouse", "Screen")
+        WinMaximize("ahk_class SunAwtFrame")
+        WinActivate("ahk_class SunAwtFrame")
+        WinSetAlwaysOnTop(true, "ahk_class SunAwtFrame")
+        BlockInput(true)
     }
 
     static end() {
         this.isRunning := false
         Hotkey("F12", "Off")
 
-        WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
-        BlockInput false
+        WinSetAlwaysOnTop(false, "ahk_class SunAwtFrame")
+        BlockInput(false)
     }
 
     static USE(formData := "") {
@@ -105,11 +105,11 @@ class PaymentRelation_Action {
             loop form["partyRoomQty"] {
                 this.search(" ", form["party"])
                 ; sort main folio rooms
-                Click 838, 378, "Right"
-                Sleep 200
-                Send "{Down}"
-                Sleep 200
-                Send "{Enter}"
+                Click(838, 378, "Right")
+                Sleep(200)
+                Send("{Down}")
+                Sleep(200)
+                Send("{Enter}")
                 utils.waitLoading()
                 if (!this.isRunning) {
                     msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
@@ -118,7 +118,7 @@ class PaymentRelation_Action {
 
                 ; select target room sequencially
                 loop (A_Index - 1) {
-                    Send "{Down}"
+                    Send("{Down}")
                     utils.waitLoading()
                 }
 
@@ -136,36 +136,36 @@ class PaymentRelation_Action {
     static search(roomNum := "", party := "") {
         formattedRoom := StrLen(roomNum) == 3 ? "0" . roomNum : roomNum
 
-        Send "!r" ; room number field
+        Send("!r") ; room number field
         utils.waitLoading()
         if (!this.isRunning) {
             msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 
-        Send "{Text}" . formattedRoom
+        Send("{Text}" . formattedRoom)
         utils.waitLoading()
 
         if (party) {
             loop 16 {
-                Send "{Tab}"
-                Sleep 10
+                Send("{Tab}")
+                Sleep(10)
             }
-            Send "{Text}" . party
+            Send("{Text}" . party)
             utils.waitLoading()
         }
 
-        Send "!h" ; alt+h => search
+        Send("!h") ; alt+h => search
         utils.waitLoading()
 
-        CoordMode "Pixel", "Screen"
+        CoordMode("Pixel", "Screen")
         ; if (ImageSearch(&_, &_ ,0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["info.PNG"])) {
         ;     Send "{Enter}"
         ;     return "not found"
         ; }
         found := PmsImageFinder.find("info.PNG")
         if (found) {
-            Send "{Enter}"
+            Send("{Enter}")
             return false
         }
 
@@ -188,11 +188,11 @@ class PaymentRelation_Action {
 			this.isRunning := false
 		}
 		else {
-			Click found.outX + 672, found.outY + 222, "Right"
-			Sleep 200
-			Send "{Down}"
-			Sleep 200
-			Send "{Enter}"
+			Click(found.outX + 672, found.outY + 222, "Right")
+			Sleep(200)
+			Send("{Down}")
+			Sleep(200)
+			Send("{Enter}")
 		}
 
         if (!this.isRunning) {
@@ -238,7 +238,7 @@ class PaymentRelation_Action {
         commentFound := PmsImageFinder.find(commentPos)
         if (!commentFound) {
             ; open reservation click
-            Send "{Enter}"
+            Send("{Enter}")
             utils.waitLoading()
 
             ; check if alert is on top
@@ -248,45 +248,45 @@ class PaymentRelation_Action {
                     break
                 }
 
-                Send "{Enter}"
-                Sleep 250
+                Send("{Enter}")
+                Sleep(250)
             }
 
             ; open comment
-            MouseMove 949, 599
+            MouseMove(949, 599)
             utils.waitLoading()
-            Click
+            Click()
             utils.waitLoading()
         }
         else {
             anchorX := commentFound.outX
             anchorY := commentFound.outY
             ; open comment
-            MouseMove anchorX + 1, anchorY + 1
-            Click
+            MouseMove(anchorX + 1, anchorY + 1)
+            Click()
         }
 
-        Sleep 100
-        Send "!e"
-        Sleep 200
+        Sleep(100)
+        Send("!e")
+        Sleep(200)
 
         ; check if this is the pf room
         if (pfMessage) {
-            MouseMove 315, 367
-            Sleep 200
-            Click 3
-            Sleep 200
-            Send "^c"
-            Sleep 100
+            MouseMove(315, 367)
+            Sleep(200)
+            Click(3)
+            Sleep(200)
+            Send("^c")
+            Sleep(100)
 
             if (A_Clipboard.includes(pfMessage)) {
                 loop 2 {
-                    Send "!c"
+                    Send("!c")
                     utils.waitLoading()
                 }
 
                 if (!IsSet(anchorX)) {
-                    Send "!o"
+                    Send("!o")
                     utils.waitLoading()
                 }
 
@@ -299,18 +299,18 @@ class PaymentRelation_Action {
             A_Clipboard := pbMessage
         }
 
-        Send "{Up}"
+        Send("{Up}")
         utils.waitLoading()
-        Send "^v"
+        Send("^v")
         utils.waitLoading()
-        Send "!o"
+        Send("!o")
         utils.waitLoading()
-        Send "!c"
+        Send("!c")
         utils.waitLoading()
 
         ; when ImageSearch of comment flag fails, hence, comment edited in reservation window
         if (!IsSet(anchorX)) {
-            Send "!o"
+            Send("!o")
             utils.waitLoading()
         }
 
@@ -319,36 +319,36 @@ class PaymentRelation_Action {
             return
         }
 
-        Send "!t"
-        MouseMove initX, initY ; 759, 266
+        Send("!t")
+        MouseMove(initX, initY) ; 759, 266
         utils.waitLoading()
-        Click
-        Send "!n"
+        Click()
+        Send("!n")
         utils.waitLoading()
-        Send "{Text}OTH"
-        MouseMove initX - 242, initY + 133 ; 517, 399
+        Send("{Text}OTH")
+        MouseMove(initX - 242, initY + 133) ; 517, 399
         utils.waitLoading()
-        Click
-        MouseMove initX - 280, initY + 169 ; 479, 435
+        Click()
+        MouseMove(initX - 280, initY + 169) ; 479, 435
         utils.waitLoading()
-        Click
-        MouseMove initX - 70, initY + 211 ; 689, 477
+        Click()
+        MouseMove(initX - 70, initY + 211) ; 689, 477
         utils.waitLoading()
         if (!this.isRunning) {
             msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 
-        Click "Down"
-        MouseMove initX - 62, initY + 211 ; 697, 477
+        Click("Down")
+        MouseMove(initX - 62, initY + 211) ; 697, 477
         utils.waitLoading()
-        Click "Up"
+        Click("Up")
         utils.waitLoading()
-        Send "^v"
+        Send("^v")
         utils.waitLoading()
-        Send "!o"
+        Send("!o")
         utils.waitLoading()
-        Sleep 200
+        Sleep(200)
 
         ; check if "record already exist" popup
         ; if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["info.PNG"])) {
@@ -359,18 +359,18 @@ class PaymentRelation_Action {
         ; }
         alertFound := PmsImageFinder.find("info.PNG")
         if (alertFound) {
-            Send "!c"
+            Send("!c")
             utils.waitLoading()
-            Send "!n"
+            Send("!n")
             utils.waitLoading()
         }
 
-        Send "!c"
+        Send("!c")
         utils.waitLoading()
-        Sleep 200
-        Send "!c"
+        Sleep(200)
+        Send("!c")
         utils.waitLoading()
-        Sleep 1000
+        Sleep(1000)
 
         (!keepGoing && this.end())
     }

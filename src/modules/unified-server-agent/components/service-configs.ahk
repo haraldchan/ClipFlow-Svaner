@@ -61,15 +61,15 @@ ServiceConfigs(App, enabled, isListening) {
         PMN_FillIn.end()
         ; close all windows
         loop {
-            Send "!w"
-            Sleep 100
-            Send "{Up}"
-            Sleep 100
-            Send "{Enter}"
-            Sleep 100
-            Send "!c"
+            Send("!w")
+            Sleep(100)
+            Send("{Up}")
+            Sleep(100)
+            Send("{Enter}")
+            Sleep(100)
+            Send("!c")
             utils.waitLoading()
-            Send "{Esc}"
+            Send("{Esc}")
             utils.waitLoading()
 
             if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-logo.PNG"])) {
@@ -78,11 +78,11 @@ ServiceConfigs(App, enabled, isListening) {
         }
 
         ; restore In-house window
-        Send "!f"
+        Send("!f")
         utils.waitLoading()
-        Send "{Down}"
-        Sleep 100
-        Send "{Enter}"
+        Send("{Down}")
+        Sleep(100)
+        Send("{Enter}")
         utils.waitLoading()
     }
 

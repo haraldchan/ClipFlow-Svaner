@@ -2,70 +2,70 @@ class PMG_Data {
     static saveFileName := ""
 
     static reportFiling(blockcode, initX := 433, initY := 598) {
-        WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
-        BlockInput true
-        WinMaximize "ahk_class SunAwtFrame"
-        WinActivate "ahk_class SunAwtFrame"
+        WinSetAlwaysOnTop(true, "ahk_class SunAwtFrame")
+        BlockInput(true)
+        WinMaximize("ahk_class SunAwtFrame")
+        WinActivate("ahk_class SunAwtFrame")
 
         if (utils.checkClearWin(POPUP_TITLE, IMAGES["opera-logo.png"]) = "Cancel"){
             utils.cleanReload(WIN_GROUP)
         }
 
         utils.waitLoading()
-        Send "!m"
+        Send("!m")
         utils.waitLoading()
-        Send "{Text}R"
+        Send("{Text}R")
         utils.waitLoading()
-        Send Format("{Text}{1}", "grpinhousebyroom")
+        Send(Format("{Text}{1}", "grpinhousebyroom"))
         utils.waitLoading()
-        Send "!h"
+        Send("!h")
         utils.waitLoading()
-        MouseMove initX, initY ; 433, 598
+        MouseMove(initX, initY) ; 433, 598
         utils.waitLoading()
-        Click ; click print to file
+        Click()
         utils.waitLoading()
 
-        MouseMove initX + 380, initY
-        Click
+        MouseMove(initX + 380, initY)
+        Click()
         loop 2 {
-            Send "{Down}"
+            Send("{Down}")
             utils.waitLoading()
         }
         utils.waitLoading()
-        Send "{Enter}"
+        Send("{Enter}")
         utils.waitLoading()
-        Send "!o"
+        Send("!o")
 
         ; run saving actions, return filename
         this.saveGroupInhouse(blockcode)
         this.saveFileName := blockcode . ".XML"
 
         utils.waitLoading()
-        Send "!f"
+        Send("!f")
         utils.waitLoading()
-        Send "{Backspace}"
+        Send("{Backspace}")
         utils.waitLoading()
-        Send Format("{Text}{1}", this.saveFileName)
-        Sleep 1500
-        Send "{Enter}"
-        TrayTip Format("正在保存：{1}", this.saveFileName)
+        Send(Format("{Text}{1}", this.saveFileName))
+        Sleep(1500)
+        Send("{Enter}")
+        TrayTip(Format("正在保存：{1}", this.saveFileName))
 
         isWindows7 := StrSplit(A_OSVersion, ".")[1] = 6
         
         if (WinWait("Warning",, 20)) {
-            WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
-            WinSetAlwaysOnTop true, "Warning"
+            WinSetAlwaysOnTop(false, "ahk_class SunAwtFrame")
+            WinSetAlwaysOnTop(true, "Warning")
         }
         
         loop 30 {
-            sleep 1000
+            sleep(1000)
 
             if (!isWindows7 && WinExist("Warning")) {
 
                 utils.waitLoading()
-                Send "{Enter}"
+                Send("{Enter}")
                 utils.waitLoading()
-                WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
+                WinSetAlwaysOnTop(true, "ahk_class SunAwtFrame")
             }
 
             if (FileExist(A_MyDocuments . "\" . this.saveFileName)) {
@@ -79,28 +79,28 @@ class PMG_Data {
         }
 
         utils.waitLoading()
-        WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
-        Send "!c"
-        BlockInput false
-        WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
+        WinSetAlwaysOnTop(true, "ahk_class SunAwtFrame")
+        Send("!c")
+        BlockInput(false)
+        WinSetAlwaysOnTop(false, "ahk_class SunAwtFrame")
     }
 
     static saveGroupInhouse(blockcode) {
-        MouseMove 737, 395
+        MouseMove(737, 395)
         utils.waitLoading()
-        Click
+        Click()
         utils.waitLoading()
-        Send Format("{Text}{1}", blockcode)
+        Send(Format("{Text}{1}", blockcode))
         utils.waitLoading()
-        Send "!h"
+        Send("!h")
         utils.waitLoading()
         loop 2 {
-            Send "{Tab}"
+            Send("{Tab}")
             utils.waitLoading()
         }
-        Send "{Space}"
+        Send("{Space}")
         utils.waitLoading()
-        Send "!o"
+        Send("!o")
         utils.waitLoading()
 
     }

@@ -55,9 +55,9 @@ class UnifiedAgent extends useServerAgent {
             UnifiedAgentModal(() => this.isListening.set("离线"))
         }
 
-        BlockInput true
+        BlockInput(true)
         if (this.isListening.value == "离线") {
-            BlockInput false
+            BlockInput(false)
         }
     }
 
@@ -68,7 +68,7 @@ class UnifiedAgent extends useServerAgent {
         if (this.isListening.value == "在线") {
             try {
                 WinActivate("ahk_class SunAwtFrame")
-                Send "!r"
+                Send("!r")
                 utils.waitLoading()
             }
         }
@@ -88,7 +88,7 @@ class UnifiedAgent extends useServerAgent {
 
                 ; handle post
                 this.handlePosts()
-                Sleep this.interval
+                Sleep(this.interval)
             } until (this.isListening.value == "离线")
         }
         else {
