@@ -17,8 +17,8 @@ CONFIG := useJsonConfig(
 )
 
 ; init config
-CoordMode "Mouse", "Screen"
-TraySetIcon IMAGES["CFTray.ico"]
+CoordMode("Mouse", "Screen")
+TraySetIcon(IMAGES["CFTray.ico"])
 
 ; Svaner App
 ClipFlowApp := Svaner({
@@ -70,8 +70,12 @@ logError(err, *) {
 }
 
 ; hotkeys setup
-Pause:: ClipFlowApp.Show()
-F11:: utils.cleanReload(WIN_GROUP)
+Pause:: {
+	ClipFlowApp.Show()
+}
+F11:: {
+	utils.cleanReload(WIN_GROUP)
+}
 ^F11:: {
 	if (DirExist(APP_DATA_DIR . "\clipflow-clips")) {
 		DirDelete(APP_DATA_DIR . "\clipflow-clips", true)
@@ -85,4 +89,6 @@ F11:: utils.cleanReload(WIN_GROUP)
 	utils.cleanReload(WIN_GROUP)
 }
 #Hotif WinActive(POPUP_TITLE)
-Esc:: ClipFlowApp.Hide()
+Esc:: {
+	ClipFlowApp.Hide()
+}
