@@ -1,4 +1,4 @@
-#Include "./guest-profile-details.ahk"
+#Include guest-profile-details.ahk
 
 /**
  * @param {Svaner} App 
