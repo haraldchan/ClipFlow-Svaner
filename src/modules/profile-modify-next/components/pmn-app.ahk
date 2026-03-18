@@ -7,10 +7,7 @@
 PMN_App(App, moduleTitle, db, identifier) {
     ; server agent delegate/ enable QM2 panel
     isDelegate := signal(false)
-    effect(isDelegate, curIsDelegate => (
-        App["guest-profile-list"].Move(,, curIsDelegate ? 470 : 658),
-        App["component:SentPosts"].visible(curIsDelegate)
-    ))
+    effect(isDelegate, curIsDelegate => App["guest-profile-list"].Move(,, curIsDelegate ? 470 : 658))
 
     serverConnection := signal("")
     effect(serverConnection, handleConnStatus)
@@ -84,9 +81,6 @@ PMN_App(App, moduleTitle, db, identifier) {
     handleSearchByChange(cur) {
         App["guest-profile-list"].Opt(cur == "waterfall" ? "+Checked +Multi" : "-Checked -Multi")
         App["delegate-check-box"].Enabled := cur == "waterfall"
-        App["selecti-all-btn"].Visible := cur == "waterfall"
-        App["Party: "].Visible := cur == "waterfall"
-        App["party-num"].Visible := cur == "waterfall"
         if (cur != "waterfall") {
             App["delegate-check-box"].Value := false
             isDelegate.set(false)
@@ -399,6 +393,7 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         QM2_Panel({ selectedGuests: groupedSelectedGuests })
     }
+    
 
     onMount() {
         ; hotkey setup
@@ -435,7 +430,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         }
 
         ; bind check status
-        shareCheckStatus(App["selecti-all-btn"], App["guest-profile-list"])
+        shareCheckStatus(App["select-all-btn"], App["guest-profile-list"])
     }
 
 
@@ -479,12 +474,14 @@ PMN_App(App, moduleTitle, db, identifier) {
         GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile),
 
         ; sent posts
-        SentPosts(App, isDelegate, listContent),
+        Show(() => SentPosts(App, isDelegate, listContent), isDelegate, cur => cur == true),
 
         ; waterfall controls
-        App.AddCheckBox("vselecti-all-btn Hidden w80 h20 @align[x]:date y+5", "全选 (&A)"),
-        App.AddText("Hidden h20 x+15 0x200", "Party: "),
-        App.AddEdit("vparty-num Hidden x+1 w100 h20", ""),
+        Show(() => [
+            App.AddCheckBox("vselect-all-btn Hidden w80 h20 @align[x]:date y+5", "全选 (&A)"),
+            App.AddText("Hidden h20 x+15 0x200", "Party: "),
+            App.AddEdit("vparty-num Hidden x+1 w100 h20", "")
+        ], searchBy, cur => cur == "waterfall"),
 
         onMount()
     )

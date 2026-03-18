@@ -150,5 +150,5 @@ SentPosts(App, isDelegate, listContent) {
         ).onContextMenu(showPostDetails)
     )
 
-    return comp.render().visible(false)
+    return comp.render()
 }
