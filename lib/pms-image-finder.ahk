@@ -23,6 +23,6 @@ class PmsImageFinder {
             Sleep 250
         } until (timeoutCount > 10)
 
-        return Error("Image not found", -1, imageFileName)
+        return false
     }
 }

@@ -96,7 +96,7 @@ class PMG_Execute {
         ; Send "{Enter}"
         ; utils.waitLoading() 
 		found := PmsImageFinder.find("opera-active-win.PNG")
-		if (found is Error) {
+		if (!found) {
 			this.isRunning := false
 		}
 		else {

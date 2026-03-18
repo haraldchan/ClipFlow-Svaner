@@ -54,12 +54,12 @@ class PMN_FillIn {
         ; }
 
         found := PmsImageFinder.find("error.png")
-        if (found is Error) {
+        if (found) {
             Send "!o"
             utils.waitLoading()
             Send "!c"
             utils.waitLoading()
-            return Error
+            return true
         }
         else {
             Send "{BackSpace}"
@@ -72,8 +72,8 @@ class PMN_FillIn {
 
     static fill(currentGuest, isOverwrite := false, keepGoing := false) {
         this.start({ setOnTop: true, blockInput: true })
-        res := this.handleProfileOccupiedFallback()
-        if (res is Error) {
+        ok := this.handleProfileOccupiedFallback()
+        if (!ok) {
             this.end()
             return
         }
@@ -152,7 +152,7 @@ class PMN_FillIn {
         ; }
 
         found := PmsImageFinder.find("AltNameAnchor.png")
-        if (found is Error) {
+        if (!found) {
             MsgBox("界面定位失败", POPUP_TITLE, "T2 4096 icon!")
             agent.abort()
             utils.cleanReload(WIN_GROUP)
@@ -204,7 +204,7 @@ class PMN_FillIn {
         ;     }
         ; }
         found := PmsImageFinder.find("AltNameAnchor.png")
-        if (found is Error) {
+        if (!found) {
             MsgBox("界面定位失败", POPUP_TITLE, "T2 4096")
             agent.abort()
             utils.cleanReload(WIN_GROUP)
@@ -348,7 +348,7 @@ class PMN_FillIn {
         ;     return
         ; }
         found := PmsImageFinder.find("AltNameAnchor.png")
-        if (found is Error) {
+        if (!found) {
             MsgBox(found.Message, "T1 icon!")
             return
         }

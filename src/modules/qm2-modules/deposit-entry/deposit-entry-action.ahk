@@ -205,7 +205,7 @@ class DepositEntry_Action {
         ;     Sleep 200
         ; } until (A_Index > 5)
         found := PmsImageFinder.find("opera-active-win.PNG")
-        if (found is Error) {
+        if (!found) {
             utils.cleanReload(WIN_GROUP)
         }
 
@@ -239,7 +239,7 @@ class DepositEntry_Action {
         ;     Sleep 200
         ; } until (A_Index > 5)
         found := PmsImageFinder.find("alert.png")
-        if (found is Error) {
+        if (!found) {
             utils.cleanReload(WIN_GROUP)
         }
 
@@ -302,7 +302,7 @@ class DepositEntry_Action {
         ;     return Error("room not found")
         ; }
         errorIconFound := PmsImageFinder.find("error.png")
-        if !(errorIconFound is Error) {
+        if (errorIconFound) {
             Send "{Enter}"
             utils.waitLoading()
             Send "{Enter}"
@@ -320,7 +320,7 @@ class DepositEntry_Action {
         ;     return Error("room not found")
         ; }
         found := PmsImageFinder.find("opera-active-win.PNG")
-        if (found is Error) {
+        if (!found) {
             Send "{Enter}"
             utils.waitLoading()
             Send "{Enter}"

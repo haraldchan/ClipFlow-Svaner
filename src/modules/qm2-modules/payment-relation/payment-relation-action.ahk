@@ -68,7 +68,7 @@ class PaymentRelation_Action {
             ;     A_Clipboard := Format("P/B Rm{1} {2}  ", form["pfRoom"], IsNumber(form["pfName"]) ? "#" . form["pfName"] : form["pfName"])
             ;     this.pasteInfo()
             ; }
-            if (res is Error) {
+            if (!res) {
                 this.end()
                 return
             }
@@ -164,9 +164,9 @@ class PaymentRelation_Action {
         ;     return "not found"
         ; }
         found := PmsImageFinder.find("info.PNG")
-        if (found is Error) {
+        if (found) {
             Send "{Enter}"
-            return found
+            return false
         }
 
         if (!this.isRunning) {
@@ -184,7 +184,7 @@ class PaymentRelation_Action {
         ;     utils.waitLoading()
         ; }
 		found := PmsImageFinder.find("opera-active-win.PNG")
-		if (found is Error) {
+		if (!found) {
 			this.isRunning := false
 		}
 		else {
@@ -236,7 +236,7 @@ class PaymentRelation_Action {
         ; }
 
         commentFound := PmsImageFinder.find(commentPos)
-        if (commentFound is Error) {
+        if (!commentFound) {
             ; open reservation click
             Send "{Enter}"
             utils.waitLoading()
@@ -358,7 +358,7 @@ class PaymentRelation_Action {
         ;     utils.waitLoading()
         ; }
         alertFound := PmsImageFinder.find("info.PNG")
-        if (!(alertFound is Error)) {
+        if (alertFound) {
             Send "!c"
             utils.waitLoading()
             Send "!n"

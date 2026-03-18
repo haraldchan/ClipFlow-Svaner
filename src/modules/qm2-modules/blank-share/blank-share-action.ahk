@@ -47,7 +47,7 @@ class BlankShare_Action {
 			}
 
 			res := this.search(room)
-			if (res is Error || !res) {
+			if (!res) {
 				continue
 			}
 
@@ -57,7 +57,7 @@ class BlankShare_Action {
 			if (existShares < shareQty[A_Index]) {
 				sharesToMake := shareQty[A_Index] - existShares
 				res := this.search(room)
-				if (res is Error || !res) {
+				if (!res) {
 					continue
 				}
 			} else {
@@ -103,9 +103,9 @@ class BlankShare_Action {
         ; 	return "not found"
         ; }
 		found := PmsImageFinder.find("info.png")
-		if !(found is Error) {
+		if (found) {
         	Send "{Enter}"
-        	return found
+        	return false
 		}
 
         if (!this.isRunning) {
@@ -121,7 +121,7 @@ class BlankShare_Action {
         ; Sleep 200
         ; Send "{Enter}"
 		found := PmsImageFinder.find("opera-active-win.PNG")
-		if (found is Error) {
+		if (!found) {
 			this.isRunning := false
 		}
 		else {
@@ -149,7 +149,7 @@ class BlankShare_Action {
 		; x := outX + 635
 		; y := outY + 264
 		found := PmsImageFinder.find("opera-active-win.PNG")
-		if (found is Error) {
+		if (!found) {
 			utils.cleanReload(WIN_GROUP)
 		}
 		else {
@@ -229,7 +229,7 @@ class BlankShare_Action {
 		; MouseMove x + 752, y + 415
 		; Click
 		found := PmsImageFinder.find("opera-active-win.PNG")
-		if (found is Error) {
+		if (!found) {
 			utils.cleanReload(WIN_GROUP)
 		}
 		else {
@@ -246,7 +246,7 @@ class BlankShare_Action {
 			; 	break
 			; }
 			found := PmsImageFinder.find("alert.PNG")
-			if (found is Error) {
+			if (!found) {
 				break
 			}
 
@@ -290,7 +290,7 @@ class BlankShare_Action {
 			; 	} 
 			; }
 			found := PmsImageFinder.find("alert.png")
-			if (found is Error) {
+			if (!found) {
 				utils.cleanReload(WIN_GROUP)
 			}
 			else {
@@ -349,7 +349,7 @@ class BlankShare_Action {
 					; 	} 
 					; }
 					found := PmsImageFinder.find("alert.png")
-					if (found is Error) {
+					if (!found) {
 						utils.cleanReload(WIN_GROUP)
 					}
 					else {
