@@ -6,7 +6,7 @@ class PmsImageFinder {
      * @param {String} imageFileName 
      * @param {Integer} interval wait interval in millisecond
      * @param {Integer} timeoutTick wait tick
-     * @returns { { outX: Integer, outY: Integer } | Error} 
+     * @returns { { outX: Integer, outY: Integer } | false} 
      */
     static find(imageFileName, interval := 250, timeoutTick := 10) {
         ; WinActivate("ahk_class SunAwtFrame")
