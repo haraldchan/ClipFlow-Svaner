@@ -9,7 +9,9 @@ class PmsImageFinder {
      * @returns { { outX: Integer, outY: Integer } | false} 
      */
     static find(imageFileName, interval := 250, timeoutTick := 10) {
-        ; WinActivate("ahk_class SunAwtFrame")
+        if (WinExist("ahk_class SunAwtFrame")) {
+            WinActivate("ahk_class SunAwtFrame")
+        }
         CoordMode("Pixel", "Screen")
         timeoutCount := 0
 
@@ -20,8 +22,8 @@ class PmsImageFinder {
             }
 
             timeoutCount++
-            Sleep(250)
-        } until (timeoutCount > 10)
+            Sleep(interval)
+        } until (timeoutCount > timeoutTick)
 
         return false
     }
