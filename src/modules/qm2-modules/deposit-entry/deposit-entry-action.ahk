@@ -251,7 +251,11 @@ class DepositEntry_Action {
         }
 
         ; enter cardNum & exp
-        Send(Format("{Text}{1}`n{2}", depositInfo.cardNum, depositInfo.exp))
+        Send("{Text}" . depositInfo.cardNum)
+        Sleep(100)
+        Send("{Tab}")
+        Sleep(100)
+        Send("{Text}" .  depositInfo.exp)
         Sleep(100)
         Send("!s")
         utils.waitLoading()
@@ -267,8 +271,12 @@ class DepositEntry_Action {
         Send("!a")
         Send("!m")
         utils.waitLoading()
-        Send(Format("{Text}{1}`n{2}", depositInfo.amount, depositInfo.auth))
-        Sleep(200)
+        Send("{Text}" . depositInfo.amount)
+        Sleep(100)
+        Send("{Tab}")
+        Sleep(100)
+        Send("{Text}" . depositInfo.auth)
+        Sleep100)
         Send("!o")
         utils.waitLoading()
         Send("!c")
