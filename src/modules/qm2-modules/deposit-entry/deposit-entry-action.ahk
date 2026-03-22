@@ -238,19 +238,6 @@ class DepositEntry_Action {
             utils.waitLoading()
         }
 
-        ; attach card to profile prompt, choose "No"
-        ; loop {
-        ;     if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["alert.PNG"])) {
-        ;         break
-        ;     }
-
-        ;     Sleep 200
-        ; } until (A_Index > 5)
-        found := PmsImageFinder.find("alert.png")
-        if (!found) {
-            utils.cleanReload(WIN_GROUP)
-        }
-
         Send("{Esc}")
         utils.waitLoading()
         if (!this.isRunning) {
@@ -288,7 +275,7 @@ class DepositEntry_Action {
         Send("{Tab}")
         Sleep(100)
         Send("{Text}" . depositInfo.auth)
-        Sleep100)
+        Sleep(100)
         Send("!o")
         utils.waitLoading()
         Send("!c")
