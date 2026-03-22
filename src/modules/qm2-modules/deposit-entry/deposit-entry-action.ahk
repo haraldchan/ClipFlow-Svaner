@@ -162,9 +162,15 @@ class DepositEntry_Action {
             }
         })
 
+        onMount() {
+            Prompt.Show()
+            WinGetPos(&x, &y,,, "Deposit Entry")
+            MouseMove(x, y)
+        }
+
         return (
             DepositEntry(Prompt, { depositInfo: depositInfo }).render(),
-            Prompt.Show()
+            onMount()
         )
     }
 
@@ -218,6 +224,8 @@ class DepositEntry_Action {
         Sleep(100)
         Send("{Tab}")
         utils.waitLoading()
+        Send("{Esc}") ; attach card to profile prompt, choose "No"
+        utils.waitLoading()
         if (!this.isRunning) {
             msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
@@ -254,7 +262,9 @@ class DepositEntry_Action {
         Send("{Text}" . depositInfo.cardNum)
         Sleep(100)
         Send("{Tab}")
-        Sleep(100)
+        utils.waitLoading()
+        Send "{Esc}" ; attach card to profile prompt, choose "No"
+        utils.waitLoading()
         Send("{Text}" .  depositInfo.exp)
         Sleep(100)
         Send("!s")
@@ -268,7 +278,9 @@ class DepositEntry_Action {
         Send("!t")
         utils.waitLoading()
         Send("!e")
+        utils.waitLoading()
         Send("!a")
+        utils.waitLoading()
         Send("!m")
         utils.waitLoading()
         Send("{Text}" . depositInfo.amount)
