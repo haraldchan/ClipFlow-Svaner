@@ -8,15 +8,22 @@ class PmsImageFinder {
      * @param {Integer} timeoutTick wait tick
      * @returns { { outX: Integer, outY: Integer } | false} 
      */
-    static find(imageFileName, interval := 250, timeoutTick := 10) {
+    static find(imageFileName, interval := 250, timeoutTick := 10, findOptions := { coordMode: "Screen", x1: 0, y1:0, x2: A_ScreenWidth, y2: A_ScreenHeight }) {
         if (WinExist("ahk_class SunAwtFrame")) {
             WinActivate("ahk_class SunAwtFrame")
         }
-        CoordMode("Pixel", "Screen")
+
+        coordMode := findOptions.HasOwnProp("coordMode") ? findOptions.coordMode : "Screen"
+        x1 := findOptions.HasOwnProp("x1") ? findOptions.x1 : 0
+        y1 := findOptions.HasOwnProp("y1") ? findOptions.y1 : 0
+        x2 := findOptions.HasOwnProp("x2") ? findOptions.x2 : A_ScreenWidth
+        y2 := findOptions.HasOwnProp("y2") ? findOptions.y2 : A_ScreenHeight
+
+        CoordMode("Pixel", coordMode)
         timeoutCount := 0
 
         loop {
-            ImageSearch(&outX, &outY, 0, 0, A_ScreenWidth, A_ScreenHeight, this.images[imageFileName])
+            ImageSearch(&outX, &outY, x1, y1, x2, y2, this.images[imageFileName])
             if (outX && outY) {
                 return { outX: Integer(outX), outY: Integer(outY) }
             }
