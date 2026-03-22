@@ -52,6 +52,7 @@ class DepositEntry_Action {
     }
 
     static copyFromSPayPos() {
+        SUSPEND_CONTROLLER.suspendOtherScripts()
         if (!RegExMatch(A_Clipboard, "^;\d+=\d+\?$") || !WinExist("ahk_exe SPayPOS.exe")) {
             return
         }
@@ -132,6 +133,8 @@ class DepositEntry_Action {
         WinRestore("ahk_exe SPayPOS.exe")
         WinMove(prevX, prevY, prevW, prevH, "ahk_exe SPayPOS.exe")
         CoordMode("Mouse", "Screen")
+
+        SUSPEND_CONTROLLER.restoreAllScripts()
 
         this.promptCompleteInfo({
             cardType: cardType,
