@@ -10,11 +10,8 @@ POPUP_TITLE := "ClipFlow " . VERSION
 WIN_GROUP := ["ahk_class SunAwtFrame"]
 IMAGES := useImages(A_ScriptDir . "\assets")
 APP_DATA_DIR := A_AppData . "\ClipFlow"
-CONFIG := useJsonConfig(
-	"./clipflow.config.json",
-	"clipflow.config.json",
-	APP_DATA_DIR
-)
+CONFIG := useJsonConfig("./clipflow.config.json", "clipflow.config.json", APP_DATA_DIR)
+SUSPEND_CONTROLLER := SuspendController(0x0401)
 
 ; init config
 CoordMode("Mouse", "Screen")
@@ -36,6 +33,7 @@ ClipFlowApp := Svaner({
 App(ClipFlowApp)
 ClipFlowApp.Show()
 
+; error logger
 OnError(logError)
 logError(err, *) {
 	if (!DirExist(A_ScriptDir . "\error-log")) {
@@ -47,7 +45,7 @@ logError(err, *) {
 		(
 			{1} line: {2}
 			message: {3}
-			error:   {4}
+			error:   {4}`n`n
 		)", 
 		FormatTime(A_Now, "yyyy/MM/dd HH:mm"),
 		err.Line,

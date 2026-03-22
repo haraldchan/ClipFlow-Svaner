@@ -6,3 +6,4 @@
 #Include system-icon\system-icon.ahk
 #Include pms-image-finder.ahk
 #Include utils.ahk
+#Include suspend-controller.ahk
