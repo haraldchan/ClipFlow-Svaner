@@ -52,10 +52,11 @@ class DepositEntry_Action {
     }
 
     static copyFromSPayPos() {
-        SUSPEND_CONTROLLER.suspendOtherScripts()
         if (!RegExMatch(A_Clipboard, "^;\d+=\d+\?$") || !WinExist("ahk_exe SPayPOS.exe")) {
             return
         }
+        
+        SUSPEND_CONTROLLER.suspendOtherScripts()
 
         ; set window
         BlockInput(true)
