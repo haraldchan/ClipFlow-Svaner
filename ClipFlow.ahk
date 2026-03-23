@@ -11,7 +11,8 @@ WIN_GROUP := ["ahk_class SunAwtFrame"]
 IMAGES := useImages(A_ScriptDir . "\assets")
 APP_DATA_DIR := A_AppData . "\ClipFlow"
 CONFIG := useJsonConfig("./clipflow.config.json", "clipflow.config.json", APP_DATA_DIR)
-SUSPEND_CONTROLLER := SuspendController(0x0401)
+FORCE_SUSPEND_MESSAGE := 0x2042
+SUSPEND_CONTROLLER := SuspendController(FORCE_SUSPEND_MESSAGE)
 
 ; init config
 CoordMode("Mouse", "Screen")
