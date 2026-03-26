@@ -172,13 +172,18 @@ PMN_App(App, moduleTitle, db, identifier) {
                     }
                     guest[item] := updater[item]
                 }
+                ; update full name
+                if (guest["guestType"] == "国外旅客") {
+                    guest["name"] := guest["nameLast"] . ", " . guest["nameFirst"]
+                }
+
                 matchedGuest := guest
                 break
             }
         }
 
         try {
-            db.updateOne(JSON.stringify(matchedGuest), queryFilter["date"], matchedGuest["fileName"])
+            db.updateOne(JSON.stringify(matchedGuest), queryFilter.value["date"], matchedGuest["fileName"])
         } catch {
             MsgBox("无匹配目标...", POPUP_TITLE, "4096 T1.5")
             return
