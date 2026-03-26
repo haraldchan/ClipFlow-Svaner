@@ -83,6 +83,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         App["delegate-check-box"].Enabled := cur == "waterfall"
         if (cur != "waterfall") {
             App["delegate-check-box"].Value := false
+            App["qm2-agent"].Enabled := false
             isDelegate.set(false)
         }
     }
@@ -205,7 +206,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         }
 
         listContent.set(handleSearchResultFilter(loadedItems))
-        App["selecti-all-btn"].Value := false
+        App["select-all-btn"].Value := false
     }
 
     handleSearchResultFilter(loadedItems) {
