@@ -1,22 +1,47 @@
 class PMN_Waterfall {
+    /**
+     * @param {Map<String, Array>} groupedSelectedGuests 
+     * @param {true | false} isOverwrite 
+     * @param {String} party 
+     * @returns {void | Error} 
+     */
     static cascade(groupedSelectedGuests, isOverwrite, party := "") {
         PMN_FillIn.start()
 
-        for roomProfiles in groupedSelectedGuests {
-            for guest in roomProfiles.values()[1] {
+        ; for roomProfiles in groupedSelectedGuests {
+        ;     for guest in roomProfiles.values()[1] {
+        ;         res := this.search(guest["roomNum"], A_Index, party)
+        ;         if (res == "not found") {
+        ;             return Error("Room not found")
+        ;         }
+
+        ;         if (!PMN_FillIn.isRunning) {
+        ;             msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
+        ;             return Error("Ended Unexpectedly")
+        ;         }
+
+        ;         this.modify(guest, isOverwrite)
+        ;         Sleep(1000)
+
+        ;         if (!PMN_FillIn.isRunning) {
+        ;             msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
+        ;             return Error("Ended Unexpectedly")
+        ;         }
+        ;     }
+        ; }
+        for room, guests in groupedSelectedGuests {
+            for guest in guests {
                 res := this.search(guest["roomNum"], A_Index, party)
                 if (res == "not found") {
                     return Error("Room not found")
                 }
-
+                
                 if (!PMN_FillIn.isRunning) {
                     msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
                     return Error("Ended Unexpectedly")
                 }
 
                 this.modify(guest, isOverwrite)
-                Sleep(1000)
-
                 if (!PMN_FillIn.isRunning) {
                     msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
                     return Error("Ended Unexpectedly")
@@ -131,7 +156,6 @@ class PMN_Waterfall {
 
         PMN_FillIn.fill(guest, isOverwrite, true)
         utils.waitLoading()
-        ; Sleep 1000
 
         Send("!o") ; ok
         utils.waitLoading()

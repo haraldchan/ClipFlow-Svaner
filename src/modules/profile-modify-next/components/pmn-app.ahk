@@ -326,18 +326,27 @@ PMN_App(App, moduleTitle, db, identifier) {
                 selectedGuests.Push(listContent.value[row])
             }
 
-            groupedSelectedGuests := []
-            for room in rooms {
-                r := room
-                grouped := selectedGuests.filter(g => g["roomNum"] == r)
-                for guest in grouped {
-                    if (guest["name"].includes("👤")) {
-                        grouped.RemoveAt(A_Index)
-                        grouped.InsertAt(1, guest)
-                    }
-                }
+            ; groupedSelectedGuests := []
+            ; for room in rooms {
+            ;     r := room
+            ;     grouped := selectedGuests.filter(g => g["roomNum"] == r)
+            ;     for guest in grouped {
+            ;         if (guest["name"].includes("👤")) {
+            ;             grouped.RemoveAt(A_Index)
+            ;             grouped.InsertAt(1, guest)
+            ;         }
+            ;     }
 
-                groupedSelectedGuests.Push(Map(room, grouped))
+            ;     groupedSelectedGuests.Push(Map(room, grouped))
+            ; }
+            groupedSelectedGuests := Map()
+            for guest in selectedGuests {
+                if (groupedSelectedGuests.Has(guest["roomNum"])) {
+                    groupedSelectedGuests[guest["roomNum"]].Push(guest)
+                }
+                else {
+                    groupedSelectedGuests[guest["roomNum"]] := [guest]
+                }
             }
 
             if (isDelegate.value) {
@@ -382,22 +391,34 @@ PMN_App(App, moduleTitle, db, identifier) {
             selectedGuests.Push(listContent.value[checkedRow])
         }
 
-        rooms := StrSplit(queryFilter.value["search"].trim(), " ")
-        groupedSelectedGuests := []
-        for room in rooms {
-            r := room
-            grouped := selectedGuests.filter(g => g["roomNum"] == r)
-            for guest in grouped {
-                if (guest["name"].includes("👤")) {
-                    grouped.RemoveAt(A_Index)
-                    grouped.InsertAt(1, guest)
-                }
+        groupedSelectedGuests := Map()
+        for guest in selectedGuests {
+            if (groupedSelectedGuests.Has(guest["roomNum"])) {
+                groupedSelectedGuests[guest["roomNum"]].Push(guest)
             }
-
-            groupedSelectedGuests.Push(Map(room, grouped))
+            else {
+                groupedSelectedGuests[guest["roomNum"]] := [guest]
+            }
         }
 
         QM2_Panel({ selectedGuests: groupedSelectedGuests })
+
+        ; rooms := StrSplit(queryFilter.value["search"].trim(), " ")
+        ; groupedSelectedGuests := []
+        ; for room in rooms {
+        ;     r := room
+        ;     grouped := selectedGuests.filter(g => g["roomNum"] == r)
+        ;     for guest in grouped {
+        ;         if (guest["name"].includes("👤")) {
+        ;             grouped.RemoveAt(A_Index)
+        ;             grouped.InsertAt(1, guest)
+        ;         }
+        ;     }
+
+        ;     groupedSelectedGuests.Push(Map(room, grouped))
+        ; }
+
+        ; QM2_Panel({ selectedGuests: groupedSelectedGuests })
     }
     
 
@@ -469,12 +490,14 @@ PMN_App(App, moduleTitle, db, identifier) {
            .onChange((ctrl, _) => queryFilter.update("range", !ctrl.Value ? 60 * 24 : ctrl.Value)),
         App.AddText("x+1 h25 0x200", "分钟"),
         
-        ; btns
+        ; refresh/fill
         App.AddButton("vrefresh x+10 w80 h25", "刷 新(&R)").onClick(handleListContentUpdate),
         App.AddButton("vfillin x+5 w80 h25 Default", "{1}", fillBtnText)
            .onClick(fillPmsProfile)
            .onContextMenu((*) => settings.update("fillOverwrite", o => !o)),
-        App.AddButton("vqm2-agent x+5 w80 h25 Disabled", "&QM2 Agent").onClick(showQm2Panel),
+        
+        ; qm2 agent
+        App.AddButton("vqm2-agent x+5 w80 h25 ", "&QM2 Agent").onClick(showQm2Panel),
 
         ; profile list
         GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile),

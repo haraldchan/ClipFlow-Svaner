@@ -11,13 +11,13 @@ QM2_Panel(props) {
             name: "微软雅黑"
         },
         events: {
-            close: (gui) => gui.Destroy()
+            close: (gui) => (SetTimer(detectWindowIsActive, 0), gui.Destroy())
         }
     })
 
     p := useProps(props, {
         sendPm: true,
-        selectedGuests: []
+        selectedGuests: Map()
     })
 
     modules := OrderedMap(
@@ -28,7 +28,6 @@ QM2_Panel(props) {
     selectedModule := signal(modules.keys()[1])
 
     handleModuleChange(ctrl, _) {
-        moduleName := modules[ctrl.Text].name
         selectedModule.set(ctrl.Text)
 
         for desc, module in modules {
@@ -86,18 +85,29 @@ QM2_Panel(props) {
         return delegateQmActions("PaymentRelation")
     }
 
-    onMount() {
-        roomCountMap := Map()
-        for roomProfiles in p.selectedGuests {
-            for roomNum, profiles in roomProfiles {
-                roomCountMap[roomNum] := profiles.Length <= 1 ? 0 : profiles.Length - 1
-            }
+    timeoutCount := 0
+    TIMEOUT_MAX_SECOND := 60
+    detectWindowIsActive(*) {
+        timeoutCount := !WinActive(App.gui.Hwnd) ? timeoutCount + 1 : 0
+
+        if (timeoutCount >= TIMEOUT_MAX_SECOND) {
+            SetTimer(, 0)
+            App.Destroy()
         }
+    }
+
+    onMount() {
+        ; roomCountMap := Map()
+        ; for roomProfiles in p.selectedGuests {
+        ;     for roomNum, profiles in roomProfiles {
+        ;         roomCountMap[roomNum] := profiles.Length <= 1 ? 0 : profiles.Length - 1
+        ;     }
+        ; }
 
         shareRoomNums := App["share-room-nums"]
         shareRoomNums.Enabled := false
-        shareRoomNums.Value := roomCountMap.keys().join(" ")
-        App["share-qty"].Value := roomCountMap.values().join(" ")
+        shareRoomNums.Value := p.selectedGuests.keys().join(" ")
+        App["share-qty"].Value := p.selectedGuests.values().map(g => g.Length <= 1 ? 0 : g.Length - 1).join(" ")
 
         ; re-label btns
         BlankShareAction := App["blank-share-action"]
@@ -107,6 +117,8 @@ QM2_Panel(props) {
         ; override events
         BlankShareAction.onClick(handleBlankShareDelegate, -1)
         App["payment-relation-action"].onClick(handlePaymentRelationDelegate, -1)
+
+        SetTimer(detectWindowIsActive, 1000)
 
         App.Show()
     }
