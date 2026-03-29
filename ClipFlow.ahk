@@ -5,7 +5,7 @@
 #Include src\App.ahk
 
 ; global consts
-VERSION := "1.8.5"
+VERSION := "1.8.6"
 POPUP_TITLE := "ClipFlow " . VERSION
 WIN_GROUP := ["ahk_class SunAwtFrame"]
 IMAGES := useImages(A_ScriptDir . "\assets")
@@ -35,20 +35,26 @@ App(ClipFlowApp)
 ClipFlowApp.Show()
 
 ; error logger
-OnError(logError)
+OnError(logError, false)
+/**
+ * @param {Error} err 
+ */
 logError(err, *) {
 	if (!DirExist(A_ScriptDir . "\error-log")) {
 		DirCreate(A_ScriptDir . "\error-log")
 	}
 
-	errTxt := A_ScriptDir . "\error-log\" . FormatTime(A_Now, "yyyyMMdd") . "txt"
+	errTxt := A_ScriptDir . "\error-log\" . FormatTime(A_Now, "yyyyMMdd") . ".txt"
 	errLog := Format("
 		(
-			{1} line: {2}
-			message: {3}
-			error:   {4}`n`n
+			{1} 
+			file: {2}
+			line: {3}
+			message: {4}
+			extra:   {5}`n`n
 		)", 
 		FormatTime(A_Now, "yyyy/MM/dd HH:mm"),
+		err.File
 		err.Line,
 		err.Message,
 		err.Extra
