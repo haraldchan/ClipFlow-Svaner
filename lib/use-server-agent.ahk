@@ -6,7 +6,7 @@ class useServerAgent {
             expiration: 480,  ; delete posts after (exp) MINUTES
             collectRange: 15, ; collect post from recent MINUTES
             safePost: false,  ; whether ping before sending a post
-            isListening: ""   ; isListening depend signal
+            isListening: "",  ; isListening depend signal
         })
 
         this.pool := s.pool
@@ -70,7 +70,6 @@ class useServerAgent {
             if (WinExist(this.respondent . ".ahk")) {
                 WinKill(this.respondent . ".ahk")
             }
-            FileDelete(this.pool . "\" . this.respondent . ".ahk")
         }
     }
 
@@ -94,11 +93,10 @@ class useServerAgent {
             selfIncludePath,
             this.pool
         )
-        if (FileExist(respondentFilePath)) {
-            FileDelete(respondentFilePath)
+        if (!FileExist(respondentFilePath)) {
+            FileAppend(scriptContent, respondentFilePath, "utf-8")
         }
 
-        FileAppend(scriptContent, respondentFilePath, "utf-8")
         Run(respondentFilePath)
     }
 
