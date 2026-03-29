@@ -26,3 +26,4 @@ pnpm-debug.log*
 /src/ActionModules/ProfileModifyNext/GuestProfiles
 /src/ActionModules/ProfileModifyNext/GuestProfilesArchive
 /lib/use-file-db/test-base
+/error-logs
