@@ -175,14 +175,19 @@ class useServerAgent {
     }
 
     /**
+     * @typedef {Object} CollectedPost
+     * @property {String} name file name
+     * @property {String} path file fullpath
+     * @property {String} timeCreated file created time in YYYYMMDDHH24MISS
+     */
+    /**
      * <server> Collect posts
      * @param {String} method 
-     * @returns {string[]} post filepaths array
+     * @returns {Array<CollectedPost>}
      */
     COLLECT(status, pool := this.pool) {
         posts := []
         loop files (pool . "\*.json") {
-            ; postTimestamp := SubStr(StrSplit(A_LoopFileName, "==")[3], 1, 14)
             postTimestamp := A_LoopFileName.split("==")[3].substr(1, 14)
             if (DateDiff(A_Now, postTimestamp, "Minutes") >= this.collectRange && A_LoopFileName.includes(status)) {
                 this.updatePostStatus(A_LoopFileFullPath, "ABANDONED")
@@ -191,7 +196,11 @@ class useServerAgent {
 
             if (InStr(A_LoopFileFullPath, status)) {
                 this.updatePostStatus(A_LoopFileFullPath, "COLLECTED")
-                posts.Push(StrReplace(A_LoopFileFullPath, status, "COLLECTED"))
+                posts.Push({
+                    name: A_LoopFileName,
+                    path: StrReplace(A_LoopFileFullPath, status, "COLLECTED"),
+                    timeCreated: A_LoopFileTimeCreated
+                })
             }
         }
 
