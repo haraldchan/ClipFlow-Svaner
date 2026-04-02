@@ -4,6 +4,16 @@
 #Include lib\index.ahk
 #Include src\App.ahk
 
+; acquire admin
+if (!A_IsAdmin) {
+	try {
+		Run("*RunAs " . A_ScriptFullPath)
+	}
+	catch {
+		ExitApp()
+	}
+}
+
 ; global consts
 VERSION := "1.8.7"
 POPUP_TITLE := "ClipFlow " . VERSION
@@ -52,7 +62,7 @@ logError(err, *) {
 			line: {3}
 			message: {4}
 			extra:   {5}`n`n
-		)", 
+		)",
 		FormatTime(A_Now, "yyyy/MM/dd HH:mm"),
 		err.File
 		err.Line,
@@ -70,7 +80,7 @@ logError(err, *) {
 		FileDelete(CONFIG.path)
 	}
 	CONFIG.createLocal()
-	
+
 	utils.cleanReload(WIN_GROUP)
 }
 
@@ -90,7 +100,7 @@ F11:: {
 		FileDelete(CONFIG.path)
 	}
 	CONFIG.createLocal()
-	
+
 	utils.cleanReload(WIN_GROUP)
 }
 #Hotif WinActive(POPUP_TITLE)
