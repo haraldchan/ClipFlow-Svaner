@@ -50,10 +50,7 @@ PMN_App(App, moduleTitle, db, identifier) {
 
     ; settings
     settings := signal({ fillOverwrite: false }, { asMap: true })
-    fillBtnText := computed(
-        [isDelegate, settings], 
-        (curDelegate, curSettings) => handleFillInBtnTextUpdate(curDelegate, curSettings)
-    )
+    fillBtnText := computed([isDelegate, settings], handleFillInBtnTextUpdate)
     handleFillInBtnTextUpdate(curDelegate, curSettings) {
         curOverwrite := curSettings["fillOverwrite"]
         return (curDelegate ? (curOverwrite ? "覆盖代行" : "代 行") : (curOverwrite ? "覆盖填入" : "填 入"))
@@ -313,7 +310,6 @@ PMN_App(App, moduleTitle, db, identifier) {
             party := App["party-num"].Text
             App["party-num"].Text := ""
 
-            selectedGuests := []
             ; pick selected guests
             checkedRows := LV.getCheckedRowNumbers()
             if (!checkedRows.Length) {
@@ -322,23 +318,7 @@ PMN_App(App, moduleTitle, db, identifier) {
                 return 
             }
 
-            for row in checkedRows {
-                selectedGuests.Push(listContent.value[row])
-            }
-
-            ; groupedSelectedGuests := []
-            ; for room in rooms {
-            ;     r := room
-            ;     grouped := selectedGuests.filter(g => g["roomNum"] == r)
-            ;     for guest in grouped {
-            ;         if (guest["name"].includes("👤")) {
-            ;             grouped.RemoveAt(A_Index)
-            ;             grouped.InsertAt(1, guest)
-            ;         }
-            ;     }
-
-            ;     groupedSelectedGuests.Push(Map(room, grouped))
-            ; }
+            selectedGuests := checkedRows.map(row => listContent.value[row])
             groupedSelectedGuests := Map()
             for guest in selectedGuests {
                 if (groupedSelectedGuests.Has(guest["roomNum"])) {
@@ -379,7 +359,6 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         LV := App["guest-profile-list"]
 
-        selectedGuests := []
         ; pick selected guests
         checkedRows := LV.getCheckedRowNumbers() 
         if (!checkedRows.Length) {
@@ -387,10 +366,7 @@ PMN_App(App, moduleTitle, db, identifier) {
             return
         }
 
-        for checkedRow in checkedRows {
-            selectedGuests.Push(listContent.value[checkedRow])
-        }
-
+        selectedGuests := checkedRows.map(row => listContent.value[row])
         groupedSelectedGuests := Map()
         for guest in selectedGuests {
             if (groupedSelectedGuests.Has(guest["roomNum"])) {
@@ -402,23 +378,6 @@ PMN_App(App, moduleTitle, db, identifier) {
         }
 
         QM2_Panel({ selectedGuests: groupedSelectedGuests })
-
-        ; rooms := StrSplit(queryFilter.value["search"].trim(), " ")
-        ; groupedSelectedGuests := []
-        ; for room in rooms {
-        ;     r := room
-        ;     grouped := selectedGuests.filter(g => g["roomNum"] == r)
-        ;     for guest in grouped {
-        ;         if (guest["name"].includes("👤")) {
-        ;             grouped.RemoveAt(A_Index)
-        ;             grouped.InsertAt(1, guest)
-        ;         }
-        ;     }
-
-        ;     groupedSelectedGuests.Push(Map(room, grouped))
-        ; }
-
-        ; QM2_Panel({ selectedGuests: groupedSelectedGuests })
     }
     
 
