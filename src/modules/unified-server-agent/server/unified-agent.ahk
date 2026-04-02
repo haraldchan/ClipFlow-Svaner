@@ -100,23 +100,6 @@ class UnifiedAgent extends useServerAgent {
     /**
      * <Agent>
      */
-    resetPostsToPending() {
-        postsToReset := []
-
-        postsToReset.Push(this.COLLECT("COLLECTED", this.qmPool))
-        postsToReset.Push(this.COLLECT("RETRY", this.qmPool))
-        postsToReset.Push(this.COLLECT("COLLECTED"))
-        postsToReset.Push(this.COLLECT("RETRY"))
-
-        for post in postsToReset {
-            this.updatePostStatus(post, "PENDING")
-        }
-    }
-
-
-    /**
-     * <Agent>
-     */
     handlePosts() {
         if (!WinExist("ahk_class SunAwtFrame")) {
             MsgBox("后台 Opera PMS 不在线。", POPUP_TITLE, "4096 T1")
@@ -129,67 +112,80 @@ class UnifiedAgent extends useServerAgent {
 
         qmPosts := this.COLLECT("PENDING", this.qmPool)
         pmnPosts := this.COLLECT("PENDING", this.pool)
+        retryPosts := this.COLLECT("RETRY", this.pool)
 
-        if (pmnPosts.Length || qmPosts.Length) {
+        if (pmnPosts.Length || qmPosts.Length || retryPosts.Length) {
             WinHide(this.popupTitle)
         }
 
         if (qmPosts.Length) {
-            this.executeQmPostedActions(qmPosts)
+            this.handlePostMacroExecute(qmPosts)
         }
 
         if (pmnPosts.Length) {
-            this.modifyPostedProfiles(pmnPosts)
+            this.handlePostMacroExecute(pmnPosts)
         }
 
-        this.currentHandlingPost := ""
+        if (retryPosts.Length) {
+            this.handlePostMacroExecute(retryPosts)
+        }
+
         WinShow(this.popupTitle)
         this.isListening.set("在线")
     }
 
+
     /**
      * <Agent>
-     * @param {String[]} posts 
+     * @param {Array<CollectedPost>} posts 
      */
-    modifyPostedProfiles(posts) {
-        unboxedPosts := posts.map(postPath => JSON.parse(FileRead(postPath, "UTF-8"))).reverse()
+    handlePostMacroExecute(posts) {
+        /** @type {Array<CollectedPost>} */
+        sortedPosts := posts.sort((a, b) => b.timeCreated - a.timeCreated)
 
-        for post in unboxedPosts {
-            this.currentHandlingPost := post
-            c := post["content"]
-            res := PMN_Waterfall.cascade(c["profiles"], c["overwrite"], c["party"])
-            if (res is Error) {
-                switch res.Message {
-                    case "Ended Unexpectedly":
-                        this.updatePostStatus(posts[A_Index], "RETRY")
-                    case "Room not found":
-                        this.updatePostStatus(posts[A_Index], "NOTFOUND")
+        for post in sortedPosts {
+            this.currentHandlingPost := post.path
+
+            read := FileRead(post.path, "utf-8")
+            if (!read) {
+                this.updatePostStatus(post.path, "ABORTED")
+                continue
+            }
+
+            unboxedPost := JSON.parse(read)
+            if (unboxedPost is Error) {
+                this.updatePostStatus(post.path, "ABORTED")
+                continue
+            }
+
+            content := unboxedPost["content"]
+            ; QM2 post
+            if (content.Has("module")) {
+                res := ObjBindMethod(this.qmModules[content["module"]], "USE", content["form"]).Call()
+                if (res is Error) {
+                    this.updatePostStatus(post.path, "NOTFOUND")
+                    continue
                 }
-                continue
+            }
+            ; PMN post
+            else {
+                res := PMN_Waterfall.cascade(content["profiles"], content["overwrite"], content["party"])
+                if (res is Error) {
+                    switch res.Message {
+                        case "Ended Unexpectedly":
+                            this.updatePostStatus(posts[A_Index], "RETRY")
+                        case "Room not found":
+                            this.updatePostStatus(posts[A_Index], "NOTFOUND")
+                    }
+                    continue
+                }
             }
 
-            this.updatePostStatus(posts[A_Index], "MODIFIED")
+            this.updatePostStatus(post.path, "MODIFIED")
         }
-    }
 
-    /**
-     * <Agent>
-     * @param {String[]} posts 
-     */
-    executeQmPostedActions(posts) {
-        unboxedPosts := posts.map(postPath => JSON.parse(FileRead(postPath, "UTF-8"))).reverse()
+        this.currentHandlingPost := ""
 
-        for post in unboxedPosts {
-            this.currentHandlingPost := post
-            ; call QM action module
-            res := ObjBindMethod(this.qmModules[post["content"]["module"]], "USE", post["content"]["form"]).Call()
-            if (res is Error) {
-                this.updatePostStatus(posts[A_Index], "NOTFOUND")
-                continue
-            }
-
-            this.updatePostStatus(posts[A_Index], "MODIFIED")
-        }
     }
 
     /**
@@ -200,15 +196,15 @@ class UnifiedAgent extends useServerAgent {
         c := useProps(content,
             content.HasOwnProp("form")
                 ? { ; QM post
-                    module:   content.module, ; QM2 module name
-                    form:     content.form,   ; form data from module component
-                    profiles: []              ; profiles from QM2 Panel
+                    module: content.module, ; QM2 module name
+                    form: content.form,     ; form data from module component
+                    profiles: Map()         ; profiles from QM2 Panel
                 } : { ; PMN post
-                    mode:      "waterfall", ; single/waterfall/group
+                    mode: "waterfall",      ; single/waterfall/group
                     overwrite: false,       ; isOverwrite value
-                    rooms:     [],          ; waterfall/group room numbers
-                    party:     "",          ; optional party number for confinement
-                    profiles:  [],          ; json object in single, array in waterfall/group
+                    rooms: [],              ; waterfall/group room numbers
+                    party: "",              ; optional party number for confinement
+                    profiles: Map(),        ; json object in single, array in waterfall/group
                 }
         )
 
