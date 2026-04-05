@@ -8,6 +8,9 @@
 #Include record.ahk
 #Include settings.ahk
 
+if (!A_IsAdmin) {
+    Run("*RunAs " . A_ScriptFullPath)
+}
 
 MouseSpySvaner := Svaner({
     gui: {
@@ -40,18 +43,11 @@ MouseSpy(App) {
         ; }
 
         ; { tabs
-        Tab3 := App.AddTab3("x10 w370", ["Information", "Record", "Settings"]),
-
-        Tab3.UseTab("Info"),
-        MouseSpy_Information(App, config, App.gui.Title, suspendText),
-
-        Tab3.UseTab("Record"),
-        MouseSpy_Record(App, config),
-
-        Tab3.UseTab("Settings"),
-        MouseSpy_Settings(App, config, App.gui.Title),
-
-        Tab3.UseTab(0)
+        App.AddTab3("vtab3 x10 w370", OrderedMap(
+            "Information", () => MouseSpy_Information(App, config, App.gui.Title, suspendText),
+            "Record",      () => MouseSpy_Record(App, config),
+            "Settings",    () => MouseSpy_Settings(App, config, App.gui.Title),
+        ))
         ; }
     )
 }

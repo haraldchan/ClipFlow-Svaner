@@ -32,10 +32,10 @@ MouseSpy_Settings(App, config, MouseSpyWindowTitle) {
         CoordMode("Mouse", "Screen")
 
         HotIfWinExist(MouseSpyWindowTitle)
-        Hotkey "~*Ctrl", (*) => followMouse.set(false)
-        Hotkey "~*Ctrl up", (*) => followMouse.set(true)
-        Hotkey "~*Shift", (*) => followMouse.set(false)
-        Hotkey "~*Shift up", (*) => followMouse.set(true)
+        Hotkey("~*Ctrl", (*) => followMouse.set(false))
+        Hotkey("~*Ctrl up", (*) => followMouse.set(true))
+        Hotkey("~*Shift", (*) => followMouse.set(false))
+        Hotkey("~*Shift up", (*) => followMouse.set(true))
         
         if (!hotkeySetup.moveToAnchor.hotkey) {
             hotkeySetup.moveToAnchor.hotkey := hotkeySetup.moveToAnchor.defaultHotkey
@@ -49,10 +49,10 @@ MouseSpy_Settings(App, config, MouseSpyWindowTitle) {
             App["mark-anchor-hotkey"].Value := hotkeySetup.markAnchor.defaultHotkey
             handleConfigUpdate()
         }
-        Hotkey hotkeySetup.moveToAnchor.hotkey, hotkeySetup.moveToAnchor.callback, "On"
+        Hotkey(hotkeySetup.moveToAnchor.hotkey, hotkeySetup.moveToAnchor.callback, "On")
         
         HotIf((*) => WinExist(MouseSpyWindowTitle) && App["use-mouse-pos-anchor"].Value)
-        Hotkey hotkeySetup.markAnchor.hotkey, hotkeySetup.markAnchor.callback, "On"
+        Hotkey(hotkeySetup.markAnchor.hotkey, hotkeySetup.markAnchor.callback, "On")
     }
 
     handleConfigUpdate() {
@@ -68,12 +68,12 @@ MouseSpy_Settings(App, config, MouseSpyWindowTitle) {
             name => ArrayExt.join(name, "")
         )(ctrl.Name)
 
-        Sleep 200
+        Sleep(200)
         try {
-            Hotkey hotkeySetup.%curHotkeyName%.hotkey, hotkeySetup.%curHotkeyName%.callback, "Off"
+            Hotkey(hotkeySetup.%curHotkeyName%.hotkey, hotkeySetup.%curHotkeyName%.callback, "Off")
             hotkeySetup.%curHotkeyName%.hotkey := ctrl.Value
             
-            Hotkey hotkeySetup.%curHotkeyName%.hotkey, hotkeySetup.%curHotkeyName%.callback, "On"
+            Hotkey(hotkeySetup.%curHotkeyName%.hotkey, hotkeySetup.%curHotkeyName%.callback, "On")
             
             config["hotkeys"][curHotkeyName] := ctrl.Value
             handleConfigUpdate()

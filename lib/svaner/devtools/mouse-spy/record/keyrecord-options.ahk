@@ -13,7 +13,6 @@
  * @returns {Component} 
  */
 MouseSpy_Record_KeyRecordOptions(App, props) {
-    config := props.config
     recordedLog := props.recordedLog
     isKeyRecording := props.isKeyRecording
 
@@ -31,16 +30,6 @@ MouseSpy_Record_KeyRecordOptions(App, props) {
         saveLog: false
     })
 
-    lvOptions := {
-        lvOptions: "xs10 w325 y+10 r3"
-    }
-
-    columnDetails := {
-        keys: ["vk", "sc","keyName", "updn", "elapsed"],
-        titles: ["vk", "sc", "Key", "Up/Dn", "Elapsed"],
-        widths: [40, 40, 110, 60, 60]
-    }
-
     effect(isKeyRecording, handleRecordToggle)
     handleRecordToggle(recording) {
         App["key-record-toggler"].Enabled := !recording
@@ -56,7 +45,16 @@ MouseSpy_Record_KeyRecordOptions(App, props) {
         App.AddButton("vkey-record-toggler xs10 y110 w80 h20", "Start").onClick((*) => isKeyRecording.set(true)),
         App.AddCheckbox("vreplace-sleep x+30 w210 h20", "Replace `"Sleep`" with Step Filler"),
         ; key history log
-        App.AddListView(lvOptions, columnDetails, logLinePrint)
+        App.AddListView(
+            {
+                lvOptions: "xs10 w325 y+10 r3"
+            }, 
+            {
+                keys: ["vk", "sc", "keyName", "updn", "elapsed"],
+                titles: ["vk", "sc", "Key", "Up/Dn", "Elapsed"],
+                widths: [40, 40, 110, 60, 60]
+            },
+            logLinePrint)
     )
 
     return comp

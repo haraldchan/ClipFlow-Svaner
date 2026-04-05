@@ -53,10 +53,7 @@ class OptionParser {
             ; ahk options
             return opt
         }
-        ; func directive, ignore
-        ; else if (StringExt.startsWith(opt, "@func:")) {
-        ;     return this.callbackDirectives[opt]
-        ; }
+        ; func directive
         else if (this.callbackDirectives.Has(opt)) {
             return this.callbackDirectives[opt]
         }

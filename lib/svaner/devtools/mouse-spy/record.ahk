@@ -23,7 +23,8 @@ MouseSpy_Record(App, config) {
         if (ctrl.Text == "Click Step") {
             curRecordMode.set("clickStep")
             isKeyRecording.set(false)
-        } else {
+        }
+        else {
             curRecordMode.set("keyRecord")
         }
     }

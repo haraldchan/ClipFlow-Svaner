@@ -53,8 +53,8 @@ KeyRecorder_Logger(ih, vk, sc, state, replaceSleep) {
     isModifier := ih.Modifiers.find(m => keyName == m)
 
     scriptLine := Format(
-        "{3}Send `"{{1}{2}}`"", 
-        keyName, 
+        "{3}Send(`"{{1}{2}}`")",
+        keyName,
         isModifier ? (" " . state) : "",
         match(replaceSleep.isReplace(), Map(
             replace => replace == true,

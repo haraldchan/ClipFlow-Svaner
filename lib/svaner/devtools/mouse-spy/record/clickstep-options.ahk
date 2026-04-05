@@ -19,7 +19,6 @@ MouseSpy_Record_ClickStepOptions(App, props) {
     useRelative := props.useRelative
     recordedLog := props.recordedLog
 
-    
     comp := Component(App, A_ThisFunc)
 
     stepFillerTemplates := signal(config["stepFillerTemplates"], { name: "stepFillerTemplates" })
@@ -57,7 +56,7 @@ MouseSpy_Record_ClickStepOptions(App, props) {
         }
 
         newLog := Format(
-            "{1}MouseMove {2}, {3}{4}{5}",
+            "{1}MouseMove({2}, {3}){4}{5}",
             recordedLog.value ? recordedLog.value . "`r`n" : "",
             xCoord,
             yCoord,
@@ -119,7 +118,7 @@ MouseSpy_Record_StepFillerEditor(mode, stepFillerTemplates, selectedTemplate := 
         }
 
         if (ctrl.Text == "🗑") {
-            confirm := Msgbox("Are you sure to delete this template?", "Edit Snippet", "YesNo 4096")
+            confirm := Msgbox("Are you sure to delete this template?", "Edit Snippet", "YesNo 4096 icon?")
             if (confirm == "Yes") {
                 newTemplates.Delete(selectedTemplate.name)
             } else {

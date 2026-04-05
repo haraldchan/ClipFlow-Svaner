@@ -73,17 +73,17 @@ MouseSpy_Information(App, config, AppWindowTitle, suspendText) {
         SplitPath(selectedFile,,,&selectedExt)
         
         if (!selectedFile || !ArrayExt.find(imageExts, ext => ext == StrLower(selectedExt))) {
-            MsgBox("Please choose a image file.")
+            MsgBox("Please choose a image file.", AppWindowTitle, "iconi")
             return
         }
         App["image-anchor-filepath"].Value := selectedFile
 
-        CoordMode "Pixel", "Screen"
+        CoordMode("Pixel", "Screen")
         foundScreen := ImageSearch(&foundXScreen, &foundYScreen, 0, 0, A_ScreenWidth, A_ScreenHeight , selectedFile)
-        CoordMode "Pixel", "Client"
+        CoordMode("Pixel", "Client")
         ImageSearch(&foundXClient, &foundYClient, 0, 0, A_ScreenWidth, A_ScreenHeight, selectedFile)
         if (!foundScreen) {
-            MsgBox("Image not found.", AppWindowTitle, "T1")
+            MsgBox("Image not found.", AppWindowTitle, "T1 iconx")
             anchorPos.set({ Screen: { x: 0, y: 0 }, Client: { x: 0, y: 0 } })
             return
         }

@@ -21,7 +21,8 @@ class computed extends signal {
      *      asMap: true       ; converts object-type value to Map -> Map("num", 1)
      *   }
      * ) 
-     * ```     * @return {computed}
+     * ```     
+     * @return {computed}
      */
     __New(depend, mutation, options := { name: "", asMap: false }) {
         TypeChecker.checkType(depend, [signal, computed, Array], "First parameter is not a signal.")

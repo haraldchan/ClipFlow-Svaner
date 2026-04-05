@@ -22,6 +22,9 @@ class Svaner {
      *      events: {
      *          close: (thisGui) => thisGui.Destroy(),
      *          ; ...
+     *      },
+     *      devOpt: {
+     *          border: false
      *      }
      * }
      * ```
@@ -51,6 +54,7 @@ class Svaner {
 
         this.gui := Gui(IsSet(guiOptions) ? guiOptions : "", IsSet(guiTitle) ? guiTitle : A_ScriptName)
 
+        this.events := []
         if (SvanerConfigs.HasOwnProp("events")) {
             for event, callback in SvanerConfigs.events.OwnProps() {
                 this.gui.OnEvent(event, callback)
@@ -62,6 +66,7 @@ class Svaner {
         this.gui.svanerCtrls.Default := ""
 
         ; set font
+        this.font := { options: "", name: "" }
         if (SvanerConfigs.HasOwnProp("font")) {
             this.gui.SetFont(
                 SvanerConfigs.font.HasOwnProp("options") ? SvanerConfigs.font.options : "",
@@ -69,6 +74,7 @@ class Svaner {
             )
         }
 
+        this.devOpt := {}
         if (SvanerConfigs.HasOwnProp("devOpt")) {
             this.devOpt := SvanerConfigs.devOpt
         }
@@ -123,7 +129,7 @@ class Svaner {
      */
     __parseOptions(optionString) {
         if (!InStr(optionString, "@")) {
-            return { parsed: this.HasOwnProp("devOpt") ? optionString . " Border " : optionString, callbacks: "" }
+            return { parsed: (this.devOpt.HasOwnProp("border") && this.devOpt.border == true) ? optionString . " Border " : optionString, callbacks: "" }
         }
 
         parsed := ""
@@ -140,7 +146,7 @@ class Svaner {
         }
 
         return { 
-            parsed: this.HasOwnProp("devOpt") ? parsed . " Border " : parsed, 
+            parsed: (this.devOpt.HasOwnProp("border") && this.devOpt.border == true) ? parsed . " Border " : parsed, 
             callbacks: optCallbacks.Length ? optCallbacks : ""
         }
     }
@@ -564,8 +570,8 @@ class Svaner {
 
     /**
      * Add StatusBar control to Gui
-     * @param {String} options 
-     * @param {String} startingText 
+     * @param {String} options Options/Directives apply to the control.
+     * @param {String} startingText Initial text.
      * @returns {Gui.StatusBar} 
      */
     AddStatusBar(options := "", startingText := "") {
@@ -580,9 +586,17 @@ class Svaner {
 
     /**
      * Add Tab3 control to Gui
-     * @param {String} options 
-     * @param {Array<String> | Array<Map<String | Integer, ()=>void>>} pages 
-     * @returns {Gui.Tab} 
+     * @param {String} options Options/Directives apply to the control.
+     * @param {Array<String> | Map<String | Integer, ()=>void>>} pages Page titles or pages with components.
+     * ```
+     * tab3 := oGui.AddTab3("...", ["first-tab", "second-tab", ...])
+     * 
+     * oGui.AddTab3("...", Map(
+     *     "first-tab",  () => SomeComonentFunc(),
+     *     "second-tab", () => SomeComonentFunc2(),
+     * ))
+     * ```
+     * @returns {Gui.Tab}
      */
     AddTab3(options := "", pages := []) {
         parsedOptions := this.__parseOptions(options)
@@ -708,10 +722,10 @@ class Svaner {
                     this.checkedRows := []
 
                     this.ctrl := this.GuiObject.Add(this.ctrlType, this.lvOptions, this.formattedContent)
-                    this._handleListViewUpdate()
                     for width in this.colWidths {
                         this.ctrl.ModifyCol(A_Index, width)
                     }
+                    this._handleListViewUpdate()
                 case controlType == "TreeView":
                     this.tvOptions := this.options.tvOptions
                     this.itemOptions := this.options.HasOwnProp("itemOptions") ? this.options.itemOptions : ""
