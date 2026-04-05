@@ -89,7 +89,7 @@ class useDict {
     /**
      * Fetching Cantonese pinyin of certain Hanzi from NameChef.co
      * @param hanzi A chinese character to convert.
-     * @returns {String[]}
+     * @returns {Array<String>}
      */
     fetchPinyinCantonese(hanzi) {
         ; NameChef
@@ -161,10 +161,14 @@ class useDict {
     /**
      * Convert the Cantonese romanised of last name and first name.
      * @param {String} fullname The name to convert.
-     * @returns {String}
+     * @returns {Array<String>} [lastname, firstname]
      */
     getFullnamePinyinCantonese(fullname) {
         fullNameRonamized := this.fetchPinyinCantonese(fullname)
+        if (fullNameRonamized.includes("無法翻譯")) {
+            fullnamePinyin := this.getFullnamePinyin(fullname)
+            return [fullnamePinyin[1].trim(), fullnamePinyin[2].trim()]
+        }
 
         if (this.doubleLastName.Has(fullname.substr(1, 2))) {
             lastname := fullNameRonamized[1] . " " . fullNameRonamized[2]
