@@ -265,7 +265,7 @@ class PMN_FillIn {
 
         ; last/firstname
         isTaiwanese := currentGuest["guestType"] == "港澳台旅客" && currentGuest["region"] == "台湾"
-        if (currentGuest["guestType"] == "内地旅客" || isTaiwanese) {
+        if (currentGuest["guestType"] == "内地旅客" || isTaiwanese || currentGuest["idType"] == "港澳台居民居住证") {
             ; ethinic minority guests
             fullName := currentGuest["name"].includes("·") 
                 ? currentGuest["name"].split("·").map(namePart => namePart.split("").map(hanzi => this.dict.getPinyin(hanzi)).join(" ")) 
@@ -273,7 +273,8 @@ class PMN_FillIn {
 
             nameLast := fullName[1]
             nameFirst := fullName[2]
-        } else {
+        }
+        else {
             nameLast := currentGuest["nameLast"]
             nameFirst := currentGuest["nameFirst"]
         }
