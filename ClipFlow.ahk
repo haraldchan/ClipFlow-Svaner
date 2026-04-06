@@ -15,7 +15,7 @@ if (!A_IsAdmin) {
 }
 
 ; global consts
-VERSION := "1.8.8"
+VERSION := "1.8.9"
 POPUP_TITLE := "ClipFlow " . VERSION
 WIN_GROUP := ["ahk_class SunAwtFrame"]
 IMAGES := useImages(A_ScriptDir . "\assets")
@@ -101,6 +101,9 @@ F11:: {
 	}
 	CONFIG.createLocal()
 
+	if (IsSet(agent)) {
+		agent.abort()
+	}
 	utils.cleanReload(WIN_GROUP)
 }
 #Hotif WinActive(POPUP_TITLE)
