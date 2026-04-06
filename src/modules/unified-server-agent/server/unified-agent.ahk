@@ -45,6 +45,9 @@ class UnifiedAgent extends useServerAgent {
         }
 
         this.setOnlineStatus(false)
+        FileMove(this.pool . "\OFFLINE", this.pool . "\RESTART")
+        this.resetPostsToPending()
+        this.restartPMS()
     }
 
     /**
@@ -94,6 +97,81 @@ class UnifiedAgent extends useServerAgent {
         else {
             this.setOnlineStatus(false)
         }
+    }
+
+
+    /**
+     * <Agent>
+     */
+    resetPostsToPending() {
+        postsToReset := []
+
+        postsToReset.Push(this.COLLECT("COLLECTED", this.qmPool)*)
+        postsToReset.Push(this.COLLECT("RETRY", this.qmPool)*)
+        postsToReset.Push(this.COLLECT("COLLECTED")*)
+        postsToReset.Push(this.COLLECT("RETRY")*)
+
+        for post in postsToReset {
+            this.updatePostStatus(post, "PENDING")
+        }
+    }
+
+
+    restartPMS() {
+        if (!WinExist("ahk_class IEFrame")) {
+            return
+        }
+
+        PMS_USERNAME := "FOHARALDC"
+        PMS_PASSWORD := "sxzc123456"
+
+        ; close all ie win
+        loop {
+            if (WinExist("ahk_class IEFrame")) {
+                WinKill("ahk_class IEFrame")
+            }
+            Sleep(200)
+        } until (!WinExist("ahk_class IEFrame"))
+
+        ie := ComObject("InternetExplorer.Application")
+        ie.Visible := true
+
+        ; log-in opera pms
+        ie.Navigate("https://wsh-opr-app1")
+        while (ie.Busy || ie.ReadyState != 4) {
+            Sleep(200)
+        }
+
+        document := ie.document
+        username := document.getElementsByName("username")[0]
+        password := document.getElementsByName("password")[0]
+
+        username.value := PMS_USERNAME
+        username.fireEvent("onchange")
+        password.value := PMS_PASSWORD
+        password.fireEvent("onchange")
+        Sleep(10)
+        document.getElementsByTagName('button')[0].click()
+        utils.waitLoading(500)
+
+        ; update document after log-in
+        document := ie.document
+        document.getElementById("opera_pms").click()
+
+        ; wait for PMS app
+        WinWait("OPERA PMS")
+        utils.waitLoading(500)
+
+        WinMaximize("ahk_class SunAwtFrame")
+        utils.waitLoading(1000)
+        WinActivate("ahk_class SunAwtFrame")
+        Sleep(100)
+        Send("!f")
+        Sleep(100)
+        Send("{Down}")
+        Sleep(100)
+        Send("{Enter}")
+        utils.waitLoading(1000)
     }
 
 
