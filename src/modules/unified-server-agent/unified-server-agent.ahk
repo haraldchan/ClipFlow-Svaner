@@ -25,6 +25,12 @@ ServerAgentPanel(App) {
         isListening: isListening
     })
 
+    onMount() {
+        if (FileExist(agent.pool . "\RESTART")) {
+            this.isListening.set("在线")
+        }
+    }
+
     return (
         App.AddText("x30 y+10 h40 w580", "ProfileModifyNext Server").SetFont("s13 q5 Bold"),
         
@@ -32,6 +38,8 @@ ServerAgentPanel(App) {
         ServiceConfigs(App, CONFIG.read("serviceEnabled"), isListening),
         
         ; client
-        ClientPosts(App, CONFIG.read("clientEnabled")) 
+        ClientPosts(App, CONFIG.read("clientEnabled")),
+
+        onMount()
     )
 }
