@@ -45,7 +45,7 @@ class UnifiedAgent extends useServerAgent {
         }
 
         this.setOnlineStatus(false)
-        FileMove(this.pool . "\OFFLINE", this.pool . "\RESTART")
+        FileMove(this.pool . "\OFFLINE.flag", this.pool . "\RESTART.flag")
         this.resetPostsToPending()
         this.restartPMS()
     }
@@ -83,6 +83,9 @@ class UnifiedAgent extends useServerAgent {
      */
     listen(status) {
         if (status == "在线") {
+            if (FileExist(this.pool . "\RESTART.flag")) {
+                FileMove(this.pool . "\RESTART.flag", this.pool . "\OFFLINE.flag", true)
+            }
             this.setOnlineStatus(true)
             this.spawnRespondent(A_ScriptDir . "\lib\index.ahk", "ua-respondent")
             loop {

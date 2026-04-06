@@ -53,18 +53,18 @@ class useServerAgent {
      * @param {true | false} on on/off flag
      */
     setOnlineStatus(on) {
-        if (!FileExist(this.pool . "\OFFLINE")) {
-            FileAppend("OFFLINE", this.pool . "\OFFLINE")
+        if (!FileExist(this.pool . "\OFFLINE.flag")) {
+            FileAppend("OFFLINE.flag", this.pool . "\OFFLINE.flag")
         }
 
         if (on) {
-            if (FileExist(this.pool . "\ONLINE")) {
+            if (FileExist(this.pool . "\ONLINE.flag")) {
                 return
             }
-            FileMove(this.pool . "\OFFLINE", this.pool . "\ONLINE", true)
+            FileMove(this.pool . "\OFFLINE.flag", this.pool . "\ONLINE.flag", true)
         }
         else {
-            FileMove(this.pool . "\ONLINE", this.pool . "\OFFLINE", true)
+            FileMove(this.pool . "\ONLINE.flag", this.pool . "\OFFLINE.flag", true)
                 
             DetectHiddenWindows(true)
             if (WinExist(this.respondent . ".ahk")) {
@@ -155,7 +155,7 @@ class useServerAgent {
      */
     POST(content, pool := this.pool) {
         if (this.safePost) {
-            if (!FileExist(this.pool . "\ONLINE")) {
+            if (!FileExist(this.pool . "\ONLINE.flag")) {
                 MsgBox("Service offline.",, "4096 T2")
                 return false
             }

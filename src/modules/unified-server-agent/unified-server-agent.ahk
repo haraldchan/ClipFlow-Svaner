@@ -26,7 +26,7 @@ ServerAgentPanel(App) {
     })
 
     onMount() {
-        if (FileExist(agent.pool . "\RESTART")) {
+        if (FileExist(agent.pool . "\RESTART.flag")) {
             isListening.set("在线")
         }
     }
