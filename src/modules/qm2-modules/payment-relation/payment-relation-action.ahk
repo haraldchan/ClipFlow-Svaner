@@ -38,16 +38,7 @@ class PaymentRelation_Action {
             this.start()
             ; pf
             res := this.search(form["pfRoom"])
-            ; if (res != "not found") {
-            ;     A_Clipboard := Format("P/F Rm{1} {2}  ", form["pbRoom"], IsNumber(form["pbName"]) ? "#" . form["pbName"] : form["pbName"])
-            ;     this.pasteInfo(true)
-            ;     utils.waitLoading()
-            ;     if (!this.isRunning) {
-            ;         msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
-            ;         return
-            ;     }
-            ; }
-            if (res is Error) {
+            if (!res) {
                 this.end()
                 return
             }
@@ -63,11 +54,6 @@ class PaymentRelation_Action {
 
             ; pb
             res := this.search(form["pbRoom"])
-            ; if (res != "not found") {
-            ;     utils.waitLoading(true)
-            ;     A_Clipboard := Format("P/B Rm{1} {2}  ", form["pfRoom"], IsNumber(form["pfName"]) ? "#" . form["pfName"] : form["pfName"])
-            ;     this.pasteInfo()
-            ; }
             if (!res) {
                 this.end()
                 return
@@ -87,7 +73,7 @@ class PaymentRelation_Action {
             this.start()
             ; pf
             res := this.search(form["pfRoom"])
-            if (res is Error) {
+            if (!res) {
                 this.end()
                 return
             }
@@ -158,11 +144,6 @@ class PaymentRelation_Action {
         Send("!h") ; alt+h => search
         utils.waitLoading()
 
-        CoordMode("Pixel", "Screen")
-        ; if (ImageSearch(&_, &_ ,0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["info.PNG"])) {
-        ;     Send "{Enter}"
-        ;     return "not found"
-        ; }
         found := PmsImageFinder.find("info.PNG")
         if (found) {
             Send("{Enter}")
@@ -175,17 +156,13 @@ class PaymentRelation_Action {
         }
 
         ; sort by Prs.
-        ; if (!party) {
-        ;     Click 838, 378, "Right"
-        ;     Sleep 200
-        ;     Send "{Down}"
-        ;     Sleep 200
-        ;     Send "{Enter}"
-        ;     utils.waitLoading()
-        ; }
 		found := PmsImageFinder.find("opera-active-win.PNG")
 		if (!found) {
-			this.isRunning := false
+			this.end()
+			if (IsSet(agent)) {
+				agent.abort()
+				utils.cleanReload(WIN_GROUP)
+			}
 		}
 		else {
 			Click(found.outX + 672, found.outY + 222, "Right")
@@ -193,6 +170,7 @@ class PaymentRelation_Action {
 			Send("{Down}")
 			Sleep(200)
 			Send("{Enter}")
+            return true
 		}
 
         if (!this.isRunning) {
@@ -204,38 +182,7 @@ class PaymentRelation_Action {
     static pasteInfo(keepGoing := false, pfMessage := "", pbMessage := "", initX := 759, initY := 266) {
         this.start()
 
-        commentPos := (A_OSVersion = "6.1.7601") ? IMAGES["commentWin7.PNG"] : IMAGES["comment.PNG"]
-
-        ; if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenHeight, commentPos)) {
-        ;     anchorX := FoundX
-        ;     anchorY := FoundY
-        ;     ; open comment
-        ;     MouseMove anchorX + 1, anchorY + 1
-        ;     Click
-        ; } else {
-        ;     ; open reservation click
-        ;     Send "{Enter}"
-        ;     utils.waitLoading()
-
-        ;     ; check if alert is on top
-        ;     loop {
-        ;         ; if there is a alert box
-        ;         if (PixelGetColor(551, 421) != "0xFFFFFF") {
-        ;             break
-        ;         }
-
-        ;         Send "{Enter}"
-        ;         Sleep 250
-        ;     }
-
-        ;     ; open comment
-        ;     MouseMove 949, 599
-        ;     utils.waitLoading()
-        ;     Click
-        ;     utils.waitLoading()
-        ; }
-
-        commentFound := PmsImageFinder.find(commentPos)
+        commentFound := PmsImageFinder.find(A_OSVersion == "6.1.7601" ? "commentWin7.PNG" : "comment.PNG")
         if (!commentFound) {
             ; open reservation click
             Send("{Enter}")
@@ -350,13 +297,6 @@ class PaymentRelation_Action {
         utils.waitLoading()
         Sleep(200)
 
-        ; check if "record already exist" popup
-        ; if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["info.PNG"])) {
-        ;     Send "!c"
-        ;     utils.waitLoading()
-        ;     Send "!n"
-        ;     utils.waitLoading()
-        ; }
         alertFound := PmsImageFinder.find("info.PNG")
         if (alertFound) {
             Send("!c")

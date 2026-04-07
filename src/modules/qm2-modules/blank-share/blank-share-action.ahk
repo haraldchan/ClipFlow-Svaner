@@ -97,11 +97,6 @@ class BlankShare_Action {
         Send("!h") ; alt+h => search
         utils.waitLoading()
 
-        ; CoordMode "Pixel", "Screen"
-        ; if (ImageSearch(&_, &_ ,0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["info.png"])) {
-        ; 	Send "{Enter}"
-        ; 	return "not found"
-        ; }
 		found := PmsImageFinder.find("info.png")
 		if (found) {
         	Send("{Enter}")
@@ -114,12 +109,6 @@ class BlankShare_Action {
         }
 
         ; sort by Prs.
-        ; ImageSearch(&outX, &outY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["opera-active-win.PNG"])
-        ; Click outX + 672, outY + 222, "Right"
-        ; Sleep 200
-        ; Send "{Down}"
-        ; Sleep 200
-        ; Send "{Enter}"
 		found := PmsImageFinder.find("opera-active-win.PNG")
 		if (!found) {
 			this.isRunning := false
@@ -130,6 +119,7 @@ class BlankShare_Action {
 			Send("{Down}")
 			Sleep(200)
 			Send("{Enter}")
+			return true
 		}
 
         if (!this.isRunning) {
@@ -145,12 +135,13 @@ class BlankShare_Action {
 		CoordMode("Pixel", "Screen")
 		existShareCount := 0
 
-        ; ImageSearch(&outX, &outY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["opera-active-win.PNG"])
-		; x := outX + 635
-		; y := outY + 264
 		found := PmsImageFinder.find("opera-active-win.PNG")
 		if (!found) {
-			utils.cleanReload(WIN_GROUP)
+			this.end()
+			if (IsSet(agent)) {
+				agent.abort()
+				utils.cleanReload(WIN_GROUP)
+			}
 		}
 		else {
 			x := found.outX + 635
@@ -224,13 +215,13 @@ class BlankShare_Action {
 
 
 		; delete comment
-		; CoordMode "Pixel"
-		; ImageSearch(&x, &y, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["opera-active-win.PNG"])
-		; MouseMove x + 752, y + 415
-		; Click
 		found := PmsImageFinder.find("opera-active-win.PNG")
 		if (!found) {
-			utils.cleanReload(WIN_GROUP)
+			this.end()
+			if (IsSet(agent)) {
+				agent.abort()
+				utils.cleanReload(WIN_GROUP)
+			}
 		}
 		else {
 			MouseMove(found.outX + 752, found.outY + 415)
@@ -242,11 +233,7 @@ class BlankShare_Action {
 		loop {
 			Send("!d")
 			utils.waitLoading()
-			; if (!ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["alert.PNG"])) {
-			; 	break
-			; }
-			found := PmsImageFinder.find("alert.PNG")
-			if (!found) {
+			if (!ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["alert.PNG"])) {
 				break
 			}
 
@@ -262,7 +249,7 @@ class BlankShare_Action {
 		}
 
 		; change RateCode to NRR
-		MouseClickDrag("L", found.outX + 131, found.outX + 324, found.outX + 40, found.outY + 324) 
+		MouseClickDrag("L", found.outX + 131, found.outY + 324, found.outX + 40, found.outY + 324) 
 		utils.waitLoading()
 		Send("{Text}NRR")
 		utils.waitLoading()
@@ -282,16 +269,13 @@ class BlankShare_Action {
 			Send("!i")
 			utils.waitLoading()
 
-			CoordMode("Pixel", "Screen")
-			; if (ImageSearch(&foundX, &foundY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["alert.png"])) {
-			; 	if (PixelGetColor(foundX + 303, foundY) == "0xD7D7D7") {
-			; 		Send "!y"
-			; 		utils.waitLoading()
-			; 	} 
-			; }
 			found := PmsImageFinder.find("alert.png")
 			if (!found) {
-				utils.cleanReload(WIN_GROUP)
+				this.end()
+				if (IsSet(agent)) {
+					agent.abort()
+					utils.cleanReload(WIN_GROUP)
+				}
 			}
 			else {
 				if (PixelGetColor(found.outX + 303, found.outY) == "0xD7D7D7") {
@@ -341,16 +325,13 @@ class BlankShare_Action {
 					Send("!i")
 					utils.waitLoading()
 		
-					CoordMode("Pixel", "Screen")
-					; if (ImageSearch(&foundX, &foundY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["alert.PNG"])) {
-					; 	if (PixelGetColor(foundX + 303, foundY) == "0xD7D7D7") {
-					; 		Send "!y"
-					; 		utils.waitLoading()
-					; 	} 
-					; }
 					found := PmsImageFinder.find("alert.png")
 					if (!found) {
-						utils.cleanReload(WIN_GROUP)
+						this.end()
+						if (IsSet(agent)) {
+							agent.abort()
+							utils.cleanReload(WIN_GROUP)
+						}
 					}
 					else {
 						if (PixelGetColor(found.outX + 303, found.outY) == "0xD7D7D7") {

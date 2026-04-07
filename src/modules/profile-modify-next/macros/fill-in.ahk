@@ -38,21 +38,6 @@ class PMN_FillIn {
         WinActivate("ahk_class SunAwtFrame")
         Sleep(300)
 
-        ; if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["error.png"])) {
-        ;     Send "!o"
-        ;     utils.waitLoading()
-        ;     Send "!c"
-        ;     utils.waitLoading()
-
-        ;     return true
-        ; } else {
-        ;     Send "{BackSpace}"
-        ;     utils.waitLoading()
-        ;     Send "^v"
-        ;     utils.waitLoading()
-        ;     return false
-        ; }
-
         found := PmsImageFinder.find("error.png")
         if (found) {
             Send("!o")
@@ -72,8 +57,8 @@ class PMN_FillIn {
 
     static fill(currentGuest, isOverwrite := false, keepGoing := false) {
         this.start({ setOnTop: true, blockInput: true })
-        ok := this.handleProfileOccupiedFallback()
-        if (!ok) {
+        isOccupied := this.handleProfileOccupiedFallback()
+        if (isOccupied) {
             this.end()
             return
         }
@@ -142,15 +127,6 @@ class PMN_FillIn {
     static getCurrentId() {
         prevClip := A_Clipboard
 
-        ; if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["AltNameAnchor.png"])) {
-        ;     anchorX := FoundX - 10
-        ;     anchorY := FoundY
-        ; } else {
-        ;     MsgBox("界面定位失败", POPUP_TITLE, "T2 4096")
-        ;     agent.abort()
-        ;     utils.cleanReload(WIN_GROUP)
-        ; }
-
         found := PmsImageFinder.find("AltNameAnchor.png")
         if (!found) {
             MsgBox("界面定位失败", POPUP_TITLE, "T2 4096 icon!")
@@ -187,22 +163,6 @@ class PMN_FillIn {
     }
 
     static matchHistory(currentGuest) {
-        ; loop {
-        ;     Sleep 100
-        ;     if (A_Index > 30) {
-        ;         MsgBox("界面定位失败", POPUP_TITLE, "T2 4096")
-        ;         agent.abort()
-        ;         utils.cleanReload(WIN_GROUP)
-        ;     }
-
-        ;     if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["AltNameAnchor.png"])) {
-        ;         x := Number(FoundX) + 350
-        ;         y := Number(FoundY) + 80
-        ;         break
-        ;     } else {
-        ;         continue
-        ;     }
-        ; }
         found := PmsImageFinder.find("AltNameAnchor.png")
         if (!found) {
             MsgBox("界面定位失败", POPUP_TITLE, "T2 4096")
