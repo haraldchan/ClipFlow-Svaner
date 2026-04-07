@@ -63,16 +63,21 @@ QM2_Panel(props) {
     }
 
     handleTriggerPmPost(form) {
-        dbConfig := CONFIG.read("dbConfig")
-        db := useFileDB({
-                main: dbConfig["host"] . dbConfig["main"],
-                archive: dbConfig["host"] . dbConfig["archive"],
-                backup: dbConfig["host"] . dbConfig["backup"],
-        })
         roomNums := form.shareRoomNums.trim()
-        profiles := p.selectedGuests.Length == 0
-            ? db.load(,, agent.collectRange).filter(guest => roomNums.includes(!guest["roomNum"] ? "null" : guest["roomNum"]))
-            : p.selectedGuests
+        
+        if (!p.selectedGuests.Count) {
+            dbConfig := CONFIG.read("dbConfig")
+            db := useFileDB({
+                    main: dbConfig["host"] . dbConfig["main"],
+                    archive: dbConfig["host"] . dbConfig["archive"],
+                    backup: dbConfig["host"] . dbConfig["backup"],
+            })
+
+            profiles := db.load(,, agent.collectRange).filter(guest => roomNums.includes(!guest["roomNum"] ? "null" : guest["roomNum"]))
+        }
+        else {
+            profiles := p.selectedGuests
+        }
 
         SetTimer(() => agent.delegate({ rooms: roomNums.split(" "), profiles: profiles}), -300)
     }
@@ -88,22 +93,22 @@ QM2_Panel(props) {
     timeoutCount := 0
     TIMEOUT_MAX_SECOND := 60
     detectWindowIsActive(*) {
+        if (!WinExist("ServerAgents - QM2 Agent")) {
+            SetTimer(, 0)
+            return
+        }
+
         timeoutCount := !WinActive(App.gui.Hwnd) ? timeoutCount + 1 : 0
 
         if (timeoutCount >= TIMEOUT_MAX_SECOND) {
             SetTimer(, 0)
-            App.Destroy()
+            try {
+                App.Destroy()
+            }
         }
     }
 
     onMount() {
-        ; roomCountMap := Map()
-        ; for roomProfiles in p.selectedGuests {
-        ;     for roomNum, profiles in roomProfiles {
-        ;         roomCountMap[roomNum] := profiles.Length <= 1 ? 0 : profiles.Length - 1
-        ;     }
-        ; }
-
         shareRoomNums := App["share-room-nums"]
         shareRoomNums.Enabled := false
         shareRoomNums.Value := p.selectedGuests.keys().join(" ")
