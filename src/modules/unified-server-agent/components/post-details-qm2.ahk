@@ -51,20 +51,23 @@ PostDetails_QM2(post, moduleName, props) {
     }
 
     handleTriggerPmPost(form) {
-        dbConfig := CONFIG.read("dbConfig")
-        db := useFileDB({
-                main: dbConfig["host"] . dbConfig["main"],
-                archive: dbConfig["host"] . dbConfig["archive"],
-                backup: dbConfig["host"] . dbConfig["backup"],
-        })
-
         roomNums := form.shareRoomNums.trim()
+        
+        if (!post["content"]["profiles"].Count) {
+            dbConfig := CONFIG.read("dbConfig")
+            db := useFileDB({
+                    main: dbConfig["host"] . dbConfig["main"],
+                    archive: dbConfig["host"] . dbConfig["archive"],
+                    backup: dbConfig["host"] . dbConfig["backup"],
+            })
+            profiles := db.load(, , agent.collectRange).filter(guest => roomNums.includes(!guest["roomNum"] ? "null" : guest["roomNum"]))
+        }
+        else {
+            profiles := post["content"]["profiles"]
+        }
+
         ; selectedGuests can only pass by GuestProfileList
         ; if no selectedGuest, then filter results in db by room number(request from ServerAgent_Panel)
-        profiles := post["content"]["profiles"].Length == 0
-            ? db.load(, , agent.collectRange).filter(guest => roomNums.includes(!guest["roomNum"] ? "null" : guest["roomNum"]))
-            : post["content"]["profiles"]
-
         post := agent.delegate({
             rooms: roomNums.split(" "),
             profiles: profiles

@@ -8,9 +8,9 @@ PostDetails_Profile(post) {
     })
     
     profilesList := []
-    for groupedProfiles in post["content"]["profiles"] {
-        for room, profiles in groupedProfiles {
-            profilesList.Push(profiles*)
+    for room, groupedProfiles in post["content"]["profiles"] {
+        for profile in groupedProfiles {
+            profilesList.Push(profile)
         }        
     }
     profiles := signal(profilesList)
