@@ -1,45 +1,63 @@
 class useServerAgent {
     __New(serverSettings) {
         s := useProps(serverSettings, {
-            pool: "",         ; post pool dir path
-            interval: 3000,   ; post checking interval MILLISECONDS
-            expiration: 480,  ; delete posts after (exp) MINUTES
-            collectRange: 15, ; collect post from recent MINUTES
-            safePost: false,  ; whether ping before sending a post
-            isListening: "",  ; isListening depend signal
+            pool: "",
+            interval: 3000,
+            expiration: 480,
+            collectRange: 15,
+            safePost: false,
+            isListening: "",
         })
 
+        /** @type {String} post pool dir */
         this.pool := s.pool
+
+        /** @type {Integer} collect interval in ms */
         this.interval := s.interval
+        
+        /** @type {Integer} post deletion period in min */
         this.expiration := s.expiration
+        
+        /** @type {Integer} collect post range in min */
         this.collectRange := s.collectRange
+        
+        /** @type {true | false} whether ping before sending a post */
         this.safePost := s.safePost
+
+        /** @type {signal | ""} isListening depend signal */
         this.isListening := s.isListening
-        this.respondentFileName := ""
+
+        /** @type {String} reponder script filename */
+        this.responderFileName := ""
 
         if (!DirExist(this.pool)) {
             DirCreate(this.pool)
         }
     }
 
+    /**
+     * Updates post status
+     * @param {String} postPath full post json file path
+     * @param {String} newStatus updated status
+     * @returns {{ header: { status: String, sender: String, id: String }, err: 0 | Error }} 
+     */
     updatePostStatus(postPath, newStatus) {
         curHeader := postPath.split("\").at(-1).replace(".json", "").split("==")
         updatedPostHeader := 0
         err := 0
 
         try {
-            FileMove(postPath, postPath.replace(curHeader[1], newStatus))
+            FileMove(postPath, postPath.replace(curHeader[1], newStatus), true)
             updatedPostHeader := {
                 status: newStatus,
                 sender: curHeader[2],
                 id: curHeader[3]
             }
-        } catch Error as e {
-            err := e
-
-            errLogLine := Format("Time:{1} PostHeader:{2} Error:{3}`r`n", A_Now, curHeader.join("=="), e)
-
-            FileAppend(errLogLine, A_ScriptDir . "\src\Servers\error-log.txt", "UTF-8")
+        } 
+        catch Error as err {
+            if (USE_ERROR_LOG) {
+                logError(err)
+            }
         }
 
         return {
@@ -67,37 +85,37 @@ class useServerAgent {
             FileMove(this.pool . "\ONLINE.flag", this.pool . "\OFFLINE.flag", true)
                 
             DetectHiddenWindows(true)
-            if (WinExist(this.respondent . ".ahk")) {
-                WinKill(this.respondent . ".ahk")
+            if (WinExist(this.responder . ".ahk")) {
+                WinKill(this.responder . ".ahk")
             }
         }
     }
 
     /**
-     * Creates a respondent script and runs it
+     * Creates a responder script and runs it
      * @param {String} selfIncludePath filepath of lib
-     * @param {String} scriptName filename of respondent script
+     * @param {String} scriptName filename of responder script
      */
-    spawnRespondent(selfIncludePath, scriptName) {
-        this.respondent := scriptName
-        respondentFilePath := this.pool . "\" . scriptName . ".ahk"
+    spawnResponder(selfIncludePath, scriptName) {
+        this.responder := scriptName
+        responderFilePath := this.pool . "\" . scriptName . ".ahk"
         scriptContent := Format("
             (
                 #Requires AutoHotkey v2.0
                 #SingleInstance Force
                 #Include {1}
 
-                respondent := useServerAgent({ pool: "{2}" })
-                SetTimer(ObjBindMethod(respondent, "RESPONSE"), 3000)
+                responder := useServerAgent({ pool: "{2}" })
+                SetTimer(ObjBindMethod(responder, "RESPONSE"), 3000)
             )", 
             selfIncludePath,
             this.pool
         )
-        if (!FileExist(respondentFilePath)) {
-            FileAppend(scriptContent, respondentFilePath, "utf-8")
+        if (!FileExist(responderFilePath)) {
+            FileAppend(scriptContent, responderFilePath, "utf-8")
         }
 
-        Run(respondentFilePath)
+        Run(responderFilePath)
     }
 
     PING() {
@@ -132,6 +150,10 @@ class useServerAgent {
         }
     }
 
+    /**
+     * 
+     * @returns {String} 
+     */
     RESPONSE() {
         loop files, this.pool . "\*.json" {
             if (InStr(A_LoopFileName, "PING")) {
@@ -140,7 +162,8 @@ class useServerAgent {
                 try {
                     FileMove(
                         A_LoopFileFullPath, 
-                        StrReplace(A_LoopFileFullPath, A_LoopFileName, responseHeader)
+                        StrReplace(A_LoopFileFullPath, A_LoopFileName, responseHeader),
+                        true
                     )
                 }
 
@@ -150,7 +173,7 @@ class useServerAgent {
     }
 
     /**
-     * <client> Post to pool
+     * <Client> Post to pool
      * @param {Object} content 
      */
     POST(content, pool := this.pool) {
@@ -181,7 +204,7 @@ class useServerAgent {
      * @property {String} timeCreated file created time in YYYYMMDDHH24MISS
      */
     /**
-     * <server> Collect posts
+     * <Server> Collect posts
      * @param {String} method 
      * @returns {Array<CollectedPost>}
      */
