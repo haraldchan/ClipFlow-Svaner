@@ -35,6 +35,17 @@ class UnifiedAgent extends useServerAgent {
     }
 
     abort() {
+        serverComputerName := ""
+        if (FileExist(this.pool . "\ONLINE.flag")) {
+            try {
+                serverComputerName := FileRead(this.pool . "\ONLINE.flag", "utf-8")
+            }
+
+            if (serverComputerName != A_ComputerName) {
+                return
+            }
+        }
+
         this.setOnlineStatus(false)
 
         ; prep for restart
@@ -256,9 +267,9 @@ class UnifiedAgent extends useServerAgent {
                 if (res is Error) {
                     switch res.Message {
                         case "Ended Unexpectedly":
-                            this.updatePostStatus(posts[A_Index], "RETRY")
+                            this.updatePostStatus(post.path, "RETRY")
                         case "Room not found":
-                            this.updatePostStatus(posts[A_Index], "NOTFOUND")
+                            this.updatePostStatus(post.path, "NOTFOUND")
                     }
                     continue
                 }
