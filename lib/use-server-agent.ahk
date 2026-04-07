@@ -28,7 +28,7 @@ class useServerAgent {
         this.isListening := s.isListening
 
         /** @type {String} reponder script filename */
-        this.responderFileName := ""
+        this.responder := ""
 
         if (!DirExist(this.pool)) {
             DirCreate(this.pool)
@@ -55,9 +55,9 @@ class useServerAgent {
             }
         } 
         catch Error as err {
-            if (USE_ERROR_LOG) {
-                logError(err)
-            }
+            ; if (USE_ERROR_LOG) {
+            ;     logError(err)
+            ; }
         }
 
         return {
@@ -72,7 +72,7 @@ class useServerAgent {
      */
     setOnlineStatus(on) {
         if (!FileExist(this.pool . "\OFFLINE.flag")) {
-            FileAppend("OFFLINE.flag", this.pool . "\OFFLINE.flag")
+            FileAppend(A_ComputerName, this.pool . "\OFFLINE.flag", "utf-8")
         }
 
         if (on) {
