@@ -26,7 +26,7 @@ ServerAgentPanel(App) {
     })
 
     onMount() {
-        if (FileExist(agent.pool . "\RESTART.flag")) {
+        if (FileExist(agent.pool . "\RESTART.flag") && FileRead(agent.pool . "\RESTART", "utf-8") == A_ComputerName) {
             isListening.set("在线")
         }
     }
