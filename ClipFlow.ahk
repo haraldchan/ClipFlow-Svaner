@@ -15,7 +15,7 @@ if (!A_IsAdmin) {
 }
 
 ; global consts
-VERSION := "1.8.9"
+VERSION := "1.8.10"
 POPUP_TITLE := "ClipFlow " . VERSION
 WIN_GROUP := ["ahk_class SunAwtFrame"]
 IMAGES := useImages(A_ScriptDir . "\assets")
@@ -45,7 +45,8 @@ App(ClipFlowApp)
 ClipFlowApp.Show()
 
 ; error logger
-OnError(logError, false)
+USE_ERROR_LOG := false
+OnError(logError, USE_ERROR_LOG)
 /**
  * @param {Error} err 
  */
@@ -80,6 +81,10 @@ logError(err, *) {
 		FileDelete(CONFIG.path)
 	}
 	CONFIG.createLocal()
+
+	if (IsSet(agent)) {
+		agent.abort()
+	}
 
 	utils.cleanReload(WIN_GROUP)
 }
