@@ -4,9 +4,10 @@ class UnifiedAgent extends useServerAgent {
         this.qmPool := serverSettings.HasOwnProp("qmPool") ? serverSettings.qmPool : ""
         this.popupTitle := "Unified Agent"
 
-        effect(this.isListening, cur => SetTimer(() => this.listen(cur), -100))
+        ; toggle listening status. this needs to be async due to blocking loop when listening is on.
+        effect(this.isListening, cur => SetTimer(() => this.listen(cur), -100)) 
 
-        ; ongoing post
+        ; ongoing post(fullpath of the post json file)
         this.currentHandlingPost := ""
 
         ; QM2 modules
@@ -33,20 +34,19 @@ class UnifiedAgent extends useServerAgent {
         }
     }
 
-    abort(pool := this.pool) {
-        if (!this.currentHandlingPost) {
-            return
-        }
-
-        loop files (pool . "\*.json") {
-            if (InStr(A_LoopFileName, this.currentHandlingPost["id"])) {
-                this.updatePostStatus(A_LoopFileFullPath, "ABORTED")
-            }
-        }
-
+    abort() {
         this.setOnlineStatus(false)
-        FileMove(this.pool . "\OFFLINE.flag", this.pool . "\RESTART.flag")
+
+        ; prep for restart
+        try {
+            FileMove(this.pool . "\OFFLINE.flag", this.pool . "\RESTART.flag", true)
+        }
+
+        ; change posts status
+        this.updatePostStatus(this.currentHandlingPost, "ABORTED")
         this.resetPostsToPending()
+        
+        ; retart a PMS session
         this.restartPMS()
     }
 
@@ -87,7 +87,7 @@ class UnifiedAgent extends useServerAgent {
                 FileMove(this.pool . "\RESTART.flag", this.pool . "\OFFLINE.flag", true)
             }
             this.setOnlineStatus(true)
-            this.spawnRespondent(A_ScriptDir . "\lib\index.ahk", "ua-respondent")
+            this.spawnResponder(A_ScriptDir . "\lib\index.ahk", "ua-responder")
             loop {
                 ; block input
                 this.blockInput()
@@ -119,7 +119,9 @@ class UnifiedAgent extends useServerAgent {
         }
     }
 
-
+    /**
+     * <Agent>
+     */
     restartPMS() {
         if (!WinExist("ahk_class IEFrame")) {
             return
