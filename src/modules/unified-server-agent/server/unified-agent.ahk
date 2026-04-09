@@ -188,6 +188,8 @@ class UnifiedAgent extends useServerAgent {
         Sleep(100)
         Send("{Enter}")
         utils.waitLoading(1000)
+
+        ie := ""
     }
 
 
