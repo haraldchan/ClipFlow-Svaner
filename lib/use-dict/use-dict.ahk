@@ -47,6 +47,15 @@ class useDict {
         return this.fetchPinyin(hanzi, useWG)
     }
 
+
+    URIEncode(Url, Flags := 0x000C3000) {
+        Local CC := 4096, Esc := "", Result := ""
+        Loop {
+            VarSetStrCapacity(&Esc, CC), Result := DllCall("Shlwapi.dll\UrlEscapeW", "Str", Url, "Str", &Esc, "UIntP", &CC, "UInt", Flags, "UInt")
+        } Until Result != 0x80004003 ; E_POINTER
+        Return Esc
+    }
+
     
     /**
      * Fetching pinyin of certain Hanzi from hanyu.baidu.com
@@ -56,7 +65,7 @@ class useDict {
      */
     fetchPinyin(hanzi, useWG := false) {
         ; 360国学 
-        url := Format("https://guoxue.baike.so.com/query/view?type=word&title={1}", hanzi)
+        url := Format("https://guoxue.baike.so.com/query/view?type=word&title={1}", this.URIEncode(hanzi))
         
         whr := ComObject("WinHttp.WinHttpRequest.5.1")
 
@@ -64,7 +73,6 @@ class useDict {
         whr.Send()
         whr.WaitForResponse()
         page := whr.ResponseText
-        Sleep(500)
         pinyinWithPhonetic := page.split('<span class="pinyin">')[2].split("</span>")[1].replaceThese(["[", "]"], "").trim()
 
         for char, charsWithPhonetic in this.phoneticMap {
@@ -119,15 +127,6 @@ class useDict {
         html := ""
 
         return romanised
-    }
-
-
-    URIEncode(Url, Flags := 0x000C3000) {
-        Local CC := 4096, Esc := "", Result := ""
-        Loop {
-            VarSetStrCapacity(&Esc, CC), Result := DllCall("Shlwapi.dll\UrlEscapeW", "Str", Url, "Str", &Esc, "UIntP", &CC, "UInt", Flags, "UInt")
-        } Until Result != 0x80004003 ; E_POINTER
-        Return Esc
     }
 
 
