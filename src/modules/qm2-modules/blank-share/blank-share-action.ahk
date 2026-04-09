@@ -65,8 +65,8 @@ class BlankShare_Action {
 			}
 
 			if (!this.isRunning) {
-            	msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
-            	return	
+				msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
+				return
 			}
 			utils.waitLoading()
 			this.makeShare(checkIn, sharesToMake ?? 0, true)
@@ -81,37 +81,41 @@ class BlankShare_Action {
 	 * @returns {void | String} 
 	 */
 	static search(roomNum) {
-        formattedRoom := StrLen(roomNum) == 3 ? "0" . roomNum : roomNum
+		formattedRoom := StrLen(roomNum) == 3 ? "0" . roomNum : roomNum
 
 		Send("!r") ; room number field
-        utils.waitLoading()
-        if (!this.isRunning) {
-            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
-            return
-        }
+		utils.waitLoading()
+		if (!this.isRunning) {
+			msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
+			return
+		}
 
-        Send("{Text}" . formattedRoom)
-        utils.waitLoading()
+		Send("{Text}" . formattedRoom)
+		utils.waitLoading()
 
 
-        Send("!h") ; alt+h => search
-        utils.waitLoading()
+		Send("!h") ; alt+h => search
+		utils.waitLoading()
 
 		found := PmsImageFinder.find("info.png")
 		if (found) {
-        	Send("{Enter}")
-        	return false
+			Send("{Enter}")
+			return false
 		}
 
-        if (!this.isRunning) {
-            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
-            return
-        }
+		if (!this.isRunning) {
+			msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
+			return
+		}
 
-        ; sort by Prs.
+		; sort by Prs.
 		found := PmsImageFinder.find("opera-active-win.PNG")
 		if (!found) {
-			this.isRunning := false
+			this.end()
+			if (IsSet(agent)) {
+				agent.abort()
+			}
+			utils.cleanReload(WIN_GROUP)
 		}
 		else {
 			Click(found.outX + 672, found.outY + 222, "Right")
@@ -122,10 +126,10 @@ class BlankShare_Action {
 			return true
 		}
 
-        if (!this.isRunning) {
-            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
-            return
-        }
+		if (!this.isRunning) {
+			msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
+			return
+		}
 	}
 
 	/**
@@ -140,8 +144,8 @@ class BlankShare_Action {
 			this.end()
 			if (IsSet(agent)) {
 				agent.abort()
-				utils.cleanReload(WIN_GROUP)
 			}
+			utils.cleanReload(WIN_GROUP)
 		}
 		else {
 			x := found.outX + 635
@@ -220,8 +224,8 @@ class BlankShare_Action {
 			this.end()
 			if (IsSet(agent)) {
 				agent.abort()
-				utils.cleanReload(WIN_GROUP)
 			}
+			utils.cleanReload(WIN_GROUP)
 		}
 		else {
 			MouseMove(found.outX + 752, found.outY + 415)
@@ -249,7 +253,7 @@ class BlankShare_Action {
 		}
 
 		; change RateCode to NRR
-		MouseClickDrag("L", found.outX + 131, found.outY + 324, found.outX + 40, found.outY + 324) 
+		MouseClickDrag("L", found.outX + 131, found.outY + 324, found.outX + 40, found.outY + 324)
 		utils.waitLoading()
 		Send("{Text}NRR")
 		utils.waitLoading()
@@ -259,7 +263,7 @@ class BlankShare_Action {
 			Send("{Esc}")
 			utils.waitLoading()
 		}
-	
+
 		if (!this.isRunning) {
 			msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
 			return
@@ -274,8 +278,8 @@ class BlankShare_Action {
 				this.end()
 				if (IsSet(agent)) {
 					agent.abort()
-					utils.cleanReload(WIN_GROUP)
 				}
+				utils.cleanReload(WIN_GROUP)
 			}
 			else {
 				if (PixelGetColor(found.outX + 303, found.outY) == "0xD7D7D7") {
@@ -324,22 +328,22 @@ class BlankShare_Action {
 				if (checkIn) {
 					Send("!i")
 					utils.waitLoading()
-		
+
 					found := PmsImageFinder.find("alert.png")
 					if (!found) {
 						this.end()
 						if (IsSet(agent)) {
 							agent.abort()
-							utils.cleanReload(WIN_GROUP)
 						}
+						utils.cleanReload(WIN_GROUP)
 					}
 					else {
 						if (PixelGetColor(found.outX + 303, found.outY) == "0xD7D7D7") {
 							Send("!y")
 							utils.waitLoading()
-						} 
+						}
 					}
-		
+
 					Send("{Esc}")
 					utils.waitLoading()
 					Send("{Space}")
@@ -353,6 +357,6 @@ class BlankShare_Action {
 		Send("!c")
 		utils.waitLoading()
 
-		( !keepGoing && this.end() )
+		(!keepGoing && this.end())
 	}
 }

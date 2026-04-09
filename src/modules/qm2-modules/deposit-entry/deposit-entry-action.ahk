@@ -208,15 +208,13 @@ class DepositEntry_Action {
             return
         }
 
-        ; loop {
-        ;     if (ImageSearch(&outX, &outY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["opera-active-win.PNG"])) {
-        ;         break
-        ;     }
-        ;     Sleep 200
-        ; } until (A_Index > 5)
         found := PmsImageFinder.find("opera-active-win.PNG")
         if (!found) {
-            utils.cleanReload(WIN_GROUP)
+			this.end()
+			if (IsSet(agent)) {
+				agent.abort()
+			}
+			utils.cleanReload(WIN_GROUP)
         }
 
         ; move to payment field
@@ -303,17 +301,10 @@ class DepositEntry_Action {
         Sleep(100)
         Send("!h")
         utils.waitLoading()
-        CoordMode("Pixel", "Screen")
-        CoordMode("Mouse", "Screen")
-        ; if (ImageSearch(&outX, &outY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["error.PNG"])) {
-        ;     Send "{Enter}"
-        ;     utils.waitLoading()
-        ;     Send "{Enter}"
-        ;     utils.waitLoading()
-        ;     return Error("room not found")
-        ; }
-        errorIconFound := PmsImageFinder.find("error.png")
-        if (errorIconFound) {
+
+        ; detect "room not found" popup(with a info icon)
+        infoIconFound := PmsImageFinder.find("info.png")
+        if (infoIconFound) {
             Send("{Enter}")
             utils.waitLoading()
             Send("{Enter}")
@@ -322,21 +313,13 @@ class DepositEntry_Action {
         }
 
         ; get main-profile
-        ; ImageSearch(&outX, &outY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["opera-active-win.PNG"])
-        ; if (!outX || !outY) {
-        ;     Send "{Enter}"
-        ;     utils.waitLoading()
-        ;     Send "{Enter}"
-        ;     utils.waitLoading()
-        ;     return Error("room not found")
-        ; }
         found := PmsImageFinder.find("opera-active-win.PNG")
         if (!found) {
-            Send("{Enter}")
-            utils.waitLoading()
-            Send("{Enter}")
-            utils.waitLoading()
-            return Error("room not found")
+            this.end()
+            if (IsSet(agent)) {
+                agent.abort()
+            }
+            utils.cleanReload(WIN_GROUP)
         }
 
         Click(found.outX + 672, found.outY + 222, "Right")
