@@ -15,7 +15,7 @@ if (!A_IsAdmin) {
 }
 
 ; global consts
-VERSION := "1.8.11"
+VERSION := "1.8.12"
 POPUP_TITLE := "ClipFlow " . VERSION
 WIN_GROUP := ["ahk_class SunAwtFrame"]
 IMAGES := useImages(A_ScriptDir . "\assets")
