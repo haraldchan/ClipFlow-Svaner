@@ -4,11 +4,11 @@ class PmsImageFinder {
     /**
      * Finds image on screen.
      * @param {String} imageFileName 
-     * @param {Integer} interval wait interval in millisecond
      * @param {Integer} timeoutTick wait tick
+     * @param {Integer} interval wait interval in millisecond
      * @returns { { outX: Integer, outY: Integer } | false} 
      */
-    static find(imageFileName, interval := 250, timeoutTick := 1, findOptions := { coordMode: "Screen", x1: 0, y1:0, x2: A_ScreenWidth, y2: A_ScreenHeight }) {
+    static find(imageFileName, timeoutTick := 1, interval := 200, findOptions := { coordMode: "Screen", x1: 0, y1:0, x2: A_ScreenWidth, y2: A_ScreenHeight }) {
         if (WinExist("ahk_class SunAwtFrame")) {
             WinActivate("ahk_class SunAwtFrame")
         }
