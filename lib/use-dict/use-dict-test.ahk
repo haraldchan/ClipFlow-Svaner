@@ -17,9 +17,9 @@ UseDictTest(App) {
 
         convertType := App["pinyin-type"].Text
         converted := match(convertType, Map(
-            "汉语拼音", dict.getFullnamePinyin(hanziName),
-            "威妥玛拼音（台）", dict.getFullnamePinyin(hanziName, true),
-            "广东话拼音（港）", dict.getFullnamePinyinCantonese(hanziName)
+            "汉语拼音", () => dict.getFullnamePinyin(hanziName),
+            "威妥玛拼音（台）", () => dict.getFullnamePinyin(hanziName, true),
+            "广东话拼音（港）", () => dict.getFullnamePinyinCantonese(hanziName)
         ))
 
         fullname.set({ last: converted[1], first: converted[2] })
