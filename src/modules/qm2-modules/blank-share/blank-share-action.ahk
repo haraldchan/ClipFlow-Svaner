@@ -156,7 +156,7 @@ class BlankShare_Action {
 			Send("{Down}")
 			utils.waitLoading()
 			if (PixelGetColor(x, y) == "0x000080") {
-				existShareCount()
+				existShareCount++
 				y += 22
 			} else {
 				break
