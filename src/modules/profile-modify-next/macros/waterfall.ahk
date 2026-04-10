@@ -8,29 +8,12 @@ class PMN_Waterfall {
     static cascade(groupedSelectedGuests, isOverwrite, party := "") {
         PMN_FillIn.start()
 
-        ; for roomProfiles in groupedSelectedGuests {
-        ;     for guest in roomProfiles.values()[1] {
-        ;         res := this.search(guest["roomNum"], A_Index, party)
-        ;         if (res == "not found") {
-        ;             return Error("Room not found")
-        ;         }
-
-        ;         if (!PMN_FillIn.isRunning) {
-        ;             msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
-        ;             return Error("Ended Unexpectedly")
-        ;         }
-
-        ;         this.modify(guest, isOverwrite)
-        ;         Sleep(1000)
-
-        ;         if (!PMN_FillIn.isRunning) {
-        ;             msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
-        ;             return Error("Ended Unexpectedly")
-        ;         }
-        ;     }
-        ; }
         for room, guests in groupedSelectedGuests {
-            for guest in guests {
+
+            primaryProfile := guests.RemoveAt(guests.findIndex(g => g["name"].includes("👤")))
+            sortedGuests := [primaryProfile, guests*]
+
+            for guest in sortedGuests {
                 res := this.search(guest["roomNum"], A_Index, party)
                 if (res == "not found") {
                     return Error("Room not found")
