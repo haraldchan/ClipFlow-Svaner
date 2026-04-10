@@ -10,8 +10,14 @@ class PMN_Waterfall {
 
         for room, guests in groupedSelectedGuests {
 
-            primaryProfile := guests.RemoveAt(guests.findIndex(g => g["name"].includes("👤")))
-            sortedGuests := [primaryProfile, guests*]
+            primaryIndex := guests.findIndex(g => g["name"].includes("👤"))
+            if (primaryIndex > 0) {
+                primaryProfile := guests.RemoveAt(primaryIndex)
+                sortedGuests := [primaryProfile, guests*]
+            }
+            else {
+                sortedGuests := guests
+            }
 
             for guest in sortedGuests {
                 res := this.search(guest["roomNum"], A_Index, party)
