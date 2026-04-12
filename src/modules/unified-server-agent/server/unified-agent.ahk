@@ -126,7 +126,7 @@ class UnifiedAgent extends useServerAgent {
         postsToReset.Push(this.COLLECT("RETRY")*)
 
         for post in postsToReset {
-            this.updatePostStatus(post, "PENDING")
+            this.updatePostStatus(post.path, "PENDING")
         }
     }
 
@@ -134,7 +134,7 @@ class UnifiedAgent extends useServerAgent {
      * <Agent>
      */
     restartPMS() {
-        if (!WinExist("ahk_class IEFrame")) {
+        if (!WinExist("OPERA Full Service Edition")) {
             return
         }
 
@@ -143,11 +143,11 @@ class UnifiedAgent extends useServerAgent {
 
         ; close all ie win
         loop {
-            if (WinExist("ahk_class IEFrame")) {
-                WinKill("ahk_class IEFrame")
+            if (WinExist("OPERA Full Service Edition")) {
+                WinKill("OPERA Full Service Edition")
             }
             Sleep(200)
-        } until (!WinExist("ahk_class IEFrame"))
+        } until (!WinExist("OPERA Full Service Edition"))
 
         ie := ComObject("InternetExplorer.Application")
         ie.Visible := true
