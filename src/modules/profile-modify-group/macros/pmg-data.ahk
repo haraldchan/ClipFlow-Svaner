@@ -105,44 +105,73 @@ class PMG_Data {
 
     }
 
-    static getGroupHouseInformations(xmlPath) {
+    /**
+     * 
+     * @param {String} xmlPath fullpath of GroupInHouse report xml
+     * @returns {Array} list of group room numbers
+     */
+    static getGroupRoomNumbers(xmlPath) {
         xmlDoc := ComObject("msxml2.DOMDocument.6.0")
         xmlDoc.async := false
         xmlDoc.load(xmlPath)
         roomElements := xmlDoc.getElementsByTagName("ROOM")
         
+        ; inhRooms := []
+        ; loop roomElements.Length {
+        ;     roomNumString := roomElements[A_Index - 1].ChildNodes[0].nodeValue
+        ;     roomNum := (SubStr(roomNumString, 0, 1) = "0")
+        ;         ? SubStr(roomNumString, 1)
+        ;         : roomNumString
+
+        ;     inhRooms.Push(roomNum)
+        ; }
+
+        ; return Map("inhRooms", inhRooms)
+        
         inhRooms := []
         loop roomElements.Length {
-            roomNumString := roomElements[A_Index - 1].ChildNodes[0].nodeValue
-            roomNum := (SubStr(roomNumString, 0, 1) = "0")
-                ? SubStr(roomNumString, 1)
-                : roomNumString
+            curRoom := roomElements[A_Index - 1].ChildNodes[0].nodeValue
+            if (inhRooms.Length && inhRooms.at(-1) == curRoom) {
+                continue
+            }
 
-            inhRooms.Push(roomNum)
+            inhRooms.Push(curRoom)
         }
 
-        return Map("inhRooms", inhRooms)
+        return inhRooms
     }
 
+    /**
+     * 
+     * @param {useFileDB} db db object
+     * @param {Array} inhRooms in house room numbers
+     * @param {Integer} fetchPeriod fetch period hrs
+     * @returns {Array} grouped guest profiles
+     */
     static getGroupGuests(db, inhRooms, fetchPeriod) {
-        roomNums := inhRooms.unique()
+        ; roomNums := inhRooms.unique()
+        ; loadedGuests := db.load(, FormatTime(A_Now, "yyyyMMdd"), 60 * fetchPeriod)
+
+        ; groupGuests := []
+
+        ; for roomNum in roomNums {
+        ;     for guest in loadedGuests {
+
+        ;         if (StrLen(guest["roomNum"]) = 3) {
+        ;             guest["roomNum"] := "0" . guest["roomNum"]
+        ;         }
+
+        ;         if (guest["roomNum"] = roomNum) {
+        ;             groupGuests.Push(guest)
+        ;         }
+        ;     }
+        ; }
+
+        ; return groupGuests
+
         loadedGuests := db.load(, FormatTime(A_Now, "yyyyMMdd"), 60 * fetchPeriod)
+        filteredGuests := loadedGuests.filter(guest => inhRooms.includes(guest["roomNum"]))
 
-        groupGuests := []
-
-        for roomNum in roomNums {
-            for guest in loadedGuests {
-
-                if (StrLen(guest["roomNum"]) = 3) {
-                    guest["roomNum"] := "0" . guest["roomNum"]
-                }
-
-                if (guest["roomNum"] = roomNum) {
-                    groupGuests.Push(guest)
-                }
-            }
-        }
-
-        return groupGuests
+        return filteredGuests
     }
 }

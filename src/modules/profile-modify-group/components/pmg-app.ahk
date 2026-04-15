@@ -26,21 +26,27 @@ PMG_App(App, popupTitle, db) {
 
         useListPlaceholder(loadedGuests, ["roomNum", "name"], "Loading...")
 
-        groupInfo := PMG_Data.getGroupHouseInformations(A_MyDocuments . "\" . selectedGroup.value["blockCode"] . ".XML")
-        guestInfo := PMG_Data.getGroupGuests(db, groupInfo["inhRooms"], fetchPeriod.value)
+        groupRoomNums := PMG_Data.getGroupRoomNumbers(A_MyDocuments . "\" . selectedGroup.value["blockCode"] . ".XML")
+        guestProfiles := PMG_Data.getGroupGuests(db, groupRoomNums, fetchPeriod.value)
 
-        currentGroupRooms.set(groupInfo["inhRooms"])
-        loadedGuests.set(guestInfo.Length == 0 ? [{ roomNum: "Nil", name: "Nil" }] : guestInfo)
+        currentGroupRooms.set(groupRoomNums)
+        loadedGuests.set(guestProfiles.Length == 0 ? [{ roomNum: "Nil", name: "Nil" }] : guestProfiles)
     }
 
     performModify(*) {
         checkedRows := App["group-guest-list"].getCheckedRowNumbers()
-        selectedGuests := []
-        for row in checkedRows {
-            selectedGuests.Push(loadedGuests.value[row])
+        selectedGuests := checkedRows.map(row => loadedGuests.value[row])
+        groupedSelectedGuests := Map()
+        for room in currentGroupRooms.value {
+            groupedSelectedGuests[room] := []
         }
 
-        PMG_Execute.startModify(currentGroupRooms.value, selectedGuests)
+        for guest in selectedGuests {
+            groupedSelectedGuests[guest["roomNum"]].Push(guest)
+        }
+
+
+        PMG_Execute.startModify(currentGroupRooms.value, groupedSelectedGuests)
     }
 
     return (
