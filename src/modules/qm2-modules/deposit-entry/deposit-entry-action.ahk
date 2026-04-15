@@ -20,6 +20,8 @@ class DepositEntry_Action {
 
         Hotkey("F12", (*) => this.end(), "On")
         this.isRunning := true
+
+        SUSPEND_CONTROLLER.suspendOtherScripts()
     }
 
     static end() {
@@ -30,6 +32,8 @@ class DepositEntry_Action {
 
         Hotkey("F12", (*) => {}, "Off")
         this.isRunning := false
+
+        SUSPEND_CONTROLLER.restoreAllScripts()
     }
 
     /**
