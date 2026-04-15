@@ -115,13 +115,22 @@ class PMN_Waterfall {
         }
 
         ; sort by Prs.
-        ImageSearch(&outX, &outY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["opera-active-win.PNG"])
-        Click(outX + 672, outY + 222, "Right")
-        Sleep(200)
-        Send("{Down}")
-        Sleep(200)
-        Send("{Enter}")
-        utils.waitLoading()
+        found := PmsImageFinder.find("opera-active-win.PNG")
+        if (!found) {
+            if (IsSet(agent)) {
+                agent.abort()
+                utils.cleanReload(WIN_GROUP)
+            }
+        }
+        else {
+            Click(found.outX + 672, found.outY + 222, "Right")
+            Sleep(200)
+            Send("{Down}")
+            Sleep(200)
+            Send("{Enter}")
+            utils.waitLoading()
+        }
+
         if (!PMN_FillIn.isRunning) {
             msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
