@@ -190,6 +190,22 @@ PMN_App(App, moduleTitle, db, identifier) {
         return matchedGuest
     }
 
+    handleRefresh(*) {
+        if (queryFilter.value["date"] != FormatTime(A_Now, "yyyyMMdd")) {
+            res := MsgBox(
+                Format("搜索日期非今天，请确认是否准确`n`n是 - 继续搜索 {1}`n否 - 返回今天", FormatTime(queryFilter.value["date"], "yyyy年MM月dd日")), 
+                POPUP_TITLE, 
+                "4096 YesNo icon!"
+            )
+            if (res == "No") {
+                queryFilter.update("date", FormatTime(A_Now, "yyyyMMdd"))
+                App["date"].Value := FormatTime(A_Now, "yyyyMMdd")
+            }
+        }
+
+        handleListContentUpdate()
+    }
+
     handleListContentUpdate(*) {
         colTitles := App["guest-profile-list"].svanerWrapper.titleKeys
         useListPlaceholder(listContent, colTitles, "Loading...")
@@ -450,7 +466,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         App.AddText("x+1 h25 0x200", "分钟"),
         
         ; refresh/fill
-        App.AddButton("vrefresh x+10 w80 h25", "刷 新(&R)").onClick(handleListContentUpdate),
+        App.AddButton("vrefresh x+10 w80 h25", "刷 新(&R)").onClick(handleRefresh),
         App.AddButton("vfillin x+5 w80 h25 Default", "{1}", fillBtnText)
            .onClick(fillPmsProfile)
            .onContextMenu((*) => settings.update("fillOverwrite", o => !o)),
