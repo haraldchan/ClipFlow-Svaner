@@ -1,7 +1,8 @@
 {
 	"app": {
 		"moduleSelected": 1,
-		"tabPos": 1
+		"tabPos": 1,
+		"errorLogging": 0
 	},
 	"dbConfig": {
 		"host": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本",
