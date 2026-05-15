@@ -15,12 +15,13 @@ if (!A_IsAdmin) {
 }
 
 ; global consts
-VERSION := "1.8.13"
+VERSION := "1.8.14"
 POPUP_TITLE := "ClipFlow " . VERSION
 WIN_GROUP := ["ahk_class SunAwtFrame"]
 IMAGES := useImages(A_ScriptDir . "\assets")
 APP_DATA_DIR := A_AppData . "\ClipFlow"
 CONFIG := useJsonConfig("./clipflow.config.json", "clipflow.config.json", APP_DATA_DIR)
+USE_ERROR_LOG := CONFIG.read(["app", "errorLogging"])
 FORCE_SUSPEND_MESSAGE := 0x2042
 SUSPEND_CONTROLLER := SuspendController(FORCE_SUSPEND_MESSAGE)
 
@@ -43,51 +44,6 @@ ClipFlowApp := Svaner({
 
 App(ClipFlowApp)
 ClipFlowApp.Show()
-
-; error logger
-USE_ERROR_LOG := false
-OnError(logError, USE_ERROR_LOG)
-/**
- * @param {Error} err 
- */
-logError(err, *) {
-	if (!DirExist(A_ScriptDir . "\error-log")) {
-		DirCreate(A_ScriptDir . "\error-log")
-	}
-
-	errTxt := A_ScriptDir . "\error-log\" . FormatTime(A_Now, "yyyyMMdd") . ".txt"
-	errLog := Format("
-		(
-			{1} 
-			file: {2}
-			line: {3}
-			message: {4}
-			extra:   {5}`n`n
-		)",
-		FormatTime(A_Now, "yyyy/MM/dd HH:mm"),
-		err.File
-		err.Line,
-		err.Message,
-		err.Extra
-	)
-
-	FileAppend(errLog, errTxt, "utf-8")
-
-	if (DirExist(APP_DATA_DIR . "\clipflow-clips")) {
-		DirDelete(APP_DATA_DIR . "\clipflow-clips", true)
-	}
-
-	if (FileExist(CONFIG.path)) {
-		FileDelete(CONFIG.path)
-	}
-	CONFIG.createLocal()
-
-	if (IsSet(agent)) {
-		agent.abort()
-	}
-
-	utils.cleanReload(WIN_GROUP)
-}
 
 ; hotkeys setup
 Pause:: {
