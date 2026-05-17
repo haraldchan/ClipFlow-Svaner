@@ -1,14 +1,16 @@
 /**
- * @typedef {Object} Deposit
+ * @typedef {Object} Transaction
  * @property {"VS" | "MC" | "AE" | "JC" | "UP"} cardType
  * @property {String} cardNum
  * @property {String} exp
  * @property {String} amount
+ * @property {String} transType
  * @property {String} auth
  */
 
 class DepositEntry_Action {
     static isRunning := false
+    static isSelected := "0xC5E5FF"
 
     static start() {
         WinMaximize("ahk_class SunAwtFrame")
@@ -75,6 +77,14 @@ class DepositEntry_Action {
         cardNum := parsedCard[1]
         exp := parsedCard[2].substr(3, 4) . parsedCard[2].substr(1, 2)
 
+        CoordMode("Pixel", "Window")
+        found := PixelSearch(&x, &y, 0, 0, 1300, 800, this.isSelected)
+        if (!found) {
+            MsgBox("未选中交易。",, "icon! T2")
+            return
+        }
+        CoordMode("Pixel", "Screen")
+
         ; copy room num
         MouseMove(547, 191)
         Sleep(50)
@@ -85,7 +95,7 @@ class DepositEntry_Action {
         room := StrLen(A_Clipboard) == 3 ? "0" . A_Clipboard : A_Clipboard
 
         ; copy auth num
-        MouseMove(465, 358)
+        MouseMove(x + 232, y + 30)
         Sleep(50)
         Click(2)
         Sleep(10)
@@ -94,16 +104,25 @@ class DepositEntry_Action {
         auth := A_Clipboard
 
         ; copy amount
-        MouseMove(950, 355)
+        MouseMove(x + 704, y + 27)
         Sleep(50)
-        Click(2)
+        Click(3)
         Sleep(10)
         Send("^c")
         Sleep(10)
         amount := A_Clipboard
 
+        ; copy transaction type
+        MouseMove(x + 861, y + 26)
+        Sleep(50)
+        Click(3)
+        Sleep(10)
+        Send("^c")
+        Sleep(10)
+        transType := A_Clipboard     
+
         ; copy card type
-        MouseMove(1245, 345)
+        MouseMove(x + 1015, y + 31)
         Sleep(50)
         Click(3)
         Sleep(10)
@@ -141,18 +160,29 @@ class DepositEntry_Action {
 
         SUSPEND_CONTROLLER.restoreAllScripts()
 
+        ; MsgBox(JSON.stringify({
+        ;     cardType: cardType,
+        ;     cardNum: cardNum,
+        ;     exp: exp,
+        ;     amount: amount.replace("`t", ""),
+        ;     transType: transType.replace("`t", ""),
+        ;     auth: auth,
+        ;     room: room
+        ; }))
+
         this.promptCompleteInfo({
             cardType: cardType,
             cardNum: cardNum,
             exp: exp,
-            amount: amount,
+            amount: amount.replace("`t", ""),
+            transType: transType.replace("`t", ""),
             auth: auth,
             room: room
         })
     }
 
     /**
-     * @param {Deposit} depositInfo 
+     * @param {Transaction} depositInfo 
      */
     static promptCompleteInfo(depositInfo) {
         if (WinExist("Deposit Entry")) {
@@ -186,6 +216,15 @@ class DepositEntry_Action {
      * @param {Deposit} depositInfo 
      */
     static entry(depositInfo) {
+        if (depositInfo.transType == "预授权") {
+            this.entryDeposit(depositInfo)
+        }
+        else {
+            this.entryPayment(depositInfo)
+        }
+    }
+
+    static entryDeposit(depositInfo) {
         this.start()
 
         if (!WinExist("ahk_class SunAwtFrame")) {
@@ -214,11 +253,7 @@ class DepositEntry_Action {
 
         found := PmsImageFinder.find("opera-active-win.PNG")
         if (!found) {
-			this.end()
-			if (IsSet(agent)) {
-				agent.abort()
-			}
-			utils.cleanReload(WIN_GROUP)
+            utils.cleanReload(WIN_GROUP)
         }
 
         ; move to payment field
@@ -290,6 +325,41 @@ class DepositEntry_Action {
         this.end()
     }
 
+    static entryPayment(depositInfo) {
+        this.start()
+
+        mcBtn := PmsImageFinder.find("payment-mc.png")
+        if (!mcBtn) {
+            Send("!y")
+            utils.waitLoading()
+        }
+
+        Send(Format("{Text}{1}", depositInfo.cardType))
+        Send("{Tab}")
+        utils.waitLoading()
+
+        ; dismiss exist credit card list
+        if (!PmsImageFinder.find("payment-mc.png")) {
+            Send("!c")
+            utils.waitLoading()
+        }
+
+        Send("{Esc}") ; dismiss attach card msgbox
+        utils.waitLoading()
+        Send(depositInfo.amount)
+        Sleep(100)
+        Send("{Tab}")
+        Send(depositInfo.cardNum)
+        Sleep(100)
+        Send("{Tab}")
+        Send(depositInfo.exp)
+        Sleep(100)
+        Send("!p")
+        utils.waitLoading()
+
+        this.end()
+    }
+
     static USE(depositInfo) {
         if (depositInfo is Map) {
             depositInfo := JSON.parse(JSON.stringify(depositInfo), , false)
@@ -305,10 +375,11 @@ class DepositEntry_Action {
         Sleep(100)
         Send("!h")
         utils.waitLoading()
+        CoordMode("Pixel", "Screen")
+        CoordMode("Mouse", "Screen")
 
-        ; detect "room not found" popup(with a info icon)
-        infoIconFound := PmsImageFinder.find("info.png")
-        if (infoIconFound) {
+        errorIconFound := PmsImageFinder.find("error.png")
+        if (errorIconFound) {
             Send("{Enter}")
             utils.waitLoading()
             Send("{Enter}")
@@ -319,11 +390,11 @@ class DepositEntry_Action {
         ; get main-profile
         found := PmsImageFinder.find("opera-active-win.PNG")
         if (!found) {
-            this.end()
-            if (IsSet(agent)) {
-                agent.abort()
-            }
-            utils.cleanReload(WIN_GROUP)
+            Send("{Enter}")
+            utils.waitLoading()
+            Send("{Enter}")
+            utils.waitLoading()
+            return Error("room not found")
         }
 
         Click(found.outX + 672, found.outY + 222, "Right")
