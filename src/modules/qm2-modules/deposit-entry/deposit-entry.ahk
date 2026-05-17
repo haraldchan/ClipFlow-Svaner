@@ -57,12 +57,18 @@ DepositEntry(App, props := {}) {
     }
 
     onMount() {
+        if (depositInfo.transType != "预授权") {
+            App["de-delegate"].Value := false
+            App["de-delegate"].Enabled := false
+            App["room"].Enabled := false
+        }
+
         App[depositInfo.cardType].Value := true
         App["amount"].Focus()
     }
 
     comp.render := this => this.Add(
-        App.AddGroupBox("Section vdeposit-info-gb w350 h150", "押金信息").SetFont("bold"),
+        App.AddGroupBox("Section vdeposit-info-gb w350 h150", Format("{1}信息", depositInfo.transType)).SetFont("bold"),
         ; card type
         App.AddText("xs10 yp+23 w80 h25 0x200", "支付类型"),
         ["&UP", "&VS", "&MC", "&AE", "&JC"].map(card => App.AddRadio("x+1 w50 h25", card)),
