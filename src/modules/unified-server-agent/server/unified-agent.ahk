@@ -14,7 +14,7 @@ class UnifiedAgent extends useServerAgent {
         this.qmModules := Map(
             "BlankShare", BlankShare_Action,
             "PaymentRelation", PaymentRelation_Action,
-            "DepositEntry", DepositEntry_Action
+            "TransactionEntry", TransactionEntry_Action
         )
 
         ; delete expired posts

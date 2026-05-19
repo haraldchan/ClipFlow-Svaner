@@ -43,7 +43,7 @@ ListenerHub(App) {
             description: "SPayPos 复制卡号",
             type: "persist",
             isOn: false,
-            callback: (*) => DepositEntry_Action.copyFromSPayPos()
+            callback: (*) => TransactionEntry_Action.copyFromSPayPos()
         })
     }
 

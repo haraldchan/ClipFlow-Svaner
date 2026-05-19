@@ -77,7 +77,7 @@ SentPosts(App, isDelegate, listContent) {
             post["action"] := match(post["content"]["module"], Map(
                 "BlankShare", "Share",
                 "PaymentRelation", "PayBy PayFor",
-                "DepositEntry", "Auth"
+                "TransactionEntry", "Auth"
             ))
             posts.InsertAt(1, post)
         }     
@@ -124,7 +124,7 @@ SentPosts(App, isDelegate, listContent) {
                 })
             case "Auth":
                 form := JSON.parse(JSON.stringify(selectedPost["content"]["form"]),, false)
-                PostDetails_QM2(selectedPost, "DepositEntry",{
+                PostDetails_QM2(selectedPost, "TransactionEntry",{
                     depositInfo: form,
                     style: { xyPos: "xs10 y+10" },
                 })

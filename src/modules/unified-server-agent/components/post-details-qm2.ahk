@@ -10,7 +10,7 @@ PostDetails_QM2(post, moduleName, props) {
     qmModules := Map(
         "BlankShare",      { desc: "Share 详情", module: BlankShare },
         "PaymentRelation", { desc: "Payment 关系", module: PaymentRelation },
-        "DepositEntry",    { desc: "授权押金", module: DepositEntry }
+        "TransactionEntry",    { desc: "授权押金", module: TransactionEntry }
     )
 
     handleRepost(*) {
@@ -80,7 +80,7 @@ PostDetails_QM2(post, moduleName, props) {
     )
 
     onMount() {
-        if (moduleName != "DepositEntry") {
+        if (moduleName != "TransactionEntry") {
             App[moduleName.toCase("kebab") . "-action"].OnEvent("Click", handleModuleEventDelegate, -1)
             App[moduleName.toCase("kebab") . "-action"].Opt("+Default")
         }
