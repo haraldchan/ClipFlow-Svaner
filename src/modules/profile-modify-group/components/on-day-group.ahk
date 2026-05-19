@@ -29,8 +29,13 @@ OnDayGroups(App, selectedGroup) {
     getBlockInfo(fileName) {
         blockInfo := []
 
-        Xl := ComObject("Excel.Application")
-        OnDayGroupDetails := Xl.Workbooks.Open(fileName).Worksheets("Sheet1")
+        Xl := ""
+        try {
+            Xl := ComObject("Ket.Application")
+        }
+        catch {
+            Xl := ComObject("Excel.Application")
+        }        OnDayGroupDetails := Xl.Workbooks.Open(fileName).Worksheets("Sheet1")
         loop {
             blockCodeReceived := OnDayGroupDetails.Cells(A_Index + 3, 1).Text
             blockNameReceived := OnDayGroupDetails.Cells(A_Index + 3, 2).Text
