@@ -160,16 +160,6 @@ class TransactionEntry_Action {
 
         SUSPEND_CONTROLLER.restoreAllScripts()
 
-        ; MsgBox(JSON.stringify({
-        ;     cardType: cardType,
-        ;     cardNum: cardNum,
-        ;     exp: exp,
-        ;     amount: amount.replace("`t", ""),
-        ;     transType: transType.replace("`t", ""),
-        ;     auth: auth,
-        ;     room: room
-        ; }))
-
         this.promptCompleteInfo({
             cardType: cardType,
             cardNum: cardNum,
@@ -182,9 +172,9 @@ class TransactionEntry_Action {
     }
 
     /**
-     * @param {Transaction} depositInfo 
+     * @param {Transaction} transactionInfo 
      */
-    static promptCompleteInfo(depositInfo) {
+    static promptCompleteInfo(transactionInfo) {
         if (WinExist("Deposit Entry")) {
             WinClose("Deposit Entry")
         }
@@ -207,24 +197,24 @@ class TransactionEntry_Action {
         }
 
         return (
-            TransactionEntry(Prompt, { depositInfo: depositInfo }).render(),
+            TransactionEntry(Prompt, { transactionInfo: transactionInfo }).render(),
             onMount()
         )
     }
 
     /**
-     * @param {Deposit} depositInfo 
+     * @param {Deposit} transactionInfo 
      */
-    static entry(depositInfo) {
-        if (depositInfo.transType == "预授权") {
-            this.entryDeposit(depositInfo)
+    static entry(transactionInfo) {
+        if (transactionInfo.transType == "预授权") {
+            this.entryDeposit(transactionInfo)
         }
         else {
-            this.entryPayment(depositInfo)
+            this.entryPayment(transactionInfo)
         }
     }
 
-    static entryDeposit(depositInfo) {
+    static entryDeposit(transactionInfo) {
         this.start()
 
         if (!WinExist("ahk_class SunAwtFrame")) {
@@ -232,8 +222,8 @@ class TransactionEntry_Action {
         }
         WinActivate("ahk_class SunAwtFrame")
 
-        if (depositInfo is Map) {
-            depositInfo := JSON.parse(JSON.stringify(depositInfo), , false)
+        if (transactionInfo is Map) {
+            transactionInfo := JSON.parse(JSON.stringify(transactionInfo), , false)
         }
 
         ; dismiss alerts
@@ -261,7 +251,7 @@ class TransactionEntry_Action {
         Sleep(100)
         Click(3)
         Sleep(100)
-        Send("{Text}" . depositInfo.cardType)
+        Send("{Text}" . transactionInfo.cardType)
         Sleep(100)
         Send("{Tab}")
         utils.waitLoading()
@@ -287,13 +277,13 @@ class TransactionEntry_Action {
         }
 
         ; enter cardNum & exp
-        Send("{Text}" . depositInfo.cardNum)
+        Send("{Text}" . transactionInfo.cardNum)
         Sleep(100)
         Send("{Tab}")
         utils.waitLoading()
         Send "{Esc}" ; attach card to profile prompt, choose "No"
         utils.waitLoading()
-        Send("{Text}" .  depositInfo.exp)
+        Send("{Text}" .  transactionInfo.exp)
         Sleep(100)
         Send("!s")
         utils.waitLoading()
@@ -311,11 +301,11 @@ class TransactionEntry_Action {
         utils.waitLoading()
         Send("!m")
         utils.waitLoading()
-        Send("{Text}" . depositInfo.amount)
+        Send("{Text}" . transactionInfo.amount)
         Sleep(100)
         Send("{Tab}")
         Sleep(100)
-        Send("{Text}" . depositInfo.auth)
+        Send("{Text}" . transactionInfo.auth)
         Sleep(100)
         Send("!o")
         utils.waitLoading()
@@ -325,7 +315,7 @@ class TransactionEntry_Action {
         this.end()
     }
 
-    static entryPayment(depositInfo) {
+    static entryPayment(transactionInfo) {
         this.start()
 
         mcBtn := PmsImageFinder.find("payment-mc.png")
@@ -334,7 +324,7 @@ class TransactionEntry_Action {
             utils.waitLoading()
         }
 
-        Send(Format("{Text}{1}", depositInfo.cardType))
+        Send(Format("{Text}{1}", transactionInfo.cardType))
         Send("{Tab}")
         utils.waitLoading()
 
@@ -346,13 +336,13 @@ class TransactionEntry_Action {
 
         Send("{Esc}") ; dismiss attach card msgbox
         utils.waitLoading()
-        Send(depositInfo.amount)
+        Send(transactionInfo.amount)
         Sleep(100)
         Send("{Tab}")
-        Send(depositInfo.cardNum)
+        Send(transactionInfo.cardNum)
         Sleep(100)
         Send("{Tab}")
-        Send(depositInfo.exp)
+        Send(transactionInfo.exp)
         Sleep(100)
         Send("!p")
         utils.waitLoading()
@@ -360,9 +350,9 @@ class TransactionEntry_Action {
         this.end()
     }
 
-    static USE(depositInfo) {
-        if (depositInfo is Map) {
-            depositInfo := JSON.parse(JSON.stringify(depositInfo), , false)
+    static USE(transactionInfo) {
+        if (transactionInfo is Map) {
+            transactionInfo := JSON.parse(JSON.stringify(transactionInfo), , false)
         }
 
         ; clear form
@@ -370,7 +360,7 @@ class TransactionEntry_Action {
         utils.waitLoading()
 
         ; search room
-        Send("{Text}" . depositInfo.room)
+        Send("{Text}" . transactionInfo.room)
 
         Sleep(100)
         Send("!h")
@@ -405,7 +395,7 @@ class TransactionEntry_Action {
         utils.waitLoading()
         Send("!e")
         utils.waitLoading()
-        this.entry(depositInfo)
+        this.entry(transactionInfo)
         utils.waitLoading()
 
         Send("!o")
