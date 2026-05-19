@@ -8,7 +8,7 @@
  * @property {String} auth
  */
 
-class DepositEntry_Action {
+class TransactionEntry_Action {
     static isRunning := false
     static isSelected := "0xC5E5FF"
 
@@ -207,7 +207,7 @@ class DepositEntry_Action {
         }
 
         return (
-            DepositEntry(Prompt, { depositInfo: depositInfo }).render(),
+            TransactionEntry(Prompt, { depositInfo: depositInfo }).render(),
             onMount()
         )
     }
