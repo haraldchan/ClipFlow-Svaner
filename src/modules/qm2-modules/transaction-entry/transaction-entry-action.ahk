@@ -38,30 +38,21 @@ class TransactionEntry_Action {
         SUSPEND_CONTROLLER.restoreAllScripts()
     }
 
-    /**
-     * @param {String} cardInfo 
-     * @returns {"VS" | "MC" | "AE" | "JC" | "UP"} 
-     */
-    static validateType(cardInfo) {
-        switch {
-            case cardInfo.includes("VISA"):
-                return "VS"
-            case cardInfo.includes("MASTER"):
-                return "MC"
-            case cardInfo.includes("AMEX"):
-                return "AE"
-            case cardInfo.includes("JCB"):
-                return "JC"
-            default:
-                return "UP"
-        }
-    }
+    static Transaction := Struct({
+        cardType: ["VS", "MC", "AE", "JC", "UP"],
+        cardNum: num => IsNumber(num),
+        exp: exp => StrLen(exp) == 4,
+        amount: amount => IsFloat(amount),
+        transType: ["预授权", "消费", "预授权"],
+        auth: auth => StrLen(auth) == 6,
+        room: room => IsNumber(room) && StrLen(room) == 4
+    })
 
     static copyFromSPayPos() {
         if (!RegExMatch(A_Clipboard, "^;\d+=\d+\?$") || !WinExist("ahk_exe SPayPOS.exe")) {
             return
         }
-        
+
         SUSPEND_CONTROLLER.suspendOtherScripts()
 
         ; set window
@@ -80,7 +71,7 @@ class TransactionEntry_Action {
         CoordMode("Pixel", "Window")
         found := PixelSearch(&x, &y, 0, 0, 1300, 800, this.isSelected)
         if (!found) {
-            MsgBox("未选中交易。",, "icon! T2")
+            MsgBox("未选中交易。", , "icon! T2")
             return
         }
         CoordMode("Pixel", "Screen")
@@ -119,7 +110,7 @@ class TransactionEntry_Action {
         Sleep(10)
         Send("^c")
         Sleep(10)
-        transType := A_Clipboard     
+        transType := A_Clipboard
 
         ; copy card type
         MouseMove(x + 1015, y + 31)
@@ -128,7 +119,13 @@ class TransactionEntry_Action {
         Sleep(10)
         Send("^c")
         Sleep(10)
-        cardType := this.validateType(A_Clipboard)
+
+        cardType := match(A_Clipboard, Map(
+            card => card.includes("VISA"), "VS",
+            card => card.includes("MASTER"), "MC",
+            card => card.includes("AMEX"), "AE",
+            card => card.includes("JCB"), "JC",
+        ), "UP")
 
         ; get full card num
         if (!cardNum.startsWith("1") && !cardNum.startsWith("2")) {
@@ -160,7 +157,7 @@ class TransactionEntry_Action {
 
         SUSPEND_CONTROLLER.restoreAllScripts()
 
-        this.promptCompleteInfo({
+        capturedTransaction := {
             cardType: cardType,
             cardNum: cardNum,
             exp: exp,
@@ -168,21 +165,28 @@ class TransactionEntry_Action {
             transType: transType.replace("`t", ""),
             auth: auth,
             room: room
-        })
+        }
+
+        if (!capturedTransaction.satisfies(this.Transaction)) {
+            MsgBox("复制信息有误，请重试！", "Transaction Entry", "4096 T2 icon!")
+            return
+        }
+
+        this.promptCompleteInfo(capturedTransaction)
     }
 
     /**
      * @param {Transaction} transactionInfo 
      */
     static promptCompleteInfo(transactionInfo) {
-        if (WinExist("Deposit Entry")) {
-            WinClose("Deposit Entry")
+        if (WinExist("Transaction Entry")) {
+            WinClose("Transaction Entry")
         }
 
         Prompt := Svaner({
             gui: {
                 options: "+AlwaysOnTop",
-                title: "Deposit Entry"
+                title: "Transaction Entry"
             },
             font: { name: "微软雅黑" },
             events: {
@@ -192,8 +196,8 @@ class TransactionEntry_Action {
 
         onMount() {
             Prompt.Show()
-            WinGetPos(&x, &y,,, "Deposit Entry")
-            MouseMove(x, y)
+            WinGetPos(&x, &y, &w, &h, "Transaction Entry")
+            MouseMove(x + w, y + h)
         }
 
         return (
@@ -283,7 +287,7 @@ class TransactionEntry_Action {
         utils.waitLoading()
         Send "{Esc}" ; attach card to profile prompt, choose "No"
         utils.waitLoading()
-        Send("{Text}" .  transactionInfo.exp)
+        Send("{Text}" . transactionInfo.exp)
         Sleep(100)
         Send("!s")
         utils.waitLoading()
@@ -374,7 +378,7 @@ class TransactionEntry_Action {
             utils.waitLoading()
             Send("{Enter}")
             utils.waitLoading()
-            return Error("room not found") 
+            return Error("room not found")
         }
 
         ; get main-profile
