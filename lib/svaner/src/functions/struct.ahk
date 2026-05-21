@@ -249,6 +249,11 @@ class Struct {
                     throw TypeError(Format("Type mismatch.`n`nAssignables: {1}", ArrayExt.join(typeMap[key], " | ")), -1, value)
                 }
             }
+            else if (typeMap[key] is Func) {
+                if (!typeMap[key](value)) {
+                    throw TypeError(Format("Invalid value.", value), -1, value)
+                }
+            }
             else {
                 if !(value is typeMap[key]) {
                     throw TypeError(Format(
