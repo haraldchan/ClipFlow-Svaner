@@ -11,11 +11,23 @@
 class TransactionEntry_Action {
     static isRunning := false
     static isSelected := "0xC5E5FF"
+    static OPERA := "ahk_class SunAwtFrame"
+    static SPAY := "ahk_exe SPayPOS.exe"
+
+    static Transaction := Struct({
+        cardType: ["VS", "MC", "AE", "JC", "UP"],
+        cardNum: num => IsNumber(num),
+        exp: exp => StrLen(exp) == 4,
+        amount: amount => IsFloat(amount),
+        transType: ["预授权", "消费", "预授权完成", "预授权（已撤销）", "预授权撤销", "预授权（已完成）"],
+        auth: auth => StrLen(auth) == 6,
+        room: room => IsNumber(room) && StrLen(room) == 4
+    })
 
     static start() {
-        WinMaximize("ahk_class SunAwtFrame")
-        WinActivate("ahk_class SunAwtFrame")
-        WinSetAlwaysOnTop(true, "ahk_class SunAwtFrame")
+        WinMaximize(this.OPERA)
+        WinActivate(this.OPERA)
+        WinSetAlwaysOnTop(true, this.OPERA)
         BlockInput(true)
         CoordMode("Mouse", "Screen")
         CoordMode("Pixel", "Screen")
@@ -28,7 +40,7 @@ class TransactionEntry_Action {
 
     static end() {
         BlockInput(false)
-        WinSetAlwaysOnTop(false, "ahk_class SunAwtFrame")
+        WinSetAlwaysOnTop(false, this.OPERA)
         CoordMode("Mouse", "Screen")
         CoordMode("Pixel", "Screen")
 
@@ -38,30 +50,32 @@ class TransactionEntry_Action {
         SUSPEND_CONTROLLER.restoreAllScripts()
     }
 
-    static Transaction := Struct({
-        cardType: ["VS", "MC", "AE", "JC", "UP"],
-        cardNum: num => IsNumber(num),
-        exp: exp => StrLen(exp) == 4,
-        amount: amount => IsFloat(amount),
-        transType: ["预授权", "消费", "预授权完成", "预授权（已撤销）", "预授权撤销", "预授权（已完成）"],
-        auth: auth => StrLen(auth) == 6,
-        room: room => IsNumber(room) && StrLen(room) == 4
-    })
+    static startCopy(&prevX, &prevY, &prevW, &prevH) {
+        BlockInput(true)
+        WinGetPos(&prevX, &prevY, &prevW, &prevH, this.SPAY)
+        WinMove(0, 0, 1300, 800, this.SPAY)
+        WinSetAlwaysOnTop(false, this.SPAY)
+        CoordMode("Mouse", "Window")
+
+        SUSPEND_CONTROLLER.suspendOtherScripts()
+    }
+
+    static endCopy(prevX, prevY, prevW, prevH) {
+        BlockInput(false)
+        WinRestore(this.SPAY)
+        WinSetAlwaysOnTop(false, this.SPAY)
+        WinMove(prevX, prevY, prevW, prevH, this.SPAY)
+        CoordMode("Mouse", "Screen")
+
+        SUSPEND_CONTROLLER.restoreAllScripts()
+    }
 
     static copyFromSPayPos() {
-        if (!RegExMatch(A_Clipboard, "^;\d+=\d+\?$") || !WinExist("ahk_exe SPayPOS.exe")) {
+        if (!RegExMatch(A_Clipboard, "^;\d+=\d+\?$") || !WinExist(this.SPAY)) {
             return
         }
 
-        SUSPEND_CONTROLLER.suspendOtherScripts()
-
-        ; set window
-        BlockInput(true)
-        WinRestore("ahk_exe SPayPOS.exe")
-        WinGetPos(&prevX, &prevY, &prevW, &prevH, "ahk_exe SPayPOS.exe")
-        WinMove(0, 0, 1300, 800, "ahk_exe SPayPOS.exe")
-        WinActivate("ahk_exe SPayPOS.exe")
-        CoordMode("Mouse", "Window")
+        this.startCopy(&prevX, &prevY, &prevW, &prevH)
 
         cardInfoCopied := A_Clipboard
         parsedCard := cardInfoCopied.replaceThese([";", "?"]).split("=")
@@ -85,13 +99,14 @@ class TransactionEntry_Action {
             Sleep(10)
             Send("^c")
             Sleep(10)
-            room := (StrLen(A_Clipboard) == 3 ? "0" . A_Clipboard : A_Clipboard).replace("`t", "")
+            room := StrLen(A_Clipboard) == 3 ? "0" . A_Clipboard : A_Clipboard
             if (this.Transaction.typeMap["room"](room)) {
                 break
             }
 
             if (A_Index > 5) {
                 MsgBox("复制信息有误，请重试！", "Transaction Entry", "4096 T2 icon!")
+                this.endCopy(prevX, prevY, prevW, prevH)
                 return
             }
         }
@@ -112,6 +127,7 @@ class TransactionEntry_Action {
 
             if (A_Index > 5) {
                 MsgBox("复制信息有误，请重试！", "Transaction Entry", "4096 T2 icon!")
+                this.endCopy(prevX, prevY, prevW, prevH)
                 return
             }
         }
@@ -133,6 +149,7 @@ class TransactionEntry_Action {
 
             if (A_Index > 5) {
                 MsgBox("复制信息有误，请重试！", "Transaction Entry", "4096 T2 icon!")
+                this.endCopy(prevX, prevY, prevW, prevH)
                 return
             }          
         }
@@ -154,10 +171,10 @@ class TransactionEntry_Action {
 
             if (A_Index > 5) {
                 MsgBox("复制信息有误，请重试！", "Transaction Entry", "4096 T2 icon!")
+                this.endCopy(prevX, prevY, prevW, prevH)
                 return
             } 
         }
-
 
         ; copy card type
         cardType := ""
@@ -169,34 +186,12 @@ class TransactionEntry_Action {
             Send("^c")
             Sleep(10)
 
-            cardType := match(A_Clipboard.replace("`t", ""), Map(
+            cardType := match(A_Clipboard, Map(
                 card => card.includes("VISA"), "VS",
                 card => card.includes("MASTER"), "MC",
                 card => card.includes("AMEX"), "AE",
                 card => card.includes("JCB"), "JC",
             ), "UP")
-
-            ; get full card num
-            if (!cardNum.startsWith("1") && !cardNum.startsWith("2")) {
-                MouseMove(368, 115)
-                Sleep(100)
-                Click()
-                Sleep(100)
-                Send("123456")
-                Sleep(100)
-                Send("{Enter}")
-                Sleep(500)
-                MouseMove(368, 479)
-                Click()
-                Sleep(200)
-                MouseMove(544, 707)
-                Click(2)
-                Sleep(10)
-                Send("^c")
-                Sleep(10)
-                cardNum := A_Clipboard.replace("`t", "")
-                Send("{Esc}")
-            }
 
             if (this.Transaction.typeMap["cardType"].find(t => t == cardType)) {
                 break
@@ -204,18 +199,33 @@ class TransactionEntry_Action {
 
             if (A_Index > 5) {
                 MsgBox("复制信息有误，请重试！", "Transaction Entry", "4096 T2 icon!")
+                this.endCopy(prevX, prevY, prevW, prevH)
                 return
             }
         }
 
-
-        ; reset window
-        BlockInput(false)
-        WinRestore("ahk_exe SPayPOS.exe")
-        WinMove(prevX, prevY, prevW, prevH, "ahk_exe SPayPOS.exe")
-        CoordMode("Mouse", "Screen")
-
-        SUSPEND_CONTROLLER.restoreAllScripts()
+        ; get full credit card num
+        if (!cardNum.startsWith(1) && !cardNum.startsWith(2)) {
+            MouseMove(368, 115)
+            Sleep(100)
+            Click()
+            Sleep(100)
+            Send("{Text}123456")
+            Sleep(100)
+            Send("{Enter}")
+            Sleep(500)
+            MouseMove(368, 479)
+            Click()
+            Sleep(200)
+            MouseMove(544, 707)
+            Click(2)
+            Sleep(10)
+            Send("^c")
+            Sleep(10)
+            cardNum := A_Clipboard.replace("`t", "")
+            Send("{Esc}")
+            Sleep(300)
+        }
 
         capturedTransaction := {
             cardType: cardType,
@@ -229,9 +239,11 @@ class TransactionEntry_Action {
 
         if (!capturedTransaction.satisfies(this.Transaction)) {
             MsgBox("复制信息有误，请重试！", "Transaction Entry", "4096 T2 icon!")
+            this.endCopy(prevX, prevY, prevW, prevH)
             return
         }
 
+        this.endCopy(prevX, prevY, prevW, prevH)
         this.promptCompleteInfo(capturedTransaction)
     }
 
@@ -267,24 +279,27 @@ class TransactionEntry_Action {
     }
 
     /**
-     * @param {Deposit} transactionInfo 
+     * @param {Transaction} transactionInfo 
      */
     static entry(transactionInfo) {
-        if (transactionInfo.transType == "预授权") {
-            this.entryDeposit(transactionInfo)
+        if (transactionInfo.transType == "消费" || transactionInfo.transType == "预授权完成") {
+            this.entryPayment(transactionInfo)
         }
         else {
-            this.entryPayment(transactionInfo)
+            this.entryDeposit(transactionInfo)
         }
     }
 
+    /**
+     * @param {Transaction} transactionInfo 
+     */
     static entryDeposit(transactionInfo) {
         this.start()
 
-        if (!WinExist("ahk_class SunAwtFrame")) {
+        if (!WinExist(this.OPERA)) {
             return
         }
-        WinActivate("ahk_class SunAwtFrame")
+        WinActivate(this.OPERA)
 
         if (transactionInfo is Map) {
             transactionInfo := JSON.parse(JSON.stringify(transactionInfo), , false)
@@ -379,6 +394,9 @@ class TransactionEntry_Action {
         this.end()
     }
 
+    /**
+     * @param {Transaction} transactionInfo 
+     */
     static entryPayment(transactionInfo) {
         this.start()
 
