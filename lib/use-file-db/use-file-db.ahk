@@ -4,13 +4,13 @@ class useFileDB {
 	 */
 	__New(dbConfig) {
 		this.main := dbConfig.main,
-		this.archive := dbConfig.HasOwnProp("archive") ? dbConfig.archive : ""
+			this.archive := dbConfig.HasOwnProp("archive") ? dbConfig.archive : ""
 		this.backup := dbConfig.HasOwnProp("backup") ? dbConfig.backup : ""
 		this.cleanPeriodDays := dbConfig.HasOwnProp("cleanPeriodDays") ? dbConfig.cleanPeriodDays : 180
 		this.cacheKey := dbConfig.HasOwnProp("cacheKey") ? dbConfig.cacheKey : ""
 
 		if (this.cacheKey) {
-			this.cache := this.load(,, 60 * 24)
+			this.cache := this.load(, , 60 * 24)
 		}
 	}
 
@@ -32,7 +32,7 @@ class useFileDB {
 		if (!saveName) {
 			res := JSON.parse(jsonString)
 			if (res is Error) {
-				MsgBox("Unable to add data.`nError: " . res.Message,, "0x10")
+				MsgBox("Unable to add data.`nError: " . res.Message, , "0x10")
 				return
 			}
 
@@ -121,7 +121,7 @@ class useFileDB {
 
 		for file in loadedPaths {
 			jsonStr := FileRead(file, "UTF-8")
-			
+
 			res := JSON.parse(jsonStr)
 			if (res is Error) {
 				parsedData.InsertAt(A_Index, this._handleMalformedJson(jsonStr).map(profile => JSON.parse(profile))*)
@@ -134,7 +134,7 @@ class useFileDB {
 		; if (this.HasOwnProp("cache")) {
 		; 	this.cache := parsedData
 		; }
-		
+
 		return parsedData
 	}
 
@@ -166,8 +166,7 @@ class useFileDB {
 
 		if (queryDate != FormatTime(A_Now, "yyyyMMdd")) {
 			if (this.archive) {
-				this.createArchive(queryDate)	
-				FileDelete(this.archive . "\" . queryDate . " - archive.json")
+				this.createArchive(queryDate)
 			}
 			if (this.backup) {
 				this.createArchiveBackup(queryDate)
@@ -182,6 +181,10 @@ class useFileDB {
 	createArchive(archiveDate) {
 		archiveDataStr := JSON.stringify(this.loadOneDay(, archiveDate, 60 * 24 * this.cleanPeriodDays))
 		archiveFullPath := this.archive . "\" . archiveDate . " - archive.json"
+		if (FileExist(archiveFullPath)) {
+			FileDelete(archiveFullPath)
+		}
+
 		FileAppend(archiveDataStr, archiveFullPath, "UTF-8")
 
 		return archiveFullPath
@@ -202,7 +205,7 @@ class useFileDB {
 		; }
 		res := JSON.parse(FileRead(archiveFullPath, "UTF-8"))
 		archivedData := res is Error ? JSON.parse(this.createArchive(archiveDate)) : res
-	
+
 		return archivedData
 	}
 
@@ -217,7 +220,7 @@ class useFileDB {
 		if (FileExist(backupFullPath)) {
 			FileDelete(backupFullPath)
 		}
-		
+
 		FileAppend(archiveData, backupFullPath, "UTF-8")
 
 		return archiveData
