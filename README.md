@@ -12,8 +12,6 @@ ClipFlow/
  |      |             |──── clipboard-history/
  |      |             |      |──── clipboard-history.ahk
  |      |             |      |──── clipboard-history-item.ahk
- |      |             |      |──── shared-clips.ahk
- |      |             |      └──── shared-clips-item.ahk
  |      |             └──── listener-hub/
  |      |                    |──── listener-hub.ahk
  |      |                    └──── listener-controller.ahk
@@ -74,9 +72,9 @@ ClipFlow/
  |                           |──── payment-relation/
  |                           |      |──── payment-relation.ahk
  |                           |      └──── payment-relation-action.ahk
- |                           └──── deposit-entry/
- |                                  └──── deposit-entry.ahk
- |                                  └──── deposit-entry-action.ahk
+ |                           └──── transaction-entry/
+ |                                  └──── transaction-entry.ahk
+ |                                  └──── transaction-entry-action.ahk
  |──── assets/
  |──── lib/
  |      |──── index.ahk/
