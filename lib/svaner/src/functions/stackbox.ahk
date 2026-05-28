@@ -68,7 +68,7 @@ class StackBox extends Component{
         ; CheckBox option
         this.checkbox := options.HasOwnProp("checkbox") ? options.checkbox : ""
         if (this.checkbox) {
-            this.cbOptions := { parsed: " xs10 yp ", callbacks: "" }
+            this.cbOptions := { parsed: " xs10 yp ", callbacks: [], attributes: {} }
     
             if (this.checkbox.HasOwnProp("options")) {
                 this.cbOptions := this.svaner.__parseOptions(this.checkbox.options)
@@ -154,7 +154,7 @@ class StackBox extends Component{
         this.gbCtrl.SetFont(this.fontOptions, this.fontName)
         this.ctrls.Push(this.gbCtrl)
         this.gbCtrl.GetPos(&gbX, &gbY, &gbWidth, &gbHeight)
-        this.svaner.__applyCallbackDirectives(this.gbCtrl, this.gbOptions.callbacks)
+        this.svaner.__applyCallbackAndAttributes(this.gbCtrl, this.gbOptions.callbacks, this.gbOptions.attributes)
 
         ; mount CheckBox if using check box as title
         if (this.checkbox) {
@@ -162,7 +162,7 @@ class StackBox extends Component{
             this.cbCtrl.SetFont(this.fontOptions, this.fontName)
             this.cbCtrl.OnEvent("Click", (ctrl, _) => this.setEnable(ctrl.Value))
             this.ctrls.Push(this.cbCtrl)
-            this.svaner.__applyCallbackDirectives(this.cbCtrl, this.cbOptions.callbacks)
+            this.svaner.__applyCallbackAndAttributes(this.cbCtrl, this.cbOptions.callbacks, this.cbOptions.attributes)
         }
 
         ; add events

@@ -14,7 +14,6 @@ class JSON {
 	 * @param text A valid JSON string.
 	 * @param keepbooltype convert true/false/null to JSON.true / JSON.false / JSON.null where it's true, otherwise 1 / 0 / ''
 	 * @param as_map object literals are converted to map, otherwise to object
-	 * @return {Map | Object | Error}
 	 */
 	static parse(text, keepbooltype := false, as_map := true) {
 		try {
