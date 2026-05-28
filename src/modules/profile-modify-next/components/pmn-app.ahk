@@ -9,6 +9,9 @@ PMN_App(App, moduleTitle, db, identifier) {
     isDelegate := signal(false)
     effect(isDelegate, curIsDelegate => App["guest-profile-list"].Move(,, curIsDelegate ? 470 : 658))
 
+    /**
+     * @property {"" | "尝试连接中..." | "后台服务在线" | "超时无响应"} value 
+     */
     serverConnection := signal("")
     effect(serverConnection, handleConnStatus)
     handleConnStatus(curServerConnection) {
@@ -58,9 +61,15 @@ PMN_App(App, moduleTitle, db, identifier) {
 
 
     ; data states
+    /**
+     * @prop {Array<ProfileMainland | ProfileHkMoTw | ProfileAbroad>} value
+     */
     listContent := signal(db.load(), { asMap: true })
+    
+    /**
+     * @prop { {date: String, search: String, range: Integer} } value
+     */
     queryFilter := signal({ date: FormatTime(A_Now, "yyyyMMdd"), search: "", range: 60 }, { asMap: true })
-
 
     ; list UI states/effect
     searchBy := signal("nameRoom")

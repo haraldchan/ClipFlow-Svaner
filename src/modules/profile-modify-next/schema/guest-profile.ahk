@@ -1,3 +1,21 @@
+/**
+ * @typedef {Object} ProfileMainland
+ * @property {String}  addr
+ * @property {String}  birthday
+ * @property {String}  fileName
+ * @property {"男" | "女"}  gender
+ * @property {"内地旅客"}  guestType
+ * @property {String}  idNum
+ * @property {String}  idType
+ * @property {String}  identifier
+ * @property {true | false}  isMod
+ * @property {String}  name
+ * @property {String}  regTime
+ * @property {String}  roomNu
+ * @property {String}  tel
+ * @property {String}  tsId 
+ */
+
 ProfileMainland := Struct({
     addr:       String,
     birthday:   String,
@@ -14,6 +32,26 @@ ProfileMainland := Struct({
     tel:        String,
     tsId:       String
 })
+
+/**
+ * @typedef {Object} ProfileHkMoTw
+ * @property {String} birthday
+ * @property {String} fileName
+ * @property {} gender
+ * @property {} guestType
+ * @property {String} idNum
+ * @property {String} idType
+ * @property {String} identifier
+ * @property {true | false} isMod
+ * @property {String} name
+ * @property {String} nameFirst
+ * @property {String} nameLast
+ * @property {String} regTime 
+ * @property {"香港" | "澳门" | "台湾"} region
+ * @property {String} roomNum
+ * @property {String} tel
+ * @property {String} tsId
+ */
 
 ProfileHkMoTw := Struct({
     birthday:   String,
@@ -33,6 +71,27 @@ ProfileHkMoTw := Struct({
     tel:        String,
     tsId:       String
 })
+
+/**
+ * @typedef {Object} ProfileAbroad
+ * @property {String} addr
+ * @property {String} birthday
+ * @property {String} country
+ * @property {String} fileName
+ * @property {"男" | "女"} gender
+ * @property {"国外游客"} guestType
+ * @property {String} idNum
+ * @property {String} idType
+ * @property {String} identifier
+ * @property {true | false} isMod
+ * @property {String} name
+ * @property {String} nameFirst
+ * @property {String} nameLast
+ * @property {String} regTime
+ * @property {String} roomNum
+ * @property {String} tel
+ * @property {String} tsId
+ */
 
 ProfileAbroad := Struct({
     addr:       String,
