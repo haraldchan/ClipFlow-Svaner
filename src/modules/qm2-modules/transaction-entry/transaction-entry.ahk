@@ -47,7 +47,7 @@ TransactionEntry(App, props := {}) {
             return
         }
 
-        WinHide(App)
+        App.Hide()
 
         if (App["de-delegate"].Value == true) {
             sendQmPost(transactionInfo)
