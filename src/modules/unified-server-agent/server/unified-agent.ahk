@@ -262,6 +262,31 @@ class UnifiedAgent extends useServerAgent {
                     this.updatePostStatus(post.path, "NOTFOUND")
                     continue
                 }
+
+                ; create pmn post if profiles exists
+                if (content["profiles"].Capacity > 0) {
+                    message := this.delegate({
+                        overwrite: content["additionals"]["overwrite"],
+                        profiles: content["profiles"]
+                    })
+
+                    postCreatedPath := Format("{1}\{2}=={3}=={4}.json", this.pool, "PENDING", A_ComputerName, message.id)
+                    loop {
+                        if (FileExist(postCreatedPath)) {
+                            break
+                        }
+                        Sleep(50)
+                    } until (A_Index > 10)
+                    if (!FileExist(postCreatedPath)) {
+                        return ; todo: need handling if pmn delegation fails
+                    }
+
+                    ; rename post file so that it can be picked up by original sender
+                    FileCopy(
+                        postCreatedPath,
+                        Format("{1}\{2}=={3}=={4}.json", this.pool, "PENDING", unboxedPost["sender"], message.id),
+                    )
+                }
             }
             ; PMN post
             else {
@@ -294,13 +319,15 @@ class UnifiedAgent extends useServerAgent {
                 ? { ; QM post
                     module: content.module, ; QM2 module name
                     form: content.form,     ; form data from module component
-                    profiles: Map()         ; profiles from QM2 Panel
+                    profiles: Map(),        ; profiles from QM2 Panel
+                    additonals: {}          ; additionals      
                 } : { ; PMN post
                     mode: "waterfall",      ; single/waterfall/group
                     overwrite: false,       ; isOverwrite value
-                    rooms: [],              ; waterfall/group room numbers
+                    ; rooms: [],              ; waterfall/group room numbers
                     party: "",              ; optional party number for confinement
                     profiles: Map(),        ; json object in single, array in waterfall/group
+                    additonals: {}          ; additionals
                 }
         )
 
