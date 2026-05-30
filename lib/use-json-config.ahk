@@ -35,27 +35,32 @@ class useJsonConfig {
         }
 
         if (!FileExist(this.configDest . "\" . this.configFileName)) {
-            FileCopy(this.configTemplateSrc, this.configDest)
+            FileCopy(this.configTemplateSrc, this.configDest, true)
         }
         return this.configDest . "\" . this.configFileName
     }
 
     /**
      * Reads value from config json.
-     * @param {String|Array} key
-     * @returns {Any}
+     * @param {String | Array} key
+     * @returns {Any | Error}
      */
     read(key) {
-        if (!(key is String) && !(key is Array)) {
-            throw TypeError("Key is not a String or Array", -1, key)
-        }
+        try {
+            if (!(key is String) && !(key is Array)) {
+                throw TypeError("Key is not a String or Array", -1, key)
+            }
 
-        if (key is String) {
-            return this._readFirstMatch(key, this.currentConfig)
-        }
+            if (key is String) {
+                return this._readFirstMatch(key, this.currentConfig)
+            }
 
-        if (key is Array) {
-            return this._readExactMatch(key, this.currentConfig)
+            if (key is Array) {
+                return this._readExactMatch(key, this.currentConfig)
+            }
+        }
+        catch Error as err {
+            return err
         }
     }
 
@@ -86,24 +91,30 @@ class useJsonConfig {
 
     /**
      * Writes new value to specific key in config json
-     * @param {String|Array} key 
-     * @param {Any} newValue  
+     * @param {String | Array} key 
+     * @param {Any} newValue
+     * @returns {void | Error}
      */
     write(key, newValue) {
-        if (!(key is String) && !(key is Array)) {
-            throw TypeError("Key is not a String or Array")
-        }
+        try {
+            if (!(key is String) && !(key is Array)) {
+                throw TypeError("Key is not a String or Array")
+            }
 
-        if (key is String) {
-            this._writeFirstMatch(key, this.currentConfig, newValue)
-        }
+            if (key is String) {
+                this._writeFirstMatch(key, this.currentConfig, newValue)
+            }
 
-        if (key is Array) {
-            this._writeExactMatch(key, this.currentConfig, newValue)
-        }
+            if (key is Array) {
+                this._writeExactMatch(key, this.currentConfig, newValue)
+            }
 
-        FileDelete(this.path)
-        FileAppend(useJsonConfig.JSON.stringify(this.currentConfig), this.path, "UTF-8")
+            FileDelete(this.path)
+            FileAppend(useJsonConfig.JSON.stringify(this.currentConfig), this.path, "UTF-8")
+        } 
+        catch Error as err {
+            return err
+        }
     }
 
     _writeFirstMatch(key, config, newValue) {
