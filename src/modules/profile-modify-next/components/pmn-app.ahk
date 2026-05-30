@@ -387,7 +387,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         ; pick selected guests
         checkedRows := LV.getCheckedRowNumbers() 
         if (!checkedRows.Length) {
-            QM2_Panel({ sendPm: false })
+            QM2_Panel({ sendPm: false, overwriteProfiles: settings["fillOverwrite"] })
             return
         }
 
@@ -402,7 +402,7 @@ PMN_App(App, moduleTitle, db, identifier) {
             }
         }
 
-        QM2_Panel({ selectedGuests: groupedSelectedGuests })
+        QM2_Panel({ overwriteProfiles: settings["fillOverwrite"], selectedGuests: groupedSelectedGuests })
     }
     
 
