@@ -17,6 +17,7 @@ QM2_Panel(props) {
 
     p := useProps(props, {
         sendPm: true,
+        overwriteProfiles: false,
         selectedGuests: Map()
     })
 
@@ -36,11 +37,14 @@ QM2_Panel(props) {
     }
 
     delegateQmActions(module) {
+        profiles := (App["send-pm-post"].Value == false || module != "BlankShare") ? Map() : p.selectedGuests
+
         form := App.Submit()
         agent.delegate({
             module: module,
             form: form,
-            profiles: p.selectedGuests
+            profiles: profiles,
+            addtionals: { overwrite: p.overwriteProfiles }
         })
 
         return form
@@ -53,34 +57,34 @@ QM2_Panel(props) {
 
         form := delegateQmActions("BlankShare")
 
-        if (App["send-pm-post"].Value) {
-            handleTriggerPmPost(form)
-        }
+        ; if (App["send-pm-post"].Value) {
+        ;     handleTriggerPmPost(form)
+        ; }
 
         SetTimer((*) => (App.Destroy(), WinHide(POPUP_TITLE)), -100)
 
         return 0
     }
 
-    handleTriggerPmPost(form) {
-        roomNums := form.shareRoomNums.trim()
+    ; handleTriggerPmPost(form) {
+    ;     roomNums := form.shareRoomNums.trim()
         
-        if (!p.selectedGuests.Count) {
-            dbConfig := CONFIG.read("dbConfig")
-            db := useFileDB({
-                    main: dbConfig["host"] . dbConfig["main"],
-                    archive: dbConfig["host"] . dbConfig["archive"],
-                    backup: dbConfig["host"] . dbConfig["backup"],
-            })
+    ;     if (!p.selectedGuests.Count) {
+    ;         dbConfig := CONFIG.read("dbConfig")
+    ;         db := useFileDB({
+    ;                 main: dbConfig["host"] . dbConfig["main"],
+    ;                 archive: dbConfig["host"] . dbConfig["archive"],
+    ;                 backup: dbConfig["host"] . dbConfig["backup"],
+    ;         })
 
-            profiles := db.load(,, agent.collectRange).filter(guest => roomNums.includes(!guest["roomNum"] ? "null" : guest["roomNum"]))
-        }
-        else {
-            profiles := p.selectedGuests
-        }
+    ;         profiles := db.load(,, agent.collectRange).filter(guest => roomNums.includes(!guest["roomNum"] ? "null" : guest["roomNum"]))
+    ;     }
+    ;     else {
+    ;         profiles := p.selectedGuests
+    ;     }
 
-        SetTimer(() => agent.delegate({ rooms: roomNums.split(" "), profiles: profiles}), -300)
-    }
+    ;     SetTimer(() => agent.delegate({ rooms: roomNums.split(" "), profiles: profiles}), -300)
+    ; }
     
     handlePaymentRelationDelegate(*) {
         if (!App["pf-room"].Value || !App["pf-name"].Value) {
