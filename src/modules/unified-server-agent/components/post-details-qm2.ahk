@@ -18,7 +18,8 @@ PostDetails_QM2(post, moduleName, props) {
         agent.delegate({
             module: moduleName,
             form: form,
-            profiles: post["content"]["profiles"]
+            profiles: post["content"]["profiles"],
+            additionals: post["content"]["additionals"]
         }),
         renameResendPost(post["id"])
 

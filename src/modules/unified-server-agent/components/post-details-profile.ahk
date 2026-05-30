@@ -20,9 +20,9 @@ PostDetails_Profile(post) {
             agent.delegate({
                 mode: post["content"]["mode"],
                 overwrite: post["content"]["overwrite"],
-                rooms: profiles.value.map(p => p["roomNum"]).unique(),
                 party: post["content"]["party"],
-                profiles: post["content"]["profiles"]
+                profiles: post["content"]["profiles"],
+                additionals: post["content"]["additionals"]
             }),
             renameResendPost(post["id"])
         ), -250)
