@@ -14,6 +14,10 @@ class PMG_Execute {
 
         BlankShare_Action.isRunning := true
         for room, profiles in groupGuests {
+            if (!profiles.Length) {
+                continue
+            }
+
             res := BlankShare_Action.search(room)
             if (!res) {
                 continue
