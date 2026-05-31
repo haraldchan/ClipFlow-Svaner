@@ -20,6 +20,7 @@ GroupGuestList(App, loadedGuests) {
                 widths: [70, 120, 120]
             }, 
             loadedGuests
-        )
+        ),
+        onMount()
     )
 }
