@@ -102,7 +102,6 @@ class PMG_Data {
         utils.waitLoading()
         Send("!o")
         utils.waitLoading()
-
     }
 
     /**
@@ -115,18 +114,6 @@ class PMG_Data {
         xmlDoc.async := false
         xmlDoc.load(xmlPath)
         roomElements := xmlDoc.getElementsByTagName("ROOM")
-        
-        ; inhRooms := []
-        ; loop roomElements.Length {
-        ;     roomNumString := roomElements[A_Index - 1].ChildNodes[0].nodeValue
-        ;     roomNum := (SubStr(roomNumString, 0, 1) = "0")
-        ;         ? SubStr(roomNumString, 1)
-        ;         : roomNumString
-
-        ;     inhRooms.Push(roomNum)
-        ; }
-
-        ; return Map("inhRooms", inhRooms)
         
         inhRooms := []
         loop roomElements.Length {
@@ -149,28 +136,9 @@ class PMG_Data {
      * @returns {Array} grouped guest profiles
      */
     static getGroupGuests(db, inhRooms, fetchPeriod) {
-        ; roomNums := inhRooms.unique()
-        ; loadedGuests := db.load(, FormatTime(A_Now, "yyyyMMdd"), 60 * fetchPeriod)
-
-        ; groupGuests := []
-
-        ; for roomNum in roomNums {
-        ;     for guest in loadedGuests {
-
-        ;         if (StrLen(guest["roomNum"]) = 3) {
-        ;             guest["roomNum"] := "0" . guest["roomNum"]
-        ;         }
-
-        ;         if (guest["roomNum"] = roomNum) {
-        ;             groupGuests.Push(guest)
-        ;         }
-        ;     }
-        ; }
-
-        ; return groupGuests
-
         loadedGuests := db.load(, FormatTime(A_Now, "yyyyMMdd"), 60 * fetchPeriod)
         filteredGuests := loadedGuests.filter(guest => inhRooms.includes(guest["roomNum"]))
+                                      .sort((a, b) => a["roomNum"] - b["roomNum"])
 
         return filteredGuests
     }
