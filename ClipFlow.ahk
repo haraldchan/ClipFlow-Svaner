@@ -15,13 +15,17 @@ if (!A_IsAdmin) {
 }
 
 ; global consts
-VERSION := "1.9.3"
+VERSION := "1.9.4"
 POPUP_TITLE := "ClipFlow " . VERSION
 WIN_GROUP := ["ahk_class SunAwtFrame"]
 IMAGES := useImages(A_ScriptDir . "\assets")
 APP_DATA_DIR := A_AppData . "\ClipFlow"
 CONFIG := useJsonConfig("./clipflow.config.json", "clipflow.config.json", APP_DATA_DIR)
 USE_ERROR_LOG := CONFIG.read(["app", "errorLogging"])
+if (USE_ERROR_LOG is Error) {
+	USE_ERROR_LOG := false
+}
+
 FORCE_SUSPEND_MESSAGE := 0x2042
 SUSPEND_CONTROLLER := SuspendController(FORCE_SUSPEND_MESSAGE)
 
