@@ -7,7 +7,7 @@
 PMN_App(App, moduleTitle, db, identifier) {
     ; server agent delegate/ enable QM2 panel
     isDelegate := signal(false)
-    effect(isDelegate, curIsDelegate => App["guest-profile-list"].Move(,, curIsDelegate ? 470 : 658))
+    effect(isDelegate, curIsDelegate => App["guest-profile-list"].Move(, , curIsDelegate ? 470 : 658))
 
     /**
      * @property {"" | "尝试连接中..." | "后台服务在线" | "超时无响应"} value 
@@ -24,7 +24,7 @@ PMN_App(App, moduleTitle, db, identifier) {
             case "后台服务在线":
                 connStatusText.SetFont("bold cGreen")
                 SetTimer(() => connStatusText.Visible := false, -2000)
-            default: 
+            default:
                 connStatusText.SetFont("bold cRed")
         }
     }
@@ -42,12 +42,12 @@ PMN_App(App, moduleTitle, db, identifier) {
         SetTimer(() => ((
             agent.PING()
                 ? serverConnection.set("后台服务在线")
-                : (
-                    isDelegate.set(false), 
-                    ctrl.Value := false,
-                    serverConnection.set("超时无响应")
-                )
-        ), ctrl.Enabled := true) , -100)
+            : (
+                isDelegate.set(false),
+                ctrl.Value := false,
+                serverConnection.set("超时无响应")
+            )
+        ), ctrl.Enabled := true), -100)
     }
 
 
@@ -65,7 +65,7 @@ PMN_App(App, moduleTitle, db, identifier) {
      * @prop {Array<ProfileMainland | ProfileHkMoTw | ProfileAbroad>} value
      */
     listContent := signal(db.load(), { asMap: true })
-    
+
     /**
      * @prop { {date: String, search: String, range: Integer} } value
      */
@@ -93,7 +93,7 @@ PMN_App(App, moduleTitle, db, identifier) {
             isDelegate.set(false)
         }
     }
-    
+
 
     ; incoming data handling
     currentGuest := signal(Map("idNum", 0))
@@ -114,16 +114,16 @@ PMN_App(App, moduleTitle, db, identifier) {
         if (currentGuest.value["idNum"] == incomingGuest["idNum"] && !incomingGuest["isMod"]) {
             handleGuestInfoUpdateFromAdd(incomingGuest)
             MsgBox(Format("已更新信息：{1}", incomingGuest["name"]), POPUP_TITLE, "T1.5")
-        } 
+        }
         ; updating from saved guest modal
         else if (incomingGuest["isMod"]) {
             updatedGuest := handleGuestInfoUpdateFromMod(incomingGuest)
             if (!updatedGuest) {
                 return
             }
-            
+
             MsgBox(Format("已保存修改：{1}", updatedGuest["name"]), POPUP_TITLE, "T1.5")
-        } 
+        }
         ; adding guest
         else {
             incomingGuest["fileName"] := A_Now . "==" . Random(10000, 99999)
@@ -151,7 +151,7 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         ; clear clipboard
         A_Clipboard := ""
-    } 
+    }
 
     handleGuestInfoUpdateFromAdd(captured) {
         recentGuests := db.load()
@@ -202,8 +202,8 @@ PMN_App(App, moduleTitle, db, identifier) {
     handleRefresh(*) {
         if (queryFilter.value["date"] != FormatTime(A_Now, "yyyyMMdd")) {
             res := MsgBox(
-                Format("搜索日期非今天，请确认是否准确`n`n是 - 继续搜索 {1}`n否 - 返回今天", FormatTime(queryFilter.value["date"], "yyyy年MM月dd日")), 
-                POPUP_TITLE, 
+                Format("搜索日期非今天，请确认是否准确`n`n是 - 继续搜索 {1}`n否 - 返回今天", FormatTime(queryFilter.value["date"], "yyyy年MM月dd日")),
+                POPUP_TITLE,
                 "4096 YesNo icon!"
             )
             if (res == "No") {
@@ -247,7 +247,7 @@ PMN_App(App, moduleTitle, db, identifier) {
                         filteredItems.InsertAt(1, item)
                     }
                 }
-            } 
+            }
             else {
                 ; searching by name fragment
                 for item in loadedItems {
@@ -260,13 +260,13 @@ PMN_App(App, moduleTitle, db, identifier) {
                         if (InStr(item["name"], searchInput)) {
                             filteredItems.InsertAt(1, item)
                         }
-                    } 
+                    }
                     ; from HK/MO/TW
                     else if (item["guestType"] == "港澳台旅客") {
                         if (InStr(item["name"], searchInput) || InStr(item["nameLast"], searchInput) || InStr(item["nameFirst"], searchInput)) {
                             filteredItems.InsertAt(1, item)
                         }
-                    } 
+                    }
                     ; from abroad
                     else {
                         if (InStr(item["nameLast"], searchInput) || InStr(item["nameFirst"], searchInput)) {
@@ -275,8 +275,8 @@ PMN_App(App, moduleTitle, db, identifier) {
                     }
                 }
             }
-        } 
-        else if (searchBy.value == "waterfall"){
+        }
+        else if (searchBy.value == "waterfall") {
             roomNums := StrSplit(queryFilter.value["search"], " ")
             ; filtering all entered room numbers
             for roomNum in roomNums {
@@ -286,7 +286,7 @@ PMN_App(App, moduleTitle, db, identifier) {
                     }
                 }
             }
-        } 
+        }
         else if (searchBy.value == "birthday") {
             bd := StrLen(searchInput) == 8
                 ? SubStr(searchInput, 1, 4) . "-" . SubStr(searchInput, 5, 2) . "-" . SubStr(searchInput, 7, 2)
@@ -296,7 +296,7 @@ PMN_App(App, moduleTitle, db, identifier) {
                     filteredItems.InsertAt(1, item)
                 }
             }
-        } 
+        }
         else {
             for item in loadedItems {
                 if (InStr(item[searchBy.value], searchInput)) {
@@ -315,10 +315,10 @@ PMN_App(App, moduleTitle, db, identifier) {
             MsgBox("Opera 未启动！ ", "Profile Modify Next", "T1")
             return
         }
-        
+
         App.Hide()
-        Sleep(500) 
-        
+        Sleep(500)
+
         LV := App["guest-profile-list"]
         if (!LV.GetNext()) {
             return
@@ -340,7 +340,7 @@ PMN_App(App, moduleTitle, db, identifier) {
             if (!checkedRows.Length) {
                 MsgBox("未选中 Profile。", POPUP_TITLE, "T2")
                 App.Show()
-                return 
+                return
             }
 
             selectedGuests := checkedRows.map(row => listContent.value[row])
@@ -385,9 +385,9 @@ PMN_App(App, moduleTitle, db, identifier) {
         LV := App["guest-profile-list"]
 
         ; pick selected guests
-        checkedRows := LV.getCheckedRowNumbers() 
+        checkedRows := LV.getCheckedRowNumbers()
         if (!checkedRows.Length) {
-            QM2_Panel({ sendPm: false, overwriteProfiles: settings["fillOverwrite"] })
+            QM2_Panel({ overwriteProfiles: settings.value["fillOverwrite"] })
             return
         }
 
@@ -402,9 +402,9 @@ PMN_App(App, moduleTitle, db, identifier) {
             }
         }
 
-        QM2_Panel({ overwriteProfiles: settings["fillOverwrite"], selectedGuests: groupedSelectedGuests })
+        QM2_Panel({ overwriteProfiles: settings.value["fillOverwrite"], selectedGuests: groupedSelectedGuests })
     }
-    
+
 
     onMount() {
         ; hotkey setup
