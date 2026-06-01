@@ -5,7 +5,7 @@ class UnifiedAgent extends useServerAgent {
         this.popupTitle := "Unified Agent"
 
         ; toggle listening status. this needs to be async due to blocking loop when listening is on.
-        effect(this.isListening, cur => SetTimer(() => this.listen(cur), -100)) 
+        effect(this.isListening, cur => SetTimer(() => this.listen(cur), -100))
 
         ; ongoing post(fullpath of the post json file)
         this.currentHandlingPost := ""
@@ -56,7 +56,7 @@ class UnifiedAgent extends useServerAgent {
         ; change posts status
         this.updatePostStatus(this.currentHandlingPost, "ABORTED")
         this.resetPostsToPending()
-        
+
         ; retart a PMS session
         this.restartPMS()
     }
@@ -236,7 +236,9 @@ class UnifiedAgent extends useServerAgent {
      * @param {Array<CollectedPost>} posts 
      */
     handlePostMacroExecute(posts) {
-        /** @type {Array<CollectedPost>} */
+        /**
+         * @type {Array<CollectedPost>} 
+         */
         sortedPosts := posts.sort((a, b) => b.timeCreated - a.timeCreated)
 
         for post in sortedPosts {
@@ -275,17 +277,15 @@ class UnifiedAgent extends useServerAgent {
                         if (FileExist(postCreatedPath)) {
                             break
                         }
-                        Sleep(50)
+                        Sleep(500)
                     } until (A_Index > 10)
                     if (!FileExist(postCreatedPath)) {
-                        return ; todo: need handling if pmn delegation fails
+                        this.updatePostStatus(post.path, "MODIFIED")
+                        return ; todo: need handling if pmn delegation fails, sending message to client
                     }
 
                     ; rename post file so that it can be picked up by original sender
-                    FileCopy(
-                        postCreatedPath,
-                        Format("{1}\{2}=={3}=={4}.json", this.pool, "PENDING", unboxedPost["sender"], message.id),
-                    )
+                    FileCopy(postCreatedPath, postCreatedPath.replace(A_ComputerName, unboxedPost["sender"]), true)
                 }
             }
             ; PMN post
@@ -320,14 +320,13 @@ class UnifiedAgent extends useServerAgent {
                     module: content.module, ; QM2 module name
                     form: content.form,     ; form data from module component
                     profiles: Map(),        ; profiles from QM2 Panel
-                    additonals: {}          ; additionals      
+                    additionals: {}         ; additionals
                 } : { ; PMN post
                     mode: "waterfall",      ; single/waterfall/group
                     overwrite: false,       ; isOverwrite value
-                    ; rooms: [],              ; waterfall/group room numbers
                     party: "",              ; optional party number for confinement
                     profiles: Map(),        ; json object in single, array in waterfall/group
-                    additonals: {}          ; additionals
+                    additionals: {}         ; additionals
                 }
         )
 
