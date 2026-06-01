@@ -16,7 +16,6 @@ QM2_Panel(props) {
     })
 
     p := useProps(props, {
-        sendPm: true,
         overwriteProfiles: false,
         selectedGuests: Map()
     })
@@ -44,10 +43,8 @@ QM2_Panel(props) {
             module: module,
             form: form,
             profiles: profiles,
-            addtionals: { overwrite: p.overwriteProfiles }
+            additionals: { overwrite: p.overwriteProfiles }
         })
-
-        return form
     }
 
     handleBlankShareDelegate(*) {
@@ -55,37 +52,13 @@ QM2_Panel(props) {
             return 0
         }
 
-        form := delegateQmActions("BlankShare")
-
-        ; if (App["send-pm-post"].Value) {
-        ;     handleTriggerPmPost(form)
-        ; }
+        delegateQmActions("BlankShare")
 
         SetTimer((*) => (App.Destroy(), WinHide(POPUP_TITLE)), -100)
 
         return 0
     }
 
-    ; handleTriggerPmPost(form) {
-    ;     roomNums := form.shareRoomNums.trim()
-        
-    ;     if (!p.selectedGuests.Count) {
-    ;         dbConfig := CONFIG.read("dbConfig")
-    ;         db := useFileDB({
-    ;                 main: dbConfig["host"] . dbConfig["main"],
-    ;                 archive: dbConfig["host"] . dbConfig["archive"],
-    ;                 backup: dbConfig["host"] . dbConfig["backup"],
-    ;         })
-
-    ;         profiles := db.load(,, agent.collectRange).filter(guest => roomNums.includes(!guest["roomNum"] ? "null" : guest["roomNum"]))
-    ;     }
-    ;     else {
-    ;         profiles := p.selectedGuests
-    ;     }
-
-    ;     SetTimer(() => agent.delegate({ rooms: roomNums.split(" "), profiles: profiles}), -300)
-    ; }
-    
     handlePaymentRelationDelegate(*) {
         if (!App["pf-room"].Value || !App["pf-name"].Value) {
             return 0
@@ -139,14 +112,15 @@ QM2_Panel(props) {
 
     return (
         StackBox(App, 
-            {
-                name: "op-radio-group",
-                groupbox: { options: "vop-radio-group Section x10 y+10 w350 Hidden " . Format("h{1}", 30 * modules.keys().Length) } 
-            },
+        {
+            name: "op-radio-group",
+            groupbox: { options: "vop-radio-group Section x10 y+10 w350 Hidden " . Format("h{1}", 30 * modules.keys().Length) }
+        },
             () => modules.entries().map(
-                (entry, index) => App.AddRadio(index == 1 ? "xs1 h20 yp+1 Checked" : "xs1 h20 yp+30" , entry[1]).onClick(handleModuleChange)
+                (entry, index) => App.AddRadio(index == 1 ? "xs1 h20 yp+1 Checked" : "xs1 h20 yp+30", entry[1]).onClick(handleModuleChange)
             )
         ),
+        
         Dynamic(App, selectedModule, modules),
         
         ; initializing
