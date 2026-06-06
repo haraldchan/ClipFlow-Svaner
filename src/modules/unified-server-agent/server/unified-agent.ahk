@@ -20,6 +20,9 @@ class UnifiedAgent extends useServerAgent {
         ; delete expired posts
         this.cleanup()
         this.cleanup(this.qmPool)
+
+        ; reset previous collected posts(after unexpected reload)
+        this.resetPostsToPending()
     }
 
     cleanup(pool := this.pool) {
@@ -35,23 +38,13 @@ class UnifiedAgent extends useServerAgent {
     }
 
     abort() {
-        serverComputerName := ""
-        if (FileExist(this.pool . "\ONLINE.flag")) {
-            try {
-                serverComputerName := FileRead(this.pool . "\ONLINE.flag", "utf-8")
-            }
-
-            if (serverComputerName != A_ComputerName) {
-                return
-            }
+        serverOnlineStatus := JSON.parse(FileRead(this.onlineStatusIndicator, "utf-8"))
+        if (serverOnlineStatus.serverName != A_ComputerName) {
+            return
         }
-
-        this.setOnlineStatus(false)
 
         ; prep for restart
-        try {
-            FileMove(this.pool . "\OFFLINE.flag", this.pool . "\RESTART.flag", true)
-        }
+        this.setOnlineStatus(false, true)
 
         ; change posts status
         this.updatePostStatus(this.currentHandlingPost, "ABORTED")
@@ -94,10 +87,8 @@ class UnifiedAgent extends useServerAgent {
      */
     listen(status) {
         if (status == "在线") {
-            if (FileExist(this.pool . "\RESTART.flag")) {
-                FileMove(this.pool . "\RESTART.flag", this.pool . "\OFFLINE.flag", true)
-            }
-            this.setOnlineStatus(true)
+
+            this.setOnlineStatus(true, false)
             this.spawnResponder(A_ScriptDir . "\lib\index.ahk", "ua-responder")
             loop {
                 ; block input
@@ -285,7 +276,7 @@ class UnifiedAgent extends useServerAgent {
                     }
 
                     ; rename post file so that it can be picked up by original sender
-                    FileCopy(postCreatedPath, postCreatedPath.replace(A_ComputerName, unboxedPost["sender"]), true)
+                    FileMove(postCreatedPath, postCreatedPath.replace(A_ComputerName, unboxedPost["sender"]), true)
                 }
             }
             ; PMN post
