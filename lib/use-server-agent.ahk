@@ -30,8 +30,20 @@ class useServerAgent {
         /** @type {String} reponder script filename */
         this.responder := ""
 
+        this.onlineStatusIndicator := this.pool . "\online-status.json"
+
+        this.onlineStatus := {
+            isOnline: false,
+            isRestart: false,
+            activeServer: A_ComputerName,
+        }
+
         if (!DirExist(this.pool)) {
             DirCreate(this.pool)
+        }
+
+        if (!FileExist(this.onlineStatusIndicator)) {
+            FileAppend(JSON.stringify(this.onlineStatus), this.onlineStatusIndicator, "utf-8")
         }
     }
 
@@ -68,22 +80,19 @@ class useServerAgent {
 
     /**
      * Creates/changes service status
-     * @param {true | false} on on/off flag
+     * @param { true | false } isOn
+     * @param { true | false } isRestarting
      */
-    setOnlineStatus(on) {
-        if (!FileExist(this.pool . "\OFFLINE.flag")) {
-            FileAppend(A_ComputerName, this.pool . "\OFFLINE.flag", "utf-8")
-        }
+    setOnlineStatus(isOn, isRestarting := false) {        
+        this.onlineStatus.isOnline := isOn
+        this.onlineStatus.isRestart := isRestarting
 
-        if (on) {
-            if (FileExist(this.pool . "\ONLINE.flag")) {
-                return
-            }
-            FileMove(this.pool . "\OFFLINE.flag", this.pool . "\ONLINE.flag", true)
-        }
-        else {
-            FileMove(this.pool . "\ONLINE.flag", this.pool . "\OFFLINE.flag", true)
-                
+        f := FileOpen(this.onlineStatusIndicator, "w", "utf-8")
+        f.Write(JSON.stringify(this.onlineStatus))
+        f.Close()
+        f := ""
+
+        if (!isOn) {
             DetectHiddenWindows(true)
             if (WinExist(this.responder . ".ahk")) {
                 WinKill(this.responder . ".ahk")
@@ -178,8 +187,18 @@ class useServerAgent {
      */
     POST(content, pool := this.pool) {
         if (this.safePost) {
-            if (!FileExist(this.pool . "\ONLINE.flag")) {
-                MsgBox("Service offline.",, "4096 T2")
+            /**
+             * @property {true | false} isOnline
+             * @property {String} serverName
+             */
+            serverOnlineStatus := JSON.parse(FileRead(this.onlineStatusIndicator, "utf-8"))
+            if (serverOnlineStatus is Error) {
+                MsgBox("Service status error.",, "4096 T2 icon!")
+                return false
+            }
+
+            if (!serverOnlineStatus.isOnline) {
+                MsgBox("Service offline.",, "4096 T2 iconx")
                 return false
             }
         }
@@ -191,8 +210,8 @@ class useServerAgent {
             content: content
         }
 
-        filename := Format("{1}\{2}=={3}=={4}.json", pool, "PENDING", A_ComputerName, message.id)
-        FileAppend(JSON.stringify(message), filename, "UTF-8")
+        post := Format("{1}\{2}=={3}=={4}.json", pool, "PENDING", A_ComputerName, message.id)
+        FileAppend(JSON.stringify(message), post, "UTF-8")
 
         return message
     }
@@ -211,7 +230,9 @@ class useServerAgent {
     COLLECT(status, pool := this.pool) {
         posts := []
         loop files (pool . "\*.json") {
-            postTimestamp := A_LoopFileName.split("==")[3].substr(1, 14)
+            postID := A_LoopFileName.split("==")[3]
+            postTimestamp := postID.substr(1, 14)
+
             if (DateDiff(A_Now, postTimestamp, "Minutes") >= this.collectRange && A_LoopFileName.includes(status)) {
                 this.updatePostStatus(A_LoopFileFullPath, "ABANDONED")
                 continue
@@ -220,7 +241,7 @@ class useServerAgent {
             if (InStr(A_LoopFileFullPath, status)) {
                 this.updatePostStatus(A_LoopFileFullPath, "COLLECTED")
                 posts.Push({
-                    name: A_LoopFileName,
+                    id: postID,
                     path: StrReplace(A_LoopFileFullPath, status, "COLLECTED"),
                     timeCreated: A_LoopFileTimeCreated
                 })
