@@ -54,8 +54,9 @@ QM2_Panel(props) {
 
         delegateQmActions("BlankShare")
 
-        SetTimer((*) => (App.Destroy(), WinHide(POPUP_TITLE)), -100)
-
+        WinHide(POPUP_TITLE)
+        App.Destroy()
+        
         return 0
     }
 
