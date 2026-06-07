@@ -14,11 +14,13 @@ PostDetails_QM2(post, moduleName, props) {
     )
 
     handleRepost(*) {
+        profiles := (App["send-pm-post"].Value == false || moduleName != "BlankShare") ? Map() : post["content"]["profiles"]
+
         form := App.Submit()
         agent.delegate({
             module: moduleName,
             form: form,
-            profiles: post["content"]["profiles"],
+            profiles: profiles,
             additionals: post["content"]["additionals"]
         }),
         renameResendPost(post["id"])
@@ -41,38 +43,10 @@ PostDetails_QM2(post, moduleName, props) {
             return 0
         }
 
-        form := handleRepost()
-
-        if (moduleName == "BlankShare" && App["send-pm-post"].Value) {
-            handleTriggerPmPost(form)
-        }
-
+        handleRepost()
         App.Destroy()
+
         return 0
-    }
-
-    handleTriggerPmPost(form) {
-        roomNums := form.shareRoomNums.trim()
-        
-        if (!post["content"]["profiles"].Count) {
-            dbConfig := CONFIG.read("dbConfig")
-            db := useFileDB({
-                    main: dbConfig["host"] . dbConfig["main"],
-                    archive: dbConfig["host"] . dbConfig["archive"],
-                    backup: dbConfig["host"] . dbConfig["backup"],
-            })
-            profiles := db.load(, , agent.collectRange).filter(guest => roomNums.includes(!guest["roomNum"] ? "null" : guest["roomNum"]))
-        }
-        else {
-            profiles := post["content"]["profiles"]
-        }
-
-        ; selectedGuests can only pass by GuestProfileList
-        ; if no selectedGuest, then filter results in db by room number(request from ServerAgent_Panel)
-        post := agent.delegate({
-            rooms: roomNums.split(" "),
-            profiles: profiles
-        })
     }
 
     App.defineDirectives(
