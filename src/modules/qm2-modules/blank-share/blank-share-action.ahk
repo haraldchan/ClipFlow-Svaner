@@ -154,10 +154,11 @@ class BlankShare_Action {
 
 		loop {
 			Send("{Down}")
-			utils.waitLoading()
+			utils.waitLoading(200)
 			if (PixelGetColor(x, y) == "0x000080") {
 				existShareCount++
 				y += 22
+				Sleep(200)
 			} else {
 				break
 			}
@@ -182,7 +183,7 @@ class BlankShare_Action {
 		Send("!s")
 		utils.waitLoading()
 		Send("!m")
-		utils.waitLoading()
+		utils.waitLoading(500)
 		Send("{Esc}")
 		utils.waitLoading()
 		Send("{Text}1")
