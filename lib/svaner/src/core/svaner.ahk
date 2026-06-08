@@ -494,14 +494,14 @@ class Svaner {
         } 
         else {
             ; Native ListView
-            parsedOptions := this.__parseOptions(options)
+            parsedLvOptions := this.__parseOptions(options)
         }
 
         control := IsSet(depend) && depend is signal
             ? SvanerListView(
                 this.gui, { lvOptions: parsedLvOptions.parsed, itemOptions: parsedItemOptions.parsed },
                 columnDetailsOrList, depend, (IsSet(key) ? key : 0))
-            : this.gui.AddListView(parsedOptions.parsed, columnDetailsOrList)
+            : this.gui.AddListView(parsedLvOptions.parsed, columnDetailsOrList)
 
         if (control is SvanerListView && (parsedLvOptions.callbacks || parsedItemOptions.callbacks)) {
             callbacks := ArrayExt.append(parsedLvOptions.callbacks, parsedItemOptions.callbacks)
