@@ -5,35 +5,35 @@ RHS_WorkflowOta(App) {
     wfConfig := CONFIG.read("workflow-ota")
 
     saveWorkflow(*) {
-        form := JSON.parse(JSON.stringify(App.Submit(false)))
         CONFIG.write("workflow-ota", {
-            profile: form["wf-profile"],
-            routing: form["wf-routing"],
-            resType: form["wf-resType"],
-            market: form["wf-market"],
-            source: form["wf-source"],
+            profile: App["wf-profile"].Value,
+            routing: App["wf-routing"].Value,
+            resType: App["wf-resType"].Value,
+            market: App["wf-market"].Value,
+            source: App["wf-source"].Value,
         })
     }
 
     onMount() {
-        for ctrl in App.gui {
-            if (ctrl.Name.includes("wf")) {
-                ctrl.Value := wfConfig[ctrl.Name.replace("wf-", "")]
-            }
-        }
+        App["#rhwf"].forEach(ctrl => (
+            ctrl.Value := wfConfig[ctrl.Name.replace("wf-", "")],
+            ctrl.onClick(saveWorkflow)
+        ))
     }
 
-    return (
-        App.AddText("x400 @relative[y+15]:cur-agent w200 h20", "录入流程设置").SetFont("bold s10.5"),
-        App.AddText("x400 y+10", "启用或关闭部分预订录入流程。"),
+    render() {
+        App.AddText("x400 @relative[y+15]:cur-agent w200 h20", "录入流程设置").SetFont("bold s10.5")
+        App.AddText("x400 y+10", "启用或关闭部分预订录入流程。")
 
         ; controller check-boxes
-        App.AddCheckbox("vwf-profile x400 y+20", "录入 Profile").onClick(saveWorkflow),
-        App.AddCheckbox("vwf-routing x400 y+10", "录入 Routing").onClick(saveWorkflow),
-        App.AddCheckbox("vwf-resType x400 y+10", "录入 Res. Type").onClick(saveWorkflow),
-        App.AddCheckbox("vwf-market x400 y+10", "录入 Market Code").onClick(saveWorkflow),
-        App.AddCheckbox("vwf-source x400 y+10", "录入 Source Code").onClick(saveWorkflow),
+        App.AddCheckbox("#rhwf vwf-profile x400 y+20", "录入 Profile")
+        App.AddCheckbox("#rhwf vwf-routing x400 y+10", "录入 Routing")
+        App.AddCheckbox("#rhwf vwf-resType x400 y+10", "录入 Res. Type")
+        App.AddCheckbox("#rhwf vwf-market x400 y+10", "录入 Market Code")
+        App.AddCheckbox("#rhwf vwf-source x400 y+10", "录入 Source Code")
 
         onMount()
-    )
+    }
+
+    return render()
 }

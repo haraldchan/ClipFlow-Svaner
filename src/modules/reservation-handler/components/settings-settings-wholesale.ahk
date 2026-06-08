@@ -9,15 +9,14 @@ RHS_SettingsWholeSale(App, params) {
             return
         }
 
-        form := JSON.parse(JSON.stringify(App.Submit(false)))
         CONFIG.write(agent, {
             agent: agent,
-            profileName: form[agent . "-profileName"],
-            profileType: form[agent . "-isTA"] == true ? "Travel Agent" : "Company",
-            ratecode: [form[agent . "-bbf0"], form[agent . "-bbf1"], form[agent . "-bbf2"]],
-            resType: form[agent . "-resType"],
-            market: form[agent . "-market"],
-            source: form[agent . "-source"]
+            profileName: App[agent . "-profileName"].Value,
+            profileType: App[agent . "-isTA"].Value == true ? "Travel Agent" : "Company",
+            ratecode: [App[agent . "-bbf0"].Value, App[agent . "-bbf1"].Value, App[agent . "-bbf2"].Value],
+            resType: App[agent . "-resType"].Value,
+            market: App[agent . "-market"].Value,
+            source: App[agent . "-source"].Value
         })
 
         ctrl.Text := "已保存"
