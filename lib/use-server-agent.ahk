@@ -191,7 +191,7 @@ class useServerAgent {
              * @property {true | false} isOnline
              * @property {String} serverName
              */
-            serverOnlineStatus := JSON.parse(FileRead(this.onlineStatusIndicator, "utf-8"))
+            serverOnlineStatus := JSON.parse(FileRead(this.onlineStatusIndicator, "utf-8"),, false)
             if (serverOnlineStatus is Error) {
                 MsgBox("Service status error.",, "4096 T2 icon!")
                 return false
@@ -230,6 +230,9 @@ class useServerAgent {
     COLLECT(status, pool := this.pool) {
         posts := []
         loop files (pool . "\*.json") {
+            if (A_LoopFileName == "online-status.json") {
+                continue
+            }
             postID := A_LoopFileName.split("==")[3]
             postTimestamp := postID.substr(1, 14)
 

@@ -28,6 +28,9 @@ class UnifiedAgent extends useServerAgent {
     cleanup(pool := this.pool) {
         exp := this.expiration
         loop files (pool . "\*.json") {
+            if (A_LoopFileName == "online-status.json") {
+                continue
+            }
             header := StrSplit(A_LoopFileName, "==")
             method := header[1]
             date := SubStr(header[3], 1, 14)
