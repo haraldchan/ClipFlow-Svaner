@@ -92,7 +92,7 @@ ClipHistoryItem(App, clipHistory, index) {
         handleCtrlVisibility(clipHistory.value)
     }
 
-    return (
+    render() {
         App.AddGroupBox(
             "Section w290 h70 " . (index == 1 ? "vchi-first-gb @align[x]:clb-his-title y+10" : "@use:chi-gb"),
             "{1}", clipHistory, 
@@ -116,5 +116,7 @@ ClipHistoryItem(App, clipHistory, index) {
         App.AddText("xs10 y+1 w230 h1 border Hidden", "bla"),
 
         onMount()
-    )
+    }
+
+    return render()
 }

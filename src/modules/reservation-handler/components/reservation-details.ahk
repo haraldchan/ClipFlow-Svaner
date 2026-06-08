@@ -34,7 +34,5 @@ ReservationDetails(App, curResv) {
         }
     }
 
-    return (
-        App.AddListView("vresv-detail-list Grid @lv:label-tip NoSortHdr w310 r13 yp+30", ["预订项目", "预订详情"])
-    )
+    return App.AddListView("vresv-detail-list Grid @lv:label-tip NoSortHdr w310 r13 yp+30", ["预订项目", "预订详情"])
 }

@@ -26,21 +26,23 @@ ServerAgentPanel(App) {
     })
 
     onMount() {
-        serverOnlineStatus := JSON.parse(FileRead(agent.onlineStatusIndicator, "utf-8"))
+        serverOnlineStatus := JSON.parse(FileRead(agent.onlineStatusIndicator, "utf-8"),, false)
         if (serverOnlineStatus.isRestart) {
             isListening.set("在线")
         }
     }
 
-    return (
-        App.AddText("x30 y+10 h40 w580", "ProfileModifyNext Server").SetFont("s13 q5 Bold"),
+    render() {
+        App.AddText("x30 y+10 h40 w580", "ProfileModifyNext Server").SetFont("s13 q5 Bold")
         
         ; server
-        ServiceConfigs(App, CONFIG.read("serviceEnabled"), isListening),
+        ServiceConfigs(App, CONFIG.read("serviceEnabled"), isListening)
         
         ; client
-        ClientPosts(App, CONFIG.read("clientEnabled")),
+        ClientPosts(App, CONFIG.read("clientEnabled"))
 
         onMount()
-    )
+    }
+
+    return render()
 }

@@ -112,13 +112,15 @@ ClipboardHistory(App) {
         })
     }
 
-    return (
+    render() {
         App.AddText("vclb-his-title @align[y]:persist-listeners-gb @relative[x+20]:persist-listeners-gb w100 h20", "剪贴板历史")
-           .SetFont("bold s10"),
-        App.AddButton("x+10 w70 h20", "上一页").onClick(handleHistoryPageFlip),
-        App.AddEdit("x+10 w30 h20", "{1}", clipHistoryPage),
-        App.AddButton("x+10 w70 h20", "下一页").onClick(handleHistoryPageFlip),
-        CLIP_HISTORY_PAGE_LENGTH.times(() => ClipHistoryItem(App, clipHistoryDisplay, A_Index)),
+           .SetFont("bold s10")
+        App.AddButton("x+10 w70 h20", "上一页").onClick(handleHistoryPageFlip)
+        App.AddEdit("x+10 w30 h20", "{1}", clipHistoryPage)
+        App.AddButton("x+10 w70 h20", "下一页").onClick(handleHistoryPageFlip)
+        CLIP_HISTORY_PAGE_LENGTH.times(() => ClipHistoryItem(App, clipHistoryDisplay, A_Index))
         onMount()
-    )
+    }
+
+    return render()
 }

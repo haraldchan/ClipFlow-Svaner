@@ -36,21 +36,20 @@ App(App) {
 
 	global clbListeners := ListenerController()
 
-    return (
+	render() {
 		App.AddTab3("vtabs x15" . " Choose" . CONFIG.read("tabPos"), ["插件模式", curModuleProps.tabs*].append("控制中心"))
 		   .onChange((ctrl, _) => CONFIG.write("tabPos", ctrl.Value)),
 
-		App["tabs"].UseTab("插件模式"), 
-		FlowModes(App, modules.keys()),	
+		App["tabs"].UseTab("插件模式")
+		FlowModes(App, modules.keys())	
 
-		curModuleProps.components.map(component => (
-			App["tabs"].UseTab(1 + A_Index), 
-			component(App)
-		)),
+		curModuleProps.components.map(component => (App["tabs"].UseTab(1 + A_Index), component(App)))
 
-		App["tabs"].UseTab("控制中心"),
-		ControlCenter(App),
+		App["tabs"].UseTab("控制中心")
+		ControlCenter(App)
 
 		App["tabs"].UseTab()
-    )
+	}
+
+    return render()
 }

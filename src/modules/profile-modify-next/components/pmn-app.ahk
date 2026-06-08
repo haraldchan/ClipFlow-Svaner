@@ -445,57 +445,59 @@ PMN_App(App, moduleTitle, db, identifier) {
     }
 
 
-    return (
-        App.AddGroupBox("Section y+20 w685 h410", ""),
-        App.AddText("xp15", moduleTitle . " ⓘ ").onClick((*) => PMN_Settings(settings)),
+    render() {
+        App.AddGroupBox("Section y+20 w685 h410", "")
+        App.AddText("xp15", moduleTitle . " ⓘ ").onClick((*) => PMN_Settings(settings))
         
         ; agent mode
-        App.AddCheckBox("vdelegate-check-box x+10 Disabled", "后台代行").onClick(handleDelegateActivate),
-        App.AddText("vconnection-status x+20 w80 Hidden", " {1}", serverConnection),
+        App.AddCheckBox("vdelegate-check-box x+10 Disabled", "后台代行").onClick(handleDelegateActivate)
+        App.AddText("vconnection-status x+20 w80 Hidden", " {1}", serverConnection)
         
         ; datetime
         App.AddDateTime("vdate xs15 yp+25 w90 h25", "yyyy/MM/dd")
            .onChange((ctrl, _) => (
-            queryFilter.update("date", FormatTime(ctrl.Value, "yyyyMMdd")),
-            handleListContentUpdate()
+                queryFilter.update("date", FormatTime(ctrl.Value, "yyyyMMdd"))
+                handleListContentUpdate()
         )),
         
         ; search conditions
         App.AddDDL("x+10 w80 Choose2", searchByMap.keys())
-           .onChange((ctrl, _) => searchBy.set(searchByMap[ctrl.Text])),
+           .onChange((ctrl, _) => searchBy.set(searchByMap[ctrl.Text]))
         
         ; search box
         App.AddEdit("vsearchBox x+5 w125 h25")
-           .onBlur((ctrl, _) => queryFilter.update("search", Trim(ctrl.Value))),
+           .onBlur((ctrl, _) => queryFilter.update("search", Trim(ctrl.Value)))
         
         ; range
-        App.AddText("x+10 h25 0x200", "最近"),
+        App.AddText("x+10 h25 0x200", "最近")
         App.AddEdit("vrange Number x+1 w30 h25", queryFilter.value["range"])
-           .onChange((ctrl, _) => queryFilter.update("range", !ctrl.Value ? 60 * 24 : ctrl.Value)),
-        App.AddText("x+1 h25 0x200", "分钟"),
+           .onChange((ctrl, _) => queryFilter.update("range", !ctrl.Value ? 60 * 24 : ctrl.Value))
+        App.AddText("x+1 h25 0x200", "分钟")
         
         ; refresh/fill
-        App.AddButton("vrefresh x+10 w80 h25", "刷 新(&R)").onClick(handleRefresh),
+        App.AddButton("vrefresh x+10 w80 h25", "刷 新(&R)").onClick(handleRefresh)
         App.AddButton("vfillin x+5 w80 h25 Default", "{1}", fillBtnText)
            .onClick(fillPmsProfile)
-           .onContextMenu((*) => settings.update("fillOverwrite", o => !o)),
+           .onContextMenu((*) => settings.update("fillOverwrite", o => !o))
         
         ; qm2 agent
-        App.AddButton("vqm2-agent x+5 w80 h25 ", "&QM2 Agent").onClick(showQm2Panel),
+        App.AddButton("vqm2-agent x+5 w80 h25 ", "&QM2 Agent").onClick(showQm2Panel)
 
         ; profile list
-        GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile),
+        GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile)
 
         ; sent posts
-        Show(() => SentPosts(App, isDelegate, listContent), isDelegate, cur => cur == true),
+        Show(() => SentPosts(App, isDelegate, listContent), isDelegate, cur => cur == true)
 
         ; waterfall controls
         Show(() => [
             App.AddCheckBox("vselect-all-btn Hidden w80 h20 @align[x]:date y+5", "全选 (&A)"),
             App.AddText("Hidden h20 x+15 0x200", "Party: "),
             App.AddEdit("vparty-num Hidden x+1 w100 h20", "")
-        ], searchBy, cur => cur == "waterfall"),
+        ], searchBy, cur => cur == "waterfall")
 
         onMount()
-    )
+    }
+
+    render()
 }

@@ -67,12 +67,14 @@ GuestProfileDetails(selectedGuest, fillIn) {
         SetTimer(detectWindowIsActive, 1000)
     }
 
-    return (
-        Profile.AddListView("vprofile Grid w230 r10", ["信息字段", "证件信息"]).onDoubleClick(copyListField),
+    render() {
+        Profile.AddListView("vprofile Grid w230 r10", ["信息字段", "证件信息"]).onDoubleClick(copyListField)
         
-        Profile.AddButton("h30 w110", "关 闭 (&C)").onClick(handleClose),
-        Profile.AddButton("x+10 h30 w110 Default", "填   入").onClick(fillInPms),
+        Profile.AddButton("h30 w110", "关 闭 (&C)").onClick(handleClose)
+        Profile.AddButton("x+10 h30 w110 Default", "填   入").onClick(fillInPms)
         
         onMount()
-    )
+    }
+
+    return render()
 }

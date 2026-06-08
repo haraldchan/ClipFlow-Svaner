@@ -14,17 +14,19 @@ ControlCenter(App) {
         App["errorToLog"].Value := USE_ERROR_LOG
     }
 
-    return (
+    render() {
         ; listener controls
-        ListenerHub(App),
+        ListenerHub(App)
 
         ; enable logging
         App.AddCheckBox("verrorToLog @align[x]:persist-listeners-gb y+10", "拦截报错至日志")
-           .onClick(handleErrorToLogToggle),
+           .onClick(handleErrorToLogToggle)
 
         ; clipboard history
-        ClipboardHistory(App),
+        ClipboardHistory(App)
 
         onMount()
-    )
+    }
+    
+    return render()
 }

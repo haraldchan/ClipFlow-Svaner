@@ -31,14 +31,16 @@ PMN_Settings(settingSignal) {
         Settings["ow"].Value := settingSignal.value["fillOverwrite"]
     }
 
-    return (
-        Settings.AddText("x10 w260", helpInfo),
+    render() {
+        Settings.AddText("x10 w260", helpInfo)
         
         ; overwrite fill-in
         Settings.AddCheckbox("vow x10 w260", "默认覆盖填入（直接在原 Profile 修改）")
-                .onClick((ctrl, _) => settingSignal.update("fillOverwrite", ctrl.value)),
+                .onClick((ctrl, _) => settingSignal.update("fillOverwrite", ctrl.value))
         
-        onMount(),
+        onMount()
         Settings.Show()
-    )
+    }
+
+    return render()
 }

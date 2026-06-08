@@ -18,8 +18,10 @@ FlowModes(App, modules) {
 		utils.cleanReload(WIN_GROUP)
 	}
 
-	return (
-		App.AddDDL("y+10 w250 Choose" . moduleSelected, moduleNames).onChange(handleModuleChange),
+	render() {
+		App.AddDDL("y+10 w250 Choose" . moduleSelected, moduleNames).onChange(handleModuleChange)
 		modules[moduleSelected].USE(App)
-	)
+	}
+	
+	return render()
 }

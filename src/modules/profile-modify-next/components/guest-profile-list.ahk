@@ -51,8 +51,7 @@ GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile) {
         SetTimer(() => db.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], selectedItem["fileName"]), -1)
     }
 
-    return (    
-        App.AddListView(
+    return App.AddListView(
             {
                 lvOptions: "vguest-profile-list Grid -ReadOnly -Multi @lv:label-tip @align[x]:date y+10 w658 h320",
                 itemOptions: ""
@@ -68,5 +67,4 @@ GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile) {
          .onDoubleClick(markAsPrimary)
          .onItemEdit(handleUpdateItem)
          .focusOnUpdate()
-    )
 }

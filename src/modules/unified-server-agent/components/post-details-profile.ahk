@@ -51,11 +51,11 @@ PostDetails_Profile(post) {
         profiles.update(profiles.value.findIndex(p => p["idNum"] == profileToChange["idNum"]), profileToChange)
     }
 
-    return (
-        App.AddGroupBox("Section w560 r12", "代行详情").SetFont("Bold"),
-        App.AddText("xs10 yp+20", "发送状态: " . post["status"]),
-        App.AddText("xs10 yp+20", "发送时间: " . post["time"]),
-        App.AddText("xs10 w200 yp+30" , "客人资料").SetFont("Bold s10"),
+    render() {
+        App.AddGroupBox("Section w560 r12", "代行详情").SetFont("Bold")
+        App.AddText("xs10 yp+20", "发送状态: " . post["status"])
+        App.AddText("xs10 yp+20", "发送时间: " . post["time"])
+        App.AddText("xs10 w200 yp+30" , "客人资料").SetFont("Bold s10")
         
         ; post guest list
         App.AddListView(
@@ -69,11 +69,13 @@ PostDetails_Profile(post) {
                 widths: [60, 90, 40, 80, 145, 120]
             }, 
             profiles
-        ).onItemEdit(handleProfilesUpdate),
+        ).onItemEdit(handleProfilesUpdate)
         
         ; repost btn
-        App.AddButton("w120 h30 y+25", "重新发送代行").onClick(handleRepost),
+        App.AddButton("w120 h30 y+25", "重新发送代行").onClick(handleRepost)
         
         App.Show()
-    )
+    }
+    
+    return render()
 }

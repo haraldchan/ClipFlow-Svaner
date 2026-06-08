@@ -49,24 +49,21 @@ PMG_App(App, popupTitle, db) {
         PMG_Execute.startModify(currentGroupRooms.value, groupedSelectedGuests)
     }
 
-    return (
-        StackBox(
-            App,
-            {
-                groupbox: {
-                    title: popupTitle . " ⓘ ",
-                    options: "Section y+20 w685 h410",
-                }
-            },
-            () => [
-                ; due in groups
-                OnDayGroups(App, selectedGroup),
-                ; btns
-                App.AddButton("@align[x]:block-list y+5 w145 h35", "获取旅客").onClick(handleListInitialize),
-                App.AddButton("x+10 w145 h35", "开始录入").onClick(performModify),
-                ; matched guests
-                GroupGuestList(App, loadedGuests)
-            ]
-        )
+    return StackBox(
+        App, {
+            groupbox: {
+                title: popupTitle . " ⓘ ",
+                options: "Section y+20 w685 h410",
+            }
+        },
+        () => [
+            ; due in groups
+            OnDayGroups(App, selectedGroup),
+            ; btns
+            App.AddButton("@align[x]:block-list y+5 w145 h35", "获取旅客").onClick(handleListInitialize),
+            App.AddButton("x+10 w145 h35", "开始录入").onClick(performModify),
+            ; matched guests
+            GroupGuestList(App, loadedGuests)
+        ]
     )
 }

@@ -111,7 +111,7 @@ QM2_Panel(props) {
         "@use:form-edit", "x+10 w200 h25 0x200"
     )
 
-    return (
+    render() {
         StackBox(App, 
         {
             name: "op-radio-group",
@@ -120,11 +120,13 @@ QM2_Panel(props) {
             () => modules.entries().map(
                 (entry, index) => App.AddRadio(index == 1 ? "xs1 h20 yp+1 Checked" : "xs1 h20 yp+30", entry[1]).onClick(handleModuleChange)
             )
-        ),
+        )
         
-        Dynamic(App, selectedModule, modules),
+        Dynamic(App, selectedModule, modules)
         
         ; initializing
         onMount()
-    )
+    }
+    
+    return render()
 }

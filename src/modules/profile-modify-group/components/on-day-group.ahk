@@ -65,8 +65,8 @@ OnDayGroups(App, selectedGroup) {
         selectedGroup.set(arrvingGroups.value[row])
     }
 
-    return (
-        App.AddLink("xs20 yp+30 w100 h20 0x200", "{1}", { text: "今日团队", href: XL_FILE_PATH}).SetFont("bold s11 q4"),
+    render() {
+        App.AddLink("xs20 yp+30 w100 h20 0x200", "{1}", { text: "今日团队", href: XL_FILE_PATH}).SetFont("bold s11 q4")
         App.AddListView(
             {
                 lvOptions: "vblock-list xs20 y+10 w300 h300 Grid NoSortHdr @lv:label-tip"
@@ -78,5 +78,7 @@ OnDayGroups(App, selectedGroup) {
             },
             arrvingGroups
         ).onClick(handleGroupSelect)
-    )
+    }
+    
+    return render()
 }

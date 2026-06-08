@@ -47,7 +47,7 @@ ListenerHub(App) {
         })
     }
 
-    return (
+    render() {
         StackBox(
             App, {
                 font: { options: "bold" },
@@ -67,7 +67,8 @@ ListenerHub(App) {
                     persistListeners
                 ).onItemCheck(handleIsOnToggle),
             ]
-        ),
+        )
+        
         StackBox(
             App, {
                 font: { options: "bold" },
@@ -87,7 +88,10 @@ ListenerHub(App) {
                     moduleListeners
                 ).onItemCheck(handleIsOnToggle),
             ]
-        ),
+        )
+
         onMount()
-    )
+    }
+
+    return render()
 }

@@ -44,42 +44,44 @@ RH_App(App, moduleTitle, identifier) {
         }
     }
 
-    return (
-        App.AddGroupBox("Section w685 h460 y+20", ""),
-        App.AddText("xp15", moduleTitle),
+    render() {
+        App.AddGroupBox("Section w685 h460 y+20", "")
+        App.AddText("xp15", moduleTitle)
 
         ; read me info
-        App.AddGroupBox("vreadme Section yp+25 w320 h200"),
-        App.AddText("xp10 h35 w80 0x1", "使用说明").SetFont("s10.5 Bold"),
-        App.AddText("xp yp+30 w270 h150", README).SetFont("s10"),
+        App.AddGroupBox("vreadme Section yp+25 w320 h200")
+        App.AddText("xp10 h35 w80 0x1", "使用说明").SetFont("s10.5 Bold")
+        App.AddText("xp yp+30 w270 h150", README).SetFont("s10")
         
         ; options
         ; append remarks to comment
-        App.AddGroupBox("Section xp-10 y+25 w320 h209"),
-        App.AddText("xp10 w80 h35 0x1", "设置选项").SetFont("s10.5 Bold"),
+        App.AddGroupBox("Section xp-10 y+25 w320 h209")
+        App.AddText("xp10 w80 h35 0x1", "设置选项").SetFont("s10.5 Bold")
 
         ; add remarks to comment
-        App.AddCheckbox("vwith-remarks xs10 yp+30 h25", "将备注添加到 Comment"),
+        App.AddCheckbox("vwith-remarks xs10 yp+30 h25", "将备注添加到 Comment")
 
         ; add remarks to trace
-        App.AddCheckbox("vwith-trace xs10 yp+30 h25", "将备注添加到 Trace"),
+        App.AddCheckbox("vwith-trace xs10 yp+30 h25", "将备注添加到 Trace")
         
         ; add extra packages
-        App.AddText("xs10 y+5 h25 0x200", "需添加的额外 Package (不包括早餐；以空格分隔)"),
-        App.AddText("xs10 y+1 h25 0x200", "Pkg Code.").SetFont("Bold"),
-        App.AddEdit("vextra-packages x+5 w200 h25"),
+        App.AddText("xs10 y+5 h25 0x200", "需添加的额外 Package (不包括早餐；以空格分隔)")
+        App.AddText("xs10 y+1 h25 0x200", "Pkg Code.").SetFont("Bold")
+        App.AddEdit("vextra-packages x+5 w200 h25")
 
         ; override ratecode
-        App.AddText("xs10 y+5 h25 0x200", "覆盖 RateCode (不使用默认)"),
-        App.AddText("xs10 y+1 h25 0x200", "RateCode.").SetFont("Bold"),
-        App.AddEdit("voverriden-ratecode x+5 w200 h25", ""),
+        App.AddText("xs10 y+5 h25 0x200", "覆盖 RateCode (不使用默认)")
+        App.AddText("xs10 y+1 h25 0x200", "RateCode.").SetFont("Bold")
+        App.AddEdit("voverriden-ratecode x+5 w200 h25", "")
         
         ; reservation details
-        App.AddText("x380 @align[y]:readme w300 h25", "订单详情  {1}", resvSource).SetFont("s13 q5 Bold"),
-        ReservationDetails(App, curResv),
+        App.AddText("x380 @align[y]:readme w300 h25", "订单详情  {1}", resvSource).SetFont("s13 q5 Bold")
+        ReservationDetails(App, curResv)
         
         ; entry btns
-        EntryBtns(App, curResv),
+        EntryBtns(App, curResv)
         onMount()
-    )
+    }
+
+    return render()
 }

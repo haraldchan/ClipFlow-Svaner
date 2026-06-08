@@ -30,21 +30,23 @@ PMG_Settings(fetchPeriod) {
         =========== 设置选项 ==========
     )"
 
-    return (
-        Settings.AddText("x10 w250", helpInfo),
+    render() {
+        Settings.AddText("x10 w250", helpInfo)
 
         ; fetchPeriod setting
-        Settings.AddText("x10 w150 h25 0x200", "获取旅客时间范围（小时）："),
-        Settings.AddEdit("vfp w80 h25 x+10", "{1}", fetchPeriod),
+        Settings.AddText("x10 w150 h25 0x200", "获取旅客时间范围（小时）：")
+        Settings.AddEdit("vfp w80 h25 x+10", "{1}", fetchPeriod)
         
         ; btns
-        Settings.AddButton("x10 y+15 w120 h35", "取 消(&C)").onClick((*) => Settings.Hide()),
+        Settings.AddButton("x10 y+15 w120 h35", "取 消(&C)").onClick((*) => Settings.Hide())
         Settings.AddButton("x+5 w120 h35", "保 存(&S)").onClick((*) => (
             fetchPeriod.set(Settings["fp"].Value),
             Sleep(200),
             Settings.Hide()
-        )),
+        ))
 
         Settings.Show()
-    )
+    }
+
+    return render()
 }
