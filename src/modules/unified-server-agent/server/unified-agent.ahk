@@ -20,9 +20,6 @@ class UnifiedAgent extends useServerAgent {
         ; delete expired posts
         this.cleanup()
         this.cleanup(this.qmPool)
-
-        ; reset previous collected posts(after unexpected reload)
-        this.resetPostsToPending()
     }
 
     cleanup(pool := this.pool) {
