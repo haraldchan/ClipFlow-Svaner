@@ -30,6 +30,13 @@ SentPosts(App, isDelegate, listContent) {
             return
         }
 
+        serverOnlineStatus := JSON.parse(FileRead(agent.onlineStatusIndicator, "utf-8"),, false)
+        if (!serverOnlineStatus.isOnline) {
+            isDelegate.set(false)
+            MsgBox("后台服务不在线。", POPUP_TITLE, "4096 T1 icon!")
+            return
+        }
+
         posts := []
         showMyOwnPosts := App["sent-posts-show-my-own-posts"].Value
         
