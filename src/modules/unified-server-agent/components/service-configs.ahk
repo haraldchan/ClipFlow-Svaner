@@ -38,8 +38,10 @@ ServiceConfigs(App, enabled, isListening) {
             return
         }
 
+        ; reset previous collected posts(after unexpected reload)
+        agent.resetPostsToPending()
+        
         isListening.set("在线")
-        ; SetTimer(handleInHouseWindowReset)
     }
 
     handleServerHostDirSelect(*) {
