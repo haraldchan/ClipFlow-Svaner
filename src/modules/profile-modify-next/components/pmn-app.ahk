@@ -30,7 +30,6 @@ PMN_App(App, moduleTitle, db, identifier) {
     }
 
     handleDelegateActivate(ctrl, _) {
-        isDelegate.set(ctrl.Value)
         if (ctrl.Value == false) {
             return
         }
@@ -450,7 +449,9 @@ PMN_App(App, moduleTitle, db, identifier) {
         App.AddText("xp15", moduleTitle . " ⓘ ").onClick((*) => PMN_Settings(settings))
         
         ; agent mode
-        App.AddCheckBox("vdelegate-check-box x+10 Disabled", "后台代行").onClick(handleDelegateActivate)
+        App.AddCheckBox("vdelegate-check-box x+10 Disabled", "后台代行", { check: isDelegate })
+           .bind()
+           .onClick(handleDelegateActivate)
         App.AddText("vconnection-status x+20 w80 Hidden", " {1}", serverConnection)
         
         ; datetime
