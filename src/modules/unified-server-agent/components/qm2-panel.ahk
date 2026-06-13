@@ -47,27 +47,6 @@ QM2_Panel(props) {
         })
     }
 
-    handleBlankShareDelegate(*) {
-        if (!App["share-room-nums"].Value) {
-            return 0
-        }
-
-        delegateQmActions("BlankShare")
-
-        WinHide(POPUP_TITLE)
-        App.Destroy()
-        
-        return 0
-    }
-
-    handlePaymentRelationDelegate(*) {
-        if (!App["pf-room"].Value || !App["pf-name"].Value) {
-            return 0
-        }
-
-        return delegateQmActions("PaymentRelation")
-    }
-
     timeoutCount := 0
     TIMEOUT_MAX_SECOND := 60
     detectWindowIsActive(*) {
@@ -87,19 +66,10 @@ QM2_Panel(props) {
     }
 
     onMount() {
-        shareRoomNums := App["share-room-nums"]
-        shareRoomNums.Enabled := false
-        shareRoomNums.Value := p.selectedGuests.keys().join(" ")
+        App["share-room-nums"].Value := p.selectedGuests.keys().join(" ")
         App["share-qty"].Value := p.selectedGuests.values().map(g => g.Length <= 1 ? 0 : g.Length - 1).join(" ")
 
-        ; re-label btns
-        BlankShareAction := App["blank-share-action"]
-        BlankShareAction.Text := "Share 代行"
-        BlankShareAction.Opt("+Default")
-
-        ; override events
-        BlankShareAction.onClick(handleBlankShareDelegate, -1)
-        App["payment-relation-action"].onClick(handlePaymentRelationDelegate, -1)
+        App["blank-share-action"].Opt("+Default")
 
         SetTimer(detectWindowIsActive, 1000)
 
@@ -122,7 +92,7 @@ QM2_Panel(props) {
             )
         )
         
-        Dynamic(App, selectedModule, modules)
+        Dynamic(App, selectedModule, modules, { clickEvent: delegateQmActions })
         
         ; initializing
         onMount()
