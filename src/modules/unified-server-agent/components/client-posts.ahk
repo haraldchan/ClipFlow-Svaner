@@ -134,7 +134,7 @@ ClientPosts(App, enabled) {
             case "Auth":
                 form := JSON.parse(JSON.stringify(selectedPost["content"]["form"]),, false)
                 PostDetails_QM2(selectedPost, "TransactionEntry",{
-                    depositInfo: form,
+                    transactionInfo: form,
                     style: { xyPos: "xs10 y+10" },
                 })
             default:
