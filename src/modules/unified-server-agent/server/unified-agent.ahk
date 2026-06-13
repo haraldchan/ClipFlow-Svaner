@@ -39,7 +39,7 @@ class UnifiedAgent extends useServerAgent {
 
     abort() {
         serverOnlineStatus := JSON.parse(FileRead(this.onlineStatusIndicator, "utf-8"))
-        if (serverOnlineStatus.serverName != A_ComputerName) {
+        if (serverOnlineStatus.activeServer != A_ComputerName) {
             return
         }
 
