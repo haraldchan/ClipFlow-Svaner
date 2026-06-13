@@ -18,6 +18,8 @@ class RH_OtaBookingEntry {
         WinSetAlwaysOnTop(c.setOnTop, "ahk_class SunAwtFrame")
 
         BlockInput(c.blockInput)
+
+        SUSPEND_CONTROLLER.suspendOtherScripts()
     }
 
     static end() {
@@ -26,6 +28,8 @@ class RH_OtaBookingEntry {
 
         WinSetAlwaysOnTop(false, "ahk_class SunAwtFrame")
         BlockInput(false)
+
+        SUSPEND_CONTROLLER.restoreAllScripts()
     }
 
     static dismissPopup() {
