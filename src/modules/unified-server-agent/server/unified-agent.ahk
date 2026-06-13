@@ -140,30 +140,35 @@ class UnifiedAgent extends useServerAgent {
             Sleep(200)
         } until (!WinExist("OPERA Full Service Edition"))
 
-        ie := ComObject("InternetExplorer.Application")
-        ie.Visible := true
+        ; launch 360se with shell
+        shell := ComObject("WScript.Shell")
+        chrome360Path := "C:\Users\4CE325BJN9\AppData\Roaming\360se6\Application\360se.exe"
+        pmsPath := "https://wsh-opr-app1"
+        command := A_ComSpec . Format(" /c start {1} {2}", chrome360Path, pmsPath)
 
-        ; log-in opera pms
-        ie.Navigate("https://wsh-opr-app1")
-        while (ie.Busy || ie.ReadyState != 4) {
-            Sleep(200)
+        shell.Exec(command)
+        WinWait("ahk_exe 360se.exe")
+        WinActivate("ahk_exe 360se.exe")
+
+        shell := ""
+
+        ; log into opera
+        Send("{Text}" . PMS_USERNAME)
+        Sleep(100)
+        Send("{Tab}")
+        Sleep(100)
+        Send("{Text}" . PMS_PASSWORD)
+        loop 3 {
+            Sleep(100)
+            Send("{Tab}")
         }
+        Sleep(100)
+        Send("{Enter}")
+        utils.waitLoading(1000)
 
-        document := ie.document
-        username := document.getElementsByName("username")[0]
-        password := document.getElementsByName("password")[0]
-
-        username.value := PMS_USERNAME
-        username.fireEvent("onchange")
-        password.value := PMS_PASSWORD
-        password.fireEvent("onchange")
-        Sleep(10)
-        document.getElementsByTagName('button')[0].click()
-        utils.waitLoading(500)
-
-        ; update document after log-in
-        document := ie.document
-        document.getElementById("opera_pms").click()
+        ImageSearch(&x, &y, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["pms-login.png"])
+        Sleep(200)
+        Click(x, y)
 
         ; wait for PMS app
         WinWait("OPERA PMS")
@@ -179,8 +184,6 @@ class UnifiedAgent extends useServerAgent {
         Sleep(100)
         Send("{Enter}")
         utils.waitLoading(1000)
-
-        ie := ""
     }
 
 
