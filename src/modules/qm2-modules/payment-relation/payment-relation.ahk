@@ -50,12 +50,12 @@ PaymentRelation(App, props := {}) {
     }
 
     action(*) {
-        App.Hide()
-        Sleep 100
+        if (!App["pf-room"].Value || !App["pf-name"].Value) {
+            return 0
+        }
 
-        form := comp.submit()
-        PaymentRelation_Action.USE(form)
-        App.Show()
+        clickEvent := props.clickEvent
+        clickEvent("PaymentRelation")
     }
 
     App.defineDirectives(
