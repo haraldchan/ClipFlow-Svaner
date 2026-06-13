@@ -18,6 +18,8 @@ class FedexBookingEntry {
         WinSetAlwaysOnTop(c.setOnTop, "ahk_class SunAwtFrame")
 
         BlockInput(c.blockInput)
+
+        SUSPEND_CONTROLLER.suspendOtherScripts()
     }
 
     static end() {
@@ -26,6 +28,8 @@ class FedexBookingEntry {
 
         WinSetAlwaysOnTop(false, "ahk_class SunAwtFrame")
         BlockInput(false)
+
+        SUSPEND_CONTROLLER.restoreAllScripts()
     }
 
     static dismissPopup() {
@@ -61,7 +65,7 @@ class FedexBookingEntry {
 
         ; workflow start
         this.start()
-        isCheckedIn := ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\isCheckedIn.png")
+        isCheckedIn := ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["isCheckedIn.png"])
         if (!isCheckedIn) {
             this.profileEntry(infoObj["crewNames"], index)
         }
@@ -339,7 +343,7 @@ class FedexBookingEntry {
         utils.waitLoading()
         Sleep(100)
 
-        ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, A_ScriptDir . "\src\Assets\opera-active-win.png")
+        ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
         MouseMove(FoundX + 226, FoundY + 142)
         Click(3)
         Send("{Text}" . (daysActual < pmsNts ? "NRR" : "FEDEXN"))
