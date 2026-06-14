@@ -134,6 +134,7 @@ class PMN_FillIn {
         found := PmsImageFinder.find("AltNameAnchor.png")
         if (!found) {
             MsgBox("界面定位失败", POPUP_TITLE, "T2 4096 icon!")
+            this.end()
             if (IsSet(agent)) {
                 agent.abort()
             }
@@ -172,6 +173,7 @@ class PMN_FillIn {
         found := PmsImageFinder.find("AltNameAnchor.png")
         if (!found) {
             MsgBox("界面定位失败", POPUP_TITLE, "T2 4096")
+            this.end()
             if (IsSet(agent)) {
                 agent.abort()
             }
@@ -312,6 +314,7 @@ class PMN_FillIn {
         found := PmsImageFinder.find("AltNameAnchor.png")
         if (!found) {
             MsgBox("界面定位失败。", "T1 icon!")
+            this.end()
             if (IsSet(agent)) {
                 agent.abort()
             }
