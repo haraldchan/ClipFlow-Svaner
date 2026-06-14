@@ -38,7 +38,7 @@ class UnifiedAgent extends useServerAgent {
     }
 
     abort() {
-        serverOnlineStatus := JSON.parse(FileRead(this.onlineStatusIndicator, "utf-8"))
+        serverOnlineStatus := JSON.parse(FileRead(this.onlineStatusIndicator, "utf-8"),, false)
         if (serverOnlineStatus.activeServer != A_ComputerName) {
             return
         }
@@ -125,14 +125,7 @@ class UnifiedAgent extends useServerAgent {
      * <Agent>
      */
     restartPMS() {
-        if (!WinExist("OPERA Full Service Edition")) {
-            return
-        }
-
-        PMS_USERNAME := "FOHARALDC"
-        PMS_PASSWORD := "sxzc123456"
-
-        ; close all ie win
+        ; close all pms win
         loop {
             if (WinExist("OPERA Full Service Edition")) {
                 WinKill("OPERA Full Service Edition")
@@ -140,50 +133,13 @@ class UnifiedAgent extends useServerAgent {
             Sleep(200)
         } until (!WinExist("OPERA Full Service Edition"))
 
-        ; launch 360se with shell
-        shell := ComObject("WScript.Shell")
-        chrome360Path := "C:\Users\4CE325BJN9\AppData\Roaming\360se6\Application\360se.exe"
-        pmsPath := "https://wsh-opr-app1"
-        command := A_ComSpec . Format(" /c start {1} {2}", chrome360Path, pmsPath)
-
-        shell.Exec(command)
-        WinWait("ahk_exe 360se.exe")
-        WinActivate("ahk_exe 360se.exe")
-
-        shell := ""
-
-        ; log into opera
-        Send("{Text}" . PMS_USERNAME)
-        Sleep(100)
-        Send("{Tab}")
-        Sleep(100)
-        Send("{Text}" . PMS_PASSWORD)
-        loop 3 {
-            Sleep(100)
-            Send("{Tab}")
-        }
-        Sleep(100)
-        Send("{Enter}")
-        utils.waitLoading(1000)
-
-        ImageSearch(&x, &y, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["pms-login.png"])
-        Sleep(200)
-        Click(x, y)
-
-        ; wait for PMS app
+        ; RunWait("*RunAs " . A_ScriptDir . "\src\modules\unified-server-agent\server\pms-restarter.ahk")
+        Run("Z:\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow-SvanerTest-main\src\modules\unified-server-agent\server\pms-restarter.ahk")
         WinWait("OPERA PMS")
-        utils.waitLoading(500)
-
-        WinMaximize("ahk_class SunAwtFrame")
-        utils.waitLoading(1000)
-        WinActivate("ahk_class SunAwtFrame")
-        Sleep(100)
-        Send("!f")
-        Sleep(100)
-        Send("{Down}")
-        Sleep(100)
-        Send("{Enter}")
-        utils.waitLoading(1000)
+        loop{
+            Sleep(100)
+        } until (WinGetMinMax("OPERA PMS") == 1)
+        Sleep(1000)
     }
 
 
