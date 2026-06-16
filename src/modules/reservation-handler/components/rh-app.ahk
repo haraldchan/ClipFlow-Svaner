@@ -1,7 +1,7 @@
 RH_App(App, moduleTitle, identifier) {
     README := FileRead(A_ScriptDir . "\src\modules\reservation-handler\data\README.txt", "UTF-8")
-    r := {}
-    curResv := signal(RH_Models.otaListFields.keys().map(key => r.DefineProp(key, { Value: "" })))
+    
+    curResv := signal(RH_Models.otaListFields.keys().map(key => {}.DefineProp(key, { Value: "" })))
     resvSource := signal("")
     OnClipboardChange((*) => handleCaptured(identifier))
     clbListeners.addListener({
@@ -34,10 +34,6 @@ RH_App(App, moduleTitle, identifier) {
     }
 
     onMount() {
-        LV := App["type:ListView"]
-        LV.ModifyCol(1, 100)
-        LV.ModifyCol(2, 200)
-
         storedResv := CONFIG.read("currentReservation")
         if (storedResv) {
             curResv.set(JSON.parse(storedResv))
@@ -80,8 +76,10 @@ RH_App(App, moduleTitle, identifier) {
         
         ; entry btns
         EntryBtns(App, curResv)
-        onMount()
     }
 
-    return render()
+    return (
+        render(),
+        onMount()
+    )
 }
