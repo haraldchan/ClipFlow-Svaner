@@ -482,7 +482,7 @@ PMN_App(App, moduleTitle, db, identifier) {
            .onContextMenu((*) => settings.update("fillOverwrite", o => !o))
         
         ; qm2 agent
-        App.AddButton("vqm2-agent x+5 w80 h25 ", "&QM2 Agent").onClick(showQm2Panel)
+        App.AddButton("vqm2-agent x+5 w80 h25 Disabled", "&QM2 Agent").onClick(showQm2Panel)
 
         ; profile list
         GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile)
@@ -496,9 +496,10 @@ PMN_App(App, moduleTitle, db, identifier) {
             App.AddText("Hidden h20 x+15 0x200", "Party: "),
             App.AddEdit("vparty-num Hidden x+1 w100 h20", "")
         ], searchBy, cur => cur == "waterfall")
-
-        onMount()
     }
 
-    render()
+    return (
+        render(), 
+        onMount()
+    )
 }
