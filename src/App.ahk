@@ -6,28 +6,18 @@
  * @param {Svaner} App
  */
 App(App) {
-    onTop := signal(false)
-
-    keepOnTop(*) {
-        onTop.set(onTop => !onTop)
-        WinSetAlwaysOnTop onTop.value, POPUP_TITLE
-    }
-
 	modules := OrderedMap(
-		ProfileModifyNext, { 
-			name: ProfileModifyNext.name, 
-			tabs: ["后台服务"], 
-			components: [ServerAgentPanel] 
+		ProfileModifyNext, {
+			name: ProfileModifyNext.name,
+			tabComponents: Map("后台服务", ServerAgentPanel)
 		},
-		ProfileModify_Group, { 
-			name: ProfileModify_Group.name, 
-			tabs: ["后台服务"], 
-			components: [ServerAgentPanel] 
+		ProfileModify_Group, {
+			name: ProfileModify_Group.name,
+			tabComponents: Map("后台服务", ServerAgentPanel)
 		},
-		ReservationHandler, { 
-			name: ReservationHandler.name, 
-			tabs: ["更多设置"], 
-			components: [ReservationHandlerSettings] 
+		ReservationHandler, {
+			name: ReservationHandler.name,
+			tabComponents: Map("更多设置", ReservationHandlerSettings)
 		},
 	)
 
@@ -37,19 +27,17 @@ App(App) {
 	global clbListeners := ListenerController()
 
 	render() {
-		App.AddTab3("vtabs x15" . " Choose" . CONFIG.read("tabPos"), ["插件模式", curModuleProps.tabs*].append("控制中心"))
-		   .onChange((ctrl, _) => CONFIG.write("tabPos", ctrl.Value)),
-
-		App["tabs"].UseTab("插件模式")
-		FlowModes(App, modules.keys())	
-
-		curModuleProps.components.map(component => (App["tabs"].UseTab(1 + A_Index), component(App)))
-
-		App["tabs"].UseTab("控制中心")
-		ControlCenter(App)
-
-		App["tabs"].UseTab()
+		App.AddTab3("vtabs x15" . " Choose" . CONFIG.read("tabPos"), OrderedMap([
+			; main tab
+			"插件模式", () => FlowModes(App, modules.keys()),
+			
+			; additional tab components
+			curModuleProps.tabComponents.entries().map((entry) => [entry[1], () => entry[2](App)]),
+			
+			; control center
+			"控制中心", () => ControlCenter(App)
+		].flat()*))
 	}
 
-    return render()
+	return render()
 }
