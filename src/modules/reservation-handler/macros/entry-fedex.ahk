@@ -65,6 +65,7 @@ class FedexBookingEntry {
 
         ; workflow start
         this.start()
+
         isCheckedIn := ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["isCheckedIn.png"])
         if (!isCheckedIn) {
             this.profileEntry(infoObj["crewNames"], index)
@@ -179,6 +180,8 @@ class FedexBookingEntry {
 
     static dateTimeEntry(checkin, checkout, ETA, ETD, isCheckedIn) {
         ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
+
+        ; TODO: better to set nts to 1 as init
 
         ; fill-in checkin/checkout
         if (!isCheckedIn) {
