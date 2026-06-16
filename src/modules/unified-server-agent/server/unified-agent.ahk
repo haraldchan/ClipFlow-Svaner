@@ -133,13 +133,53 @@ class UnifiedAgent extends useServerAgent {
             Sleep(200)
         } until (!WinExist("OPERA Full Service Edition"))
 
-        ; RunWait("*RunAs " . A_ScriptDir . "\src\modules\unified-server-agent\server\pms-restarter.ahk")
-        Run("Z:\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow-SvanerTest-main\src\modules\unified-server-agent\server\pms-restarter.ahk")
-        WinWait("OPERA PMS")
-        loop{
+        ; RunWait("Z:\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow-SvanerTest-main\src\modules\unified-server-agent\server\pms-restarter.ahk")
+
+        BROWSER := "F:\360\360se6\Application\360se.exe"
+        PMS_URL := "https://wsh-opr-app1"
+        PMS_USERNAME := "FOHARALDC"
+        PMS_PASSWORD := "sxzc123456"
+
+        Run(BROWSER . " " . PMS_URL)
+        WinWait("OPERA Login")
+        WinActivate("OPERA Login")
+        Sleep(200)
+
+        ; log into opera
+        ; Click(129, 251)
+        ; Sleep(100)
+        Send("{TEXT}" . PMS_USERNAME)
+        Sleep(100)
+        Send("{Tab}")
+        Sleep(100)
+        Send("{TEXT}" . PMS_PASSWORD)
+        Sleep(100) 
+        loop 3 {
+            Send("{Tab}")
             Sleep(100)
-        } until (WinGetMinMax("OPERA PMS") == 1)
-        Sleep(1000)
+        }
+        Send("{Enter}")
+        utils.waitLoading(1000)
+
+        found := PmsImageFinder.find(IMAGES["pms-login.png"], 5)
+        if (!found) {
+            return
+        }
+        Sleep(200)
+        Click(found.outX, found.outY)
+
+        ; wait for PMS app
+        WinWait("ahk_class SunAwtFrame")
+        WinActivate("ahk_class SunAwtFrame")
+        Sleep(2000)
+        Send("!f")
+        Sleep(100)
+        Send("{Down}")
+        Sleep(100)
+        Send("{Enter}")
+        utils.waitLoading()
+        WinMaximize("ahk_class SunAwtFrame")
+        Sleep(100)
     }
 
 
