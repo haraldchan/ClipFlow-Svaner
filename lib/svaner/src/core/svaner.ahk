@@ -93,6 +93,8 @@ class Svaner {
      * prefixes: - "type:{type-name}": returns the first type matched control
      *           - "typeAll:{type-name}": returns all type matched control in an array.
      *           - "component:{component-name}": returns a component.
+     *           - "#{attribute}": returns an array of controls with the same attribute.
+     *           - "#{attribute}={value}": returns an array of controls with the same attribute value.
      * @returns {Gui.Control | Array<Gui.Control> | Component}
      */
     __Item[ctrlSearchCondition] {
@@ -113,7 +115,7 @@ class Svaner {
                 ; search component
                 case StringExt.startsWith(ctrlSearchCondition, "component:"):
                     return this.components[StrReplace(ctrlSearchCondition, "component:")]
-                
+
                 ; by attribute
                 case (StringExt.startsWith(ctrlSearchCondition, "#") && !InStr(ctrlSearchCondition, "=")):
                     attr := pipe(
@@ -122,7 +124,7 @@ class Svaner {
                     )(ctrlSearchCondition)
 
                     return GuiExt.getCtrlsByMatch(this.gui, ctrl => ctrl.attributes.HasOwnProp(attr))
-                
+
                 ; by attribute with matched value
                 case (StringExt.startsWith(ctrlSearchCondition, "#") && InStr(ctrlSearchCondition, "=")):
                     pair := pipe(
@@ -151,7 +153,7 @@ class Svaner {
     __parseOptions(optionString) {
         if (!InStr(optionString, "@") && !InStr(optionString, "#")) {
             return {
-                parsed: (this.devOpt.HasOwnProp("border") && this.devOpt.border == true) ? optionString . " Border " : optionString, 
+                parsed: (this.devOpt.HasOwnProp("border") && this.devOpt.border == true) ? optionString . " Border " : optionString,
                 callbacks: [],
                 attributes: {}
             }
@@ -187,12 +189,13 @@ class Svaner {
             }
         }
 
-        return { 
-            parsed: (this.devOpt.HasOwnProp("border") && this.devOpt.border == true) ? parsed . " Border " : parsed, 
+        return {
+            parsed: (this.devOpt.HasOwnProp("border") && this.devOpt.border == true) ? parsed . " Border " : parsed,
             callbacks: optCallbacks,
             attributes: attributes
         }
     }
+
 
     /**
      * Apply custom directives to control.
@@ -331,7 +334,7 @@ class Svaner {
     AddDateTime(options, dateFormat := "yyyy/MM/dd", depend?, key?) {
         parsedOptions := this.__parseOptions(options)
 
-        control := IsSet(depend) 
+        control := IsSet(depend)
             ? SvanerDateTime(this.gui, parsedOptions.parsed, dateFormat, depend, (IsSet(key) ? key : 0))
             : this.gui.AddDateTime(parsedOptions.parsed, dateFormat)
         this.__applyCallbackAndAttributes(control, parsedOptions.callbacks, parsedOptions.attributes)
@@ -365,8 +368,8 @@ class Svaner {
      * @returns {SvanerDropDownList | Gui.DDL} 
      */
     AddDDL(options, listOrDepend, key?) => this.AddDropDownList(options, listOrDepend, IsSet(key) ? key : 0)
-    
-    
+
+
     /**
      * Add a Edit/SvanerEdit control to Gui.
      * @param {String} options Options/Directives apply to the control.
@@ -438,7 +441,7 @@ class Svaner {
             if (linkInfo.base == Object.Prototype) {
                 anchorEl := Format(a, linkInfo.text, linkInfo.href, linkInfo.HasOwnProp("id") ? linkInfo.id : "")
                 linkText := Format(text, anchorEl)
-            } 
+            }
             else if (linkInfo is Array) {
                 anchorEls := []
                 for info in linkInfo {
@@ -468,7 +471,7 @@ class Svaner {
         parsedOptions := this.__parseOptions(options)
 
         control := listOrDepend is signal
-            ? SvanerListBox(this.gui, parsedOptions.parsed,, listOrDepend)
+            ? SvanerListBox(this.gui, parsedOptions.parsed, , listOrDepend)
             : this.gui.AddListBox(parsedOptions.parsed, listOrDepend)
         this.__applyCallbackAndAttributes(control, parsedOptions.callbacks, parsedOptions.attributes)
 
@@ -491,7 +494,7 @@ class Svaner {
             parsedItemOptions := options.HasOwnProp("itemOptions")
                 ? this.__parseOptions(options.itemOptions)
                 : { parsed: "", callbacks: [] }
-        } 
+        }
         else {
             ; Native ListView
             parsedLvOptions := this.__parseOptions(options)
@@ -810,7 +813,7 @@ class Svaner {
                 default:
                     this.ctrl := this.GuiObject.Add(this.ctrlType, this.options, this.formattedContent)
             }
-            
+
             this.ctrl.svanerWrapper := this
 
             ; add subscribe
@@ -937,7 +940,7 @@ class Svaner {
             if (key.base == Object.Prototype) {
                 index := key.HasOwnProp("index") ? key.index : A_Index
 
-                for k in key.keys {                    
+                for k in key.keys {
                     val := ""
                     switch {
                         case (k is Func):
@@ -1089,7 +1092,7 @@ class Svaner {
                 else {
                     this.ctrl.Value := this._traverse_get(this.key, this.depend.value) || 0
                 }
-                return 
+                return
             }
             else if (this.ctrl is Gui.ListView) {
                 ; update from checkStatusDepend

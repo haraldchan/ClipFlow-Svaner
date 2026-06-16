@@ -2,7 +2,7 @@
 
 class debugger extends signal {
 	notifyChange() {
-		if (ARConfig.useDevtoolsUI) {
+		if (SvanerConfig.useDevtoolsUI) {
 			; CALL_TREE.updateTimeStamp.set(A_Now . A_MSec)
 			DebuggerList.getLatest()
 		}

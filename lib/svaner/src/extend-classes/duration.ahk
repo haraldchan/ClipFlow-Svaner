@@ -4,20 +4,20 @@
  */
 class Duration {
     /**
-     * Patches Integer and String prototypes with duration methods if enabled in ARConfig.
+     * Patches Integer and String prototypes with duration methods if enabled in SvanerConfig.
      */
     static use() {
-        if (!ARConfig.useExtendClasses) {
+        if (!SvanerConfig.useExtendClasses) {
             return
         }
 
-        for method, enabled in ARConfig.enableExtendClasses.duration.integer.OwnProps() {
+        for method, enabled in SvanerConfig.enableExtendClasses.duration.integer.OwnProps() {
             if (enabled) {
                 Integer.Prototype.%method% := ObjBindMethod(this, method)
             }
         }
 
-        for method, enabled in ARConfig.enableExtendClasses.duration.string.OwnProps() {
+        for method, enabled in SvanerConfig.enableExtendClasses.duration.string.OwnProps() {
             if (enabled) {
                 String.Prototype.%method% := ObjBindMethod(this, method)
             }

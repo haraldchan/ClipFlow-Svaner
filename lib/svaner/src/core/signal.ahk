@@ -36,9 +36,9 @@ class signal {
         this.asMap := options.HasOwnProp("asMap") ? options.asMap : false
 
         ; initialize value
-        this.value := this.asMap ? this._mapify(initialValue) : initialValue
+        this._value := this.asMap ? this._mapify(initialValue) : initialValue
         this.initValue := this.value
-        this.prevValue := 0
+        this.prevValue := this.value
 
         ; subscribers
         this.subs := []
@@ -56,17 +56,21 @@ class signal {
             return
         }
 
-        if (ARConfig.debugMode && this.name && !(this is debugger)) {
+        if (SvanerConfig.debugMode && this.name && !(this is debugger)) {
             ; this.createDebugger := DebugUtils.createDebugger
             this.debugger := DebugUtils.createDebugger(this)
             DebuggerList.addDebugger(this.debugger)
 
-            ; if (InStr(this.debugger.value["fromFile"], "AddReactive\devtools\devtools-ui")) {
+            ; if (InStr(this.debugger._value["fromFile"], "AddReactive\devtools\devtools-ui")) {
             ;     this.debugger := false
             ; } else {
             ;     IsSet(CALL_TREE) && CALL_TREE.addDebugger(this.debugger)
             ; }
         }
+    }
+
+    value {
+        get => this._value
     }
 
     /**
@@ -80,9 +84,9 @@ class signal {
         }
         this.prevValue := this.value
 
-        this.value := newSignalValue is Func ? newSignalValue(this.value) : newSignalValue
+        this._value := newSignalValue is Func ? newSignalValue(this.value) : newSignalValue
         if (this.asMap) {
-            this.value := this._mapify(this.value)
+            this._value := this._mapify(this.value)
         }
 
         ; validates new value if it matches the Struct
@@ -116,7 +120,7 @@ class signal {
         }
 
         ; notify debugger
-        if (ARConfig.debugMode && this.name && this.debugger) {
+        if (SvanerConfig.debugMode && this.name && this.debugger) {
             this.debugger.notifyChange()
         }
     }
@@ -238,11 +242,14 @@ class signal {
 
 
     /**
-     * Interface for AddReactiveControl instances to subscribe.
-     * @param {AddReactive} AddReactiveControl 
+     * Interface for Svaner.Control instances to subscribe.
+     * @param {Svaner.Control} SvanerControl 
      */
-    addSub(AddReactiveControl) {
-        this.subs.Push(AddReactiveControl)
+    addSub(SvanerControl) {
+        if (ArrayExt.find(this.subs, ctrl => ctrl == SvanerControl)) {
+            return
+        }
+        this.subs.Push(SvanerControl)
     }
 
     /**
@@ -250,6 +257,9 @@ class signal {
      * @param {computed} computed 
      */
     addComp(computed) {
+        if (ArrayExt.find(this.comps, comp => comp == computed)) {
+            return
+        }
         this.comps.Push(computed)
     }
 
@@ -258,6 +268,9 @@ class signal {
      * @param {effect} effect
      */
     addEffect(effect) {
+        if (ArrayExt.find(this.effects, e => e.effectFn == effect.effectFn)) {
+            return
+        }
         this.effects.Push(effect)
     }
 

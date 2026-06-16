@@ -3,10 +3,10 @@
  */
 class ArrayExt {
     /**
-     * Patches Array prototype with enabled methods from ARConfig.
+     * Patches Array prototype with enabled methods from SvanerConfig.
      */
     static patch() {
-        for method, enabled in ARConfig.enableExtendMethods.array.OwnProps() {
+        for method, enabled in SvanerConfig.enableExtendMethods.array.OwnProps() {
             if (method == "sort" && enabled) {
                 Array.Prototype._merge := ObjBindMethod(this, "_merge")
             }

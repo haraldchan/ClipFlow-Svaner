@@ -4,10 +4,10 @@
  */
 class StringExt {
     /**
-     * Patches the String prototype with extended methods if enabled in ARConfig.
+     * Patches the String prototype with extended methods if enabled in SvanerConfig.
      */
     static patch() {
-        for method, enabled in ARConfig.enableExtendMethods.string.OwnProps() {
+        for method, enabled in SvanerConfig.enableExtendMethods.string.OwnProps() {
             if (enabled) {
                 String.Prototype.%method% := ObjBindMethod(this, method)
             }

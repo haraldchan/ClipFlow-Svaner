@@ -4,10 +4,10 @@
  */
 class GuiExt {
     /**
-     * Patches the Gui and ListView prototypes with extended methods if enabled in ARConfig.
+     * Patches the Gui and ListView prototypes with extended methods if enabled in SvanerConfig.
      */
     static patch() {
-        for method, status in ARConfig.enableExtendMethods.gui.OwnProps() {
+        for method, status in SvanerConfig.enableExtendMethods.gui.OwnProps() {
             if (method == "listview") {
                 for lvMethod, lvStatus in status.OwnProps() {
                     if (lvStatus) {
@@ -88,7 +88,7 @@ class GuiExt {
      * Returns the first control of a given type from a GUI.
      * @param {Gui} gui - The GUI object.
      * @param {string} ctrlType - The type of the control.
-     * @returns {Object} The control object.
+     * @returns {Gui.Control} The control object.
      * @throws {TypeError} If no control of the type is found.
      */
     static getCtrlByType(gui, ctrlType) {
@@ -104,7 +104,7 @@ class GuiExt {
      * Returns all controls of a given type from a GUI.
      * @param {Gui} gui - The GUI object.
      * @param {string} ctrlType - The type of the control.
-     * @returns {Array<Object>} Array of control objects.
+     * @returns {Array<Gui.Control>} Array of control objects.
      */
     static getCtrlByTypeAll(gui, ctrlType) {
         ctrlArray := []
@@ -122,7 +122,7 @@ class GuiExt {
      * Returns a component from a GUI by its name.
      * @param {Gui | Svaner} targetObj - The GUI/Svaner object.
      * @param {string} componentName - The name of the component.
-     * @returns {Object} The component object.
+     * @returns {Component} The component object.
      * @throws {TypeError} If the component is not found.
      */
     static getComponent(targetObj, componentName) {
@@ -138,7 +138,7 @@ class GuiExt {
      * Returns a control from a GUI by its text or by a predicate function on its text.
      * @param {Gui} gui - The GUI object.
      * @param {string|Func} text - The text to match or a predicate function.
-     * @returns {Object} The control object.
+     * @returns {Gui.Control} The control object.
      * @throws {ValueError} If no control with the text is found.
      */
     static getCtrlByText(gui, text) {
@@ -156,7 +156,7 @@ class GuiExt {
     /**
      * Returns the row numbers of checked items in a ListView control.
      * @param {Gui.ListView} LV - The ListView control.
-     * @returns {Array<number>} Array of checked row numbers.
+     * @returns {Array<Integer>} Array of checked row numbers.
      */
     static getCheckedRowNumbers(LV) {
         checkedRowNumbers := []
@@ -179,7 +179,7 @@ class GuiExt {
     /**
      * Returns the row numbers of focused items in a ListView control.
      * @param {Gui.ListView} LV - The ListView control.
-     * @returns {Array<number>} Array of focused row numbers.
+     * @returns {Array<Integer>} Array of focused row numbers.
      */
     static getFocusedRowNumbers(LV) {
         focusedRows := []

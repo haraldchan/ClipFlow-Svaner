@@ -1,16 +1,16 @@
 ; #Include "./components.ahk"
 #Include "./reactives.ahk"
 
-if (ARConfig.debugMode) {
+if (SvanerConfig.debugMode) {
     ; global CALL_TREE := CallTree()
 }
 
 DevToolsUI() {
-    if (!ARConfig.debugMode) {
+    if (!SvanerConfig.debugMode) {
         return
     }
 
-    ARConfig.useDevtoolsUI := true
+    SvanerConfig.useDevtoolsUI := true
 
     dtUI := Svaner({
         gui: {

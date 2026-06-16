@@ -4,10 +4,10 @@
  */
 class MapExt {
     /**
-     * Patches the Map prototype with extended methods if enabled in ARConfig.
+     * Patches the Map prototype with extended methods if enabled in SvanerConfig.
      */
     static patch() {
-        for method, enabled in ARConfig.enableExtendMethods.map.OwnProps() {
+        for method, enabled in SvanerConfig.enableExtendMethods.map.OwnProps() {
             if (enabled) {
                 Map.Prototype.%method% := ObjBindMethod(this, method)
             }
@@ -25,7 +25,7 @@ class MapExt {
         for k, v in _map {
             newArray.Push(k)
         }
- 
+
         return newArray
     }
 
@@ -42,6 +42,20 @@ class MapExt {
         }
 
         return newArray
+    }
+
+    /**
+     * Returns an Array of all [key, value] pairs.
+     * @returns {Array} [[key, value], [key, value] ...]
+     */
+    static entries(_map) {
+        entries := []
+
+        for k, v in _map {
+            entries.Push([k, v])
+        }
+
+        return entries
     }
 
     /**

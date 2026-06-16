@@ -4,10 +4,10 @@
  */
 class NumberExt {
     /**
-     * Patches the Integer prototype with extended methods if enabled in ARConfig.
+     * Patches the Integer prototype with extended methods if enabled in SvanerConfig.
      */
     static patch() {
-        for method, enabled in ARConfig.enableExtendMethods.integer.OwnProps() {
+        for method, enabled in SvanerConfig.enableExtendMethods.integer.OwnProps() {
             if (enabled) {
                 Integer.Prototype.%method% := ObjBindMethod(this, method)
             }

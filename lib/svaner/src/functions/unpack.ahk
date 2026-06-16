@@ -3,13 +3,13 @@
  * 
  * ```
  * arr := [1, 2, 3]
- * unpack([&a, &b, &c], arr)  ; assigns: a := 1, b := 2, c := 3
+ * unpack(arr, [&a, &b, &c])  ; assigns: a := 1, b := 2, c := 3
  * 
  * staff := { name: "John", age: 33 }
- * unpack({ name: &name, age: &age }, staff)  ; assigns: name := "John", age := 33
+ * unpack(staff, { name: &name, age: &age })  ; assigns: name := "John", age := 33
  * 
  * nested := { user: { name: "Jane", location: { city: "Paris" } } }
- * unpack({ user: { name: &userName, location: { city: &city } } }, nested)
+ * unpack(nested, { user: { name: &userName, location: { city: &city } } })
  * ; assigns: userName := "Jane", city := "Paris"
  * ```
  * 

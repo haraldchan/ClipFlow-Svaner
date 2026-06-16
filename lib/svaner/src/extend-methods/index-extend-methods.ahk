@@ -5,7 +5,7 @@
 #Include extend-map-methods.ahk
 
 patchMethods() {
-    if (!ARConfig.useExtendMethods) {
+    if (!SvanerConfig.useExtendMethods) {
         return
     }
 
@@ -15,8 +15,8 @@ patchMethods() {
     GuiExt.patch()
     MapExt.patch()
     
-    if (ARConfig.enableExtendMethods.any.HasOwnProp("satisfies")) {
-        if (ARConfig.enableExtendMethods.any.satisfies) {
+    if (SvanerConfig.enableExtendMethods.any.HasOwnProp("satisfies")) {
+        if (SvanerConfig.enableExtendMethods.any.satisfies) {
             Struct.patch()
         }
     }
