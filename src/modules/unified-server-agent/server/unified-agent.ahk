@@ -133,8 +133,6 @@ class UnifiedAgent extends useServerAgent {
             Sleep(200)
         } until (!WinExist("OPERA Full Service Edition"))
 
-        ; RunWait("Z:\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow-SvanerTest-main\src\modules\unified-server-agent\server\pms-restarter.ahk")
-
         BROWSER := "F:\360\360se6\Application\360se.exe"
         PMS_URL := "https://wsh-opr-app1"
         PMS_USERNAME := "FOHARALDC"
@@ -146,8 +144,6 @@ class UnifiedAgent extends useServerAgent {
         Sleep(200)
 
         ; log into opera
-        ; Click(129, 251)
-        ; Sleep(100)
         Send("{TEXT}" . PMS_USERNAME)
         Sleep(100)
         Send("{Tab}")
@@ -161,7 +157,7 @@ class UnifiedAgent extends useServerAgent {
         Send("{Enter}")
         utils.waitLoading(1000)
 
-        found := PmsImageFinder.find(IMAGES["pms-login.png"], 5)
+        found := PmsImageFinder.find("pms-login.png", 5)
         if (!found) {
             return
         }
@@ -169,8 +165,8 @@ class UnifiedAgent extends useServerAgent {
         Click(found.outX, found.outY)
 
         ; wait for PMS app
-        WinWait("ahk_class SunAwtFrame")
-        WinActivate("ahk_class SunAwtFrame")
+        WinWait("OPERA PMS")
+        WinActivate("OPERA PMS")
         Sleep(2000)
         Send("!f")
         Sleep(100)
