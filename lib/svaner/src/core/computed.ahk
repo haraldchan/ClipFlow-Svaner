@@ -74,8 +74,8 @@ class computed extends signal {
                 values.Push(this.signal.value)
             }
         }
-
-        this._value := this.asMap ? this._mapify(this.mutation.Call(values*)) : this.mutation.Call(values*)
+        
+        this._value := this.asMap ? this._mapify(mutation(values*)) : mutation(values*)
 
         ; debug mode
         if (!IsSet(DebugUtils) && !IsSet(debugger)) {
@@ -126,10 +126,11 @@ class computed extends signal {
             else {
                 values.Push(subbedSignal.value)
             }
-
-            this._value := this.asMap ? this._mapify(this.mutation.Call(values*)) : this.mutation.Call(values*)
         }
-
+        
+        m := this.mutation
+        this._value := this.asMap ? this._mapify(m(values*)) : m(values*)
+        
         ; notify all subscribers to update
         for ctrl in this.subs {
             ctrl.update(this)
