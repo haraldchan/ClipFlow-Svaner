@@ -22,22 +22,25 @@ ServerAgentPanel(App) {
         expiration: 480,
         collectRange: 15,
         safePost: true,
-        isListening: isListening
+        isListening: isListening,
+        isAutoRestart: CONFIG.read("isAutoRestart")
     })
 
     onMount() {
-        serverOnlineStatus := JSON.parse(FileRead(agent.onlineStatusIndicator, "utf-8"),, false)
-        if (serverOnlineStatus.isRestart) {
+        serverOnlineStatus := JSON.parse(FileRead(agent.onlineStatusIndicator, "utf-8"), , false)
+        ; recover opera pms if is set to auto restart
+        if (agent.isAutoRestart && serverOnlineStatus.isRestart) {
+            agent.recoverPMS()
             isListening.set("在线")
         }
     }
 
     render() {
         App.AddText("x30 y+10 h40 w580", "ProfileModifyNext Server").SetFont("s13 q5 Bold")
-        
+
         ; server
         ServiceConfigs(App, CONFIG.read("serviceEnabled"), isListening)
-        
+
         ; client
         ClientPosts(App, CONFIG.read("clientEnabled"))
 
