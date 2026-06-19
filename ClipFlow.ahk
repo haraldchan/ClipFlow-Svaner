@@ -15,7 +15,7 @@ if (!A_IsAdmin) {
 }
 
 ; global consts
-VERSION := "1.9.11"
+VERSION := "1.9.12"
 POPUP_TITLE := "ClipFlow " . VERSION
 WIN_GROUP := ["ahk_class SunAwtFrame"]
 IMAGES := useImages(A_ScriptDir . "\assets")
@@ -42,7 +42,8 @@ ClipFlowApp := Svaner({
 		name: "微软雅黑"
 	},
 	events: {
-		close: (*) => utils.quitApp("ClipFlow", POPUP_TITLE, WIN_GROUP)
+		close: (*) => utils.quitApp("ClipFlow", POPUP_TITLE, WIN_GROUP),
+		escape: app => app.Hide()
 	}
 })
 
@@ -67,8 +68,4 @@ F11:: {
 	CONFIG.createLocal()
 
 	utils.cleanReload(WIN_GROUP)
-}
-#Hotif WinActive(POPUP_TITLE)
-Esc:: {
-	ClipFlowApp.Hide()
 }
