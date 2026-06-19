@@ -2,6 +2,7 @@ class UnifiedAgent extends useServerAgent {
     __New(serverSettings) {
         super.__New(serverSettings)
         this.qmPool := serverSettings.HasOwnProp("qmPool") ? serverSettings.qmPool : ""
+        this.isAutoRestart := serverSettings.HasOwnProp("isAutoRestart") ? serverSettings.isAutoRestart : true
         this.popupTitle := "Unified Agent"
 
         ; toggle listening status. this needs to be async due to blocking loop when listening is on.
@@ -22,6 +23,19 @@ class UnifiedAgent extends useServerAgent {
         this.cleanup(this.qmPool)
     }
 
+
+    /**
+     * <Agent>
+     * @param {String} postPath full post json file path
+     * @param {"PENDING"|"COLLECTED"|"MODIFIED"|"ABORTED"|"RETRY"|"RESENT"|"ABANDONED"|"NOTFOUND"|"ONLINE"} newStatus
+     */
+    updatePostStatus(postPath, newStatus) => super.updatePostStatus(postPath, newStatus)
+
+
+    /**
+     * <Client | Agent>
+     * @param {String} pool 
+     */
     cleanup(pool := this.pool) {
         exp := this.expiration
         loop files (pool . "\*.json") {
@@ -37,6 +51,10 @@ class UnifiedAgent extends useServerAgent {
         }
     }
 
+
+    /**
+     * <Agent>
+     */
     abort() {
         serverOnlineStatus := JSON.parse(FileRead(this.onlineStatusIndicator, "utf-8"),, false)
         if (serverOnlineStatus.activeServer != A_ComputerName) {
@@ -47,12 +65,18 @@ class UnifiedAgent extends useServerAgent {
         this.setOnlineStatus(false, true)
 
         ; change posts status
-        this.updatePostStatus(this.currentHandlingPost, "ABORTED")
+        this.updatePostStatus(this.currentHandlingPost, this.isAutoRestart ? "RETRY" : "ABORTED")
         this.resetPostsToPending()
 
-        ; retart a PMS session
-        this.restartPMS()
+        ; close all pms win
+        loop {
+            if (WinExist("OPERA Full Service Edition")) {
+                WinKill("OPERA Full Service Edition")
+            }
+            Sleep(200)
+        } until (!WinExist("OPERA Full Service Edition"))
     }
+
 
     /**
      * <Agent>
@@ -67,6 +91,7 @@ class UnifiedAgent extends useServerAgent {
             BlockInput(false)
         }
     }
+
 
     /**
      * <Agent>
@@ -124,15 +149,7 @@ class UnifiedAgent extends useServerAgent {
     /**
      * <Agent>
      */
-    restartPMS() {
-        ; close all pms win
-        loop {
-            if (WinExist("OPERA Full Service Edition")) {
-                WinKill("OPERA Full Service Edition")
-            }
-            Sleep(200)
-        } until (!WinExist("OPERA Full Service Edition"))
-
+    recoverPMS() {
         BROWSER := "F:\360\360se6\Application\360se.exe"
         PMS_URL := "https://wsh-opr-app1"
         PMS_USERNAME := "FOHARALDC"
@@ -294,6 +311,7 @@ class UnifiedAgent extends useServerAgent {
         this.currentHandlingPost := ""
 
     }
+
 
     /**
      * <Client> Send post to pool
