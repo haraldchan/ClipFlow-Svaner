@@ -121,7 +121,8 @@
 			"host": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本\\ClipFlow-server-posts",
 			"pmnPool": "\\pmn-pool",
 			"qmPool": "\\qm-pool",
-			"testPool": "\\test-pool"
+			"testPool": "\\test-pool",
+			"isAutoRestart": true
 		}
 	}
 }
