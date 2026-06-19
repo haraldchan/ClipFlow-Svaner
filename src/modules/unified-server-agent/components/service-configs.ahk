@@ -14,6 +14,7 @@ ServiceConfigs(App, enabled, isListening) {
             host: CONFIG.read(["serverAgent", "serverConfig", "host"]),
             pmnPool: CONFIG.read("pmnPool"),
             qmPool: CONFIG.read("qmPool"),
+            isAutoRestart: CONFIG.read("isAutoRestart")
         }
     })
 
@@ -24,6 +25,15 @@ ServiceConfigs(App, enabled, isListening) {
         agent.collectRange := curConfig.collectRange
         agent.pool := curConfig.serverConfig.host . curConfig.serverConfig.pmnPool
         agent.qmPool := curConfig.serverConfig.host . curConfig.serverConfig.qmPool
+        agent.isAutoRestart := curConfig.serverConfig.isAutoRestart
+
+        ; if (curConfig.serverConfig.host != prevConfig.serverConfig.host) {
+            CONFIG.write(["serverAgent", "serverConfig", "host"], curConfig.serverConfig.host)
+        ; }
+
+        ; if (curConfig.serverConfig.isAutoRestart != prevConfig.serverConfig.isAutoRestart) {
+            CONFIG.write("isAutoRestart", curConfig.serverConfig.isAutoRestart)
+        ; }
     }
 
     effect(isListening, cur => (
@@ -51,41 +61,10 @@ ServiceConfigs(App, enabled, isListening) {
         }
 
         agentConfig.update(["serverConfig", "host"], dir)
-        CONFIG.write(["serverAgent", "serverConfig", "host"], dir)
     }
 
-    handleInHouseWindowReset(*) {
-        if (!ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["error.PNG"])) {
-            return
-        }
-
-        SetTimer(, 0)
-        PMN_FillIn.end()
-        ; close all windows
-        loop {
-            Send("!w")
-            Sleep(100)
-            Send("{Up}")
-            Sleep(100)
-            Send("{Enter}")
-            Sleep(100)
-            Send("!c")
-            utils.waitLoading()
-            Send("{Esc}")
-            utils.waitLoading()
-
-            if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-logo.PNG"])) {
-                break
-            }
-        }
-
-        ; restore In-house window
-        Send("!f")
-        utils.waitLoading()
-        Send("{Down}")
-        Sleep(100)
-        Send("{Enter}")
-        utils.waitLoading()
+    handleIsAutoRestartToggle(ctrl, _) {
+        agentConfig.update("isAutoRestart", ctrl.Value)
     }
 
     App.defineDirectives(
@@ -133,10 +112,14 @@ ServiceConfigs(App, enabled, isListening) {
                    .onChange((ctrl, _) => agentConfig.update("collectRange", ctrl.Value)),
                 App.AddText("x+5 h20 0x200", "分钟"),
                 ; server configs
-                App.AddText("@use:sc-text yp+30", "代行请求池路径"),
+                App.AddText("@use:sc-text", "代行请求池路径"),
                 App.AddEdit("vserver-host w140 h20 x+1 0x200 ReadOnly", "{1}", agentConfig, [v => v.serverConfig.host])
                    .onChange((ctrl, _) => agentConfig.update("host", ctrl.Value)),
-                App.AddButton("x+1 w20 h20", "🗀").onClick(handleServerHostDirSelect)
+                App.AddButton("x+1 w20 h20", "🗀").onClick(handleServerHostDirSelect),
+                ; service restart option
+                App.AddText("@use:sc-text", "错误自动重启"),
+                App.AddCheckBox("vauto-restart h20 x+1 @text:align-center Checked", "启用")
+                   .onClick(handleIsAutoRestartToggle)
             ]
         )
     )
