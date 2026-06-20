@@ -82,7 +82,7 @@ class signal {
         if (!this.forceUpdate && newSignalValue == this.value) {
             return
         }
-        this.prevValue := this.value
+        this.prevValue := this.prevValue := this.value is Primitive ? this.value : MapExt.deepClone(this.value)
 
         this._value := newSignalValue is Func ? newSignalValue(this.value) : newSignalValue
         if (this.asMap) {
@@ -135,7 +135,7 @@ class signal {
             throw TypeError(Format("update can only handle Array/Object/Map; `n`nCurrent Type: {2}", Type(newValue)))
         }
 
-        updater := this.value
+        updater := MapExt.deepClone(this.value)
         if (key is Array) {
             this._setExactMatch(key, updater, newValue)
         } else {

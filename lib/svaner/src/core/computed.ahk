@@ -107,7 +107,8 @@ class computed extends signal {
         if (!this.forceUpdate && subbedSignal.value == this.value) {
             return
         }
-        this.prevValue := this.value
+        
+        this.prevValue := this.value is Primitive ? this.value : MapExt.deepClone(this.value)
 
         values := []
         if (this.signal is Array) {
