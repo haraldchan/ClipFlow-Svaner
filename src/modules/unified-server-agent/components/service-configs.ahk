@@ -16,7 +16,7 @@ ServiceConfigs(App, enabled, isListening) {
             qmPool: CONFIG.read("qmPool"),
             isAutoRestart: CONFIG.read("isAutoRestart")
         }
-    })
+    }, { name: "agentConfig" })
 
     effect(agentConfig, updateServerAgentConfig)
     updateServerAgentConfig(curConfig, prevConfig) {
@@ -27,13 +27,13 @@ ServiceConfigs(App, enabled, isListening) {
         agent.qmPool := curConfig.serverConfig.host . curConfig.serverConfig.qmPool
         agent.isAutoRestart := curConfig.serverConfig.isAutoRestart
 
-        ; if (curConfig.serverConfig.host != prevConfig.serverConfig.host) {
+        if (curConfig.serverConfig.host != prevConfig.serverConfig.host) {
             CONFIG.write(["serverAgent", "serverConfig", "host"], curConfig.serverConfig.host)
-        ; }
+        }
 
-        ; if (curConfig.serverConfig.isAutoRestart != prevConfig.serverConfig.isAutoRestart) {
+        if (curConfig.serverConfig.isAutoRestart != prevConfig.serverConfig.isAutoRestart) {
             CONFIG.write("isAutoRestart", curConfig.serverConfig.isAutoRestart)
-        ; }
+        }
     }
 
     effect(isListening, cur => (
@@ -118,7 +118,7 @@ ServiceConfigs(App, enabled, isListening) {
                 App.AddButton("x+1 w20 h20", "🗀").onClick(handleServerHostDirSelect),
                 ; service restart option
                 App.AddText("@use:sc-text", "错误自动重启"),
-                App.AddCheckBox("vauto-restart h20 x+1 @text:align-center Checked", "启用")
+                App.AddCheckBox("vauto-restart h20 x+1 @text:align-center", "启用")
                    .onClick(handleIsAutoRestartToggle)
             ]
         )
