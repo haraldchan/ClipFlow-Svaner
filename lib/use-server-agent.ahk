@@ -32,6 +32,15 @@ class useServerAgent {
 
         this.onlineStatusIndicator := this.pool . "\online-status.json"
 
+        /**
+         * @typedef OnlineStatus
+         * @property {true | false} isOnline
+         * @property {true | false} isRestart
+         * @property {String} activeServer
+         */
+        /**
+         * @type {OnlineStatus}
+         */
         this.onlineStatus := {
             isOnline: false,
             isRestart: false,
@@ -83,9 +92,10 @@ class useServerAgent {
      * @param { true | false } isOn
      * @param { true | false } isRestarting
      */
-    setOnlineStatus(isOn, isRestarting := false) {        
+    setOnlineStatus(isOn, isRestarting := false) {
         this.onlineStatus.isOnline := isOn
         this.onlineStatus.isRestart := isRestarting
+        this.onlineStatus.activeServer := isOn ? A_ComputerName : ""
 
         f := FileOpen(this.onlineStatusIndicator, "w", "utf-8")
         f.Write(JSON.stringify(this.onlineStatus))
@@ -188,10 +198,10 @@ class useServerAgent {
     POST(content, pool := this.pool) {
         if (this.safePost) {
             /**
-             * @property {true | false} isOnline
-             * @property {String} serverName
+             * @type {OnlineStatus}
              */
             serverOnlineStatus := JSON.parse(FileRead(this.onlineStatusIndicator, "utf-8"),, false)
+            
             if (serverOnlineStatus is Error) {
                 MsgBox("Service status error.",, "4096 T2 icon!")
                 return false
