@@ -32,7 +32,8 @@ UseDictTest(App) {
             return
         }
 
-        region.set(dict.getCountryCode(regionName))
+        ; region.set(dict.getCountryCode(regionName))
+        region.set(dict.getCountryCodeAlpha3(regionName))
     }
 
     province := signal("")
@@ -81,7 +82,7 @@ UseDictTest(App) {
             {
                 fontOptions: "bold",
                 groupbox: {
-                    title: "地区代码（ISO 3166-1 alpha-2）",
+                    title: "地区代码（ISO 3166-1 alpha-3）",
                     options: "vcountry-code Section @align[x]:pinyin-name y+5 w230 r4"
                 },
             },

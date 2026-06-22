@@ -19,6 +19,10 @@ class useDict {
         this.regionISO := JSON.parse(FileRead(this.DICT_PATH . "\region-iso.json", "UTF-8"))
         this.regionISO.Default := ""
 
+        list := JSON.parse(FileRead(this.DICT_PATH . "\iso-3166-1.json", "UTF-8"))
+        this.regionISOalpha3 := Map(list.map(region => [region["alpha3"], region["nameCN"]]).flat()*)
+        this.regionISOalpha3.Default := ""
+
         this.provinces := JSON.parse(FileRead(this.DICT_PATH . "\provinces.json", "UTF-8"))
         this.provinces.Default := ""
         this.provincesById := JSON.parse(FileRead(this.DICT_PATH . "\province-by-id.json", "UTF-8"))
@@ -187,6 +191,7 @@ class useDict {
      * @returns {String} 
      */
     getCountryCode(country) => this.regionISO[country]
+    getCountryCodeAlpha3(country) => this.regionISOalpha3[country]
     
 
     /**
