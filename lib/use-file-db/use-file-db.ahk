@@ -3,9 +3,22 @@ class useFileDB {
 	 * @param {Object} dbConfig 
 	 */
 	__New(dbConfig) {
-		this.main := dbConfig.main,
-			this.archive := dbConfig.HasOwnProp("archive") ? dbConfig.archive : ""
+		this.name := dbConfig.HasOwnProp("name") ? dbConfig.name : ""
+		this.main := dbConfig.main
+		if (!DirExist(this.main)) {
+			DirCreate(this.main)
+		}
+
+		this.archive := dbConfig.HasOwnProp("archive") ? dbConfig.archive : ""
+		if (!DirExist(this.archive)) {
+			DirCreate(this.archive)
+		}
+
 		this.backup := dbConfig.HasOwnProp("backup") ? dbConfig.backup : ""
+		if (!DirExist(this.backup)) {
+			DirCreate(this.backup)
+		}
+
 		this.cleanPeriodDays := dbConfig.HasOwnProp("cleanPeriodDays") ? dbConfig.cleanPeriodDays : 180
 		this.cacheKey := dbConfig.HasOwnProp("cacheKey") ? dbConfig.cacheKey : ""
 
@@ -225,13 +238,6 @@ class useFileDB {
 
 		return archiveData
 	}
-
-	; restoreRecent() {
-	; 	recent := JSON.parse(FileRead(this.backup . "\recent.json", "UTF-8"))
-	; 	for snippet in recent {
-	; 		this.add(JSON.stringify(snippet))
-	; 	}
-	; }
 
 	restoreArchiveOneDay(restoreDate) {
 		monthFolder := "\" . SubStr(restoreDate, 1, 6)
