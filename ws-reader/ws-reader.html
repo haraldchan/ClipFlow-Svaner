@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>ClipFlow 离线证件读取器</title>
+    <link rel="stylesheet" href="./ws-reader.css">
+</head>
+
+<body>
+    <main class="layout">
+        <div class="icon-title">
+            <img width="50" height="50" src="../assets/CFicon.jpg" alt="cf-icon">
+            <div style="padding-left: 10px;">
+                <p class="icon-title-text">ClipFlow WS Reader</p>
+                <p style="color: gray;">v0.0.1</p>
+            </div>
+        </div>
+
+        <div class="passport-card">
+
+            <div class="card-header">
+                <h2>证 件 登 记</h2>
+                <button class="connection-btn status-disconnected">
+                    未连接
+                </button>
+            </div>
+
+            <div class="content">
+                <div class="photo-panel">
+                    <img class="passport-photo" src="./no-avatar.png" alt="Passport Photo">
+                </div>
+
+                <div class="fields">
+
+                    <div class="field field-span-2">
+                        <label>全名</label>
+                        <input type="text" id="fullname" value="JOHN SMITH">
+                    </div>
+
+                    <div class="field">
+                        <label>姓氏</label>
+                        <input type="text" id="lastname" value="SMITH">
+                    </div>
+
+                    <div class="field">
+                        <label>名字</label>
+                        <input type="text" id="firstname" value="JOHN">
+                    </div>
+
+                    <div class="field">
+                        <label>房号</label>
+                        <input type="text" id="room-num">
+                    </div>
+
+                    <div class="field">
+                        <label>电话</label>
+                        <input type="text" id="tel">
+                    </div>
+
+                    <div class="field">
+                        <label>证件号码</label>
+                        <input type="text" id="id-num" value="P123456789">
+                    </div>
+
+                    <div class="field">
+                        <label>证件类型</label>
+                        <select id="id-type">
+                            <option>Foreign Passport</option>
+                            <option>Mainland ID Card</option>
+                            <option>Hong Kong Permit</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label>性别</label>
+                        <select id="gender">
+                            <option>男</option>
+                            <option>女</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label>出生日期</label>
+                        <input type="date" id="birthday" value="1990-01-01">
+                    </div>
+
+                    <div class="field">
+                        <label>旅客类型</label>
+                        <select id="guest-type">
+                            <option>内地旅客</option>
+                            <option>港澳台旅客</option>
+                            <option>国外旅客</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label>国籍/地区</label>
+                        <select id="region">
+                            <option>USA</option>
+                            <option>CHN</option>
+                            <option>GBR</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label>证件有效期</label>
+                        <input type="date" id="valid-date" value="2030-12-31">
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="action-bar">
+            <button class="btn btn-secondary" id="read-btn">读取证件</button>
+            <button class="btn btn-secondary" id="scan-btn">扫描证件</button>
+            <button class="btn btn-primary" id="send-btn">发  送</button>
+        </div>
+    </main>
+
+    <script src="./ws-reader.js"></script>
+</body>
+
+</html>
