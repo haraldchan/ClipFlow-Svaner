@@ -50,12 +50,11 @@ ServiceConfigs(App, enabled, isListening) {
 
         ; reset previous collected posts(after unexpected reload)
         agent.resetPostsToPending()
-        
         isListening.set("在线")
     }
 
     handleServerHostDirSelect(*) {
-        dir := FileSelect("D",, "选择代行任务池文件夹")
+        dir := FileSelect("D", , "选择代行任务池文件夹")
         if (!dir) {
             return
         }
@@ -70,6 +69,10 @@ ServiceConfigs(App, enabled, isListening) {
     App.defineDirectives(
         "@use:sc-text", "xs15 w100 h20 yp+25 0x200"
     )
+
+    onMount() {
+        App["auto-restart"].Value := CONFIG.read(["serverAgent", "serverConfig", "isAutoRestart"])
+    }
 
     comp.render := this => this.Add(
         StackBox(
@@ -124,5 +127,8 @@ ServiceConfigs(App, enabled, isListening) {
         )
     )
 
-    return comp.render()
+    return (
+        comp.render(),
+        onMount()
+    )
 }
