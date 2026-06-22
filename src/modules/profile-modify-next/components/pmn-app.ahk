@@ -103,6 +103,8 @@ PMN_App(App, moduleTitle, db, identifier) {
         callback: (*) => handleCaptured(identifier)
     })
     handleCaptured(identifier) {
+        db := ProfileModifyNext.db
+
         if (!InStr(A_Clipboard, identifier)) {
             return
         }
@@ -153,6 +155,8 @@ PMN_App(App, moduleTitle, db, identifier) {
     }
 
     handleGuestInfoUpdateFromAdd(captured) {
+        db := ProfileModifyNext.db
+
         recentGuests := db.load()
         for guest in recentGuests {
             if (guest["idNum"] == captured["idNum"]) {
@@ -166,6 +170,8 @@ PMN_App(App, moduleTitle, db, identifier) {
     }
 
     handleGuestInfoUpdateFromMod(updater) {
+        db := ProfileModifyNext.db
+        
         recentGuests := db.load(, , 60 * 24)
         matchedGuest := Map()
         items := updater.keys()
@@ -214,7 +220,10 @@ PMN_App(App, moduleTitle, db, identifier) {
         handleListContentUpdate()
     }
 
+    effect(ProfileModifynext.usingDB, handleListContentUpdate)
     handleListContentUpdate(*) {
+        db := ProfileModifyNext.db
+
         colTitles := App["guest-profile-list"].svanerWrapper.titleKeys
         useListPlaceholder(listContent, colTitles, "Loading...")
 
@@ -445,42 +454,41 @@ PMN_App(App, moduleTitle, db, identifier) {
 
 
     render() {
-        App.AddGroupBox("Section y+20 w685 h410", "")
+        App.AddGroupBox("Section y+20 w685 h420", "")
         App.AddText("xp15", moduleTitle . " ⓘ ").onClick((*) => PMN_Settings(settings))
-        
+
         ; agent mode
         App.AddCheckBox("vdelegate-check-box x+10 Disabled", "后台代行", { check: isDelegate })
-           .bind()
-           .onClick(handleDelegateActivate)
+            .bind()
+            .onClick(handleDelegateActivate)
         App.AddText("vconnection-status x+20 w80 Hidden", " {1}", serverConnection)
-        
+
         ; datetime
         App.AddDateTime("vdate xs15 yp+25 w90 h25", "yyyy/MM/dd")
-           .onChange((ctrl, _) => (
+            .onChange((ctrl, _) => (
                 queryFilter.update("date", FormatTime(ctrl.Value, "yyyyMMdd"))
                 handleListContentUpdate()
-        )),
-        
-        ; search conditions
-        App.AddDDL("x+10 w80 Choose2", searchByMap.keys())
-           .onChange((ctrl, _) => searchBy.set(searchByMap[ctrl.Text]))
-        
+            )),
+            ; search conditions
+            App.AddDDL("x+10 w80 Choose2", searchByMap.keys())
+            .onChange((ctrl, _) => searchBy.set(searchByMap[ctrl.Text]))
+
         ; search box
         App.AddEdit("vsearchBox x+5 w125 h25")
-           .onBlur((ctrl, _) => queryFilter.update("search", Trim(ctrl.Value)))
-        
+            .onBlur((ctrl, _) => queryFilter.update("search", Trim(ctrl.Value)))
+
         ; range
         App.AddText("x+10 h25 0x200", "最近")
         App.AddEdit("vrange Number x+1 w30 h25", queryFilter.value["range"])
-           .onChange((ctrl, _) => queryFilter.update("range", !ctrl.Value ? 60 * 24 : ctrl.Value))
+            .onChange((ctrl, _) => queryFilter.update("range", !ctrl.Value ? 60 * 24 : ctrl.Value))
         App.AddText("x+1 h25 0x200", "分钟")
-        
+
         ; refresh/fill
         App.AddButton("vrefresh x+10 w80 h25", "刷 新(&R)").onClick(handleRefresh)
         App.AddButton("vfillin x+5 w80 h25 Default", "{1}", fillBtnText)
-           .onClick(fillPmsProfile)
-           .onContextMenu((*) => settings.update("fillOverwrite", o => !o))
-        
+            .onClick(fillPmsProfile)
+            .onContextMenu((*) => settings.update("fillOverwrite", o => !o))
+
         ; qm2 agent
         App.AddButton("vqm2-agent x+5 w80 h25 Disabled", "&QM2 Agent").onClick(showQm2Panel)
 
@@ -492,14 +500,17 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         ; waterfall controls
         Show(() => [
-            App.AddCheckBox("vselect-all-btn Hidden w80 h20 @align[x]:date y+5", "全选 (&A)"),
-            App.AddText("Hidden h20 x+15 0x200", "Party: "),
-            App.AddEdit("vparty-num Hidden x+1 w100 h20", "")
+            App.AddCheckBox("vselect-all-btn Hidden w80 h25 @align[x]:date y+5", "全选 (&A)"),
+            App.AddText("Hidden h25 x+15 0x200", "Party: "),
+            App.AddEdit("vparty-num Hidden x+1 w100 h25", "")
         ], searchBy, cur => cur == "waterfall")
+
+        ; db selector(local/unc)
+        DBSelector(App)
     }
 
     return (
-        render(), 
+        render(),
         onMount()
     )
 }
