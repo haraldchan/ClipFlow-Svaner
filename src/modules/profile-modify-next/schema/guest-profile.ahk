@@ -79,7 +79,7 @@ ProfileHkMoTw := Struct({
  * @property {String} country
  * @property {String} fileName
  * @property {"男" | "女"} gender
- * @property {"国外游客"} guestType
+ * @property {"国外旅客"} guestType
  * @property {String} idNum
  * @property {String} idType
  * @property {String} identifier
