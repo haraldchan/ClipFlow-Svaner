@@ -34,7 +34,7 @@ async function findService() {
 			})(`ws://127.0.0.1:${port}`);
 
 			console.log(`Found service on ${port}`);
-			return { port, socket: ws };
+			return { port, ws };
 		} catch {
 			// try next port
 		}
@@ -46,7 +46,8 @@ async function findService() {
 async function connectOrDisconnect() {
 	if (socket === null || socket.readyState === WebSocket.CLOSED) {
 		try {
-			const { port, socket } = await findService();
+			const { port, ws } = await findService();
+			socket = ws;
 			connBtn.textContent = '● 已连接';
 			connBtn.classList.replace('status-connecting', 'status-connected');
 		} catch (error) {
@@ -71,6 +72,8 @@ async function connectOrDisconnect() {
 		};
 	} else if (socket.readyState === WebSocket.OPEN) {
 		socket.close();
+		connBtn.textContent = '✖ 已断开连接';
+		connBtn.classList.replace('status-connected', 'status-disconnected');
 	}
 }
 
@@ -93,46 +96,42 @@ const validDate = document.getElementById('valid-date');
 function handleMessageDisplay(data) {
 	currentData = data;
 
-	passportPhotoImg.src = data.data.curPhoto
-	fullName.value = data.data.name;
-	lastName.value = data.data.lastName;
-	firstName.value = data.data.firstName;
+	passportPhotoImg.src = `data:image/jpeg;base64,${data.data.curPhoto}`
+	fullName.value = data.data.name ?? "";
+	lastName.value = data.data.lastName ?? "";
+	firstName.value = data.data.firstName ?? "";
 	idNum.value = data.data.cardNo;
 	gender.selectedIndex = data.data.sex - 1;
 	birthday.value = data.data.birthday
 	validDate.value = data.data.validDate;
 }
-handleMessageDisplay({
-    code: 0, // if success
-    command: "scan",      // can only use "scan"
-    data: {
-        address:   "",
-        adminDivision: "",
-        birthday:  "1990-03-30", // yyyy-MM-dd,
-        cardNo:    "235434534",
-        cardType:  "14", // 14=foreign passport
-        curPhoto:  "awf", // base64 photo for passfoto
-        firstName: "mookie",
-        lastName:  "bets",
-        nationalityArea: "MYS", // iso-3166-1 alpha3
-        photo:     "",
-        guestType: "300", // numbered key
-        name:      "bets mookie", // full hanzi name
-        nation:    "",
-        sex:       "2", // 1=male, 2=female
-        signDate:  "--",
-        signOrg:   "",
-        signPlace: "string",
-        validDate: "1999-12-12"
-    },
-    message: ""
-})
+// handleMessageDisplay({
+//     code: 0, // if success
+//     command: "scan",      // can only use "scan"
+//     data: {
+//         address:   "",
+//         adminDivision: "",
+//         birthday:  "1990-03-30", // yyyy-MM-dd,
+//         cardNo:    "235434534",
+//         cardType:  "14", // 14=foreign passport
+//         curPhoto:  "awf", // base64 photo for passfoto
+//         firstName: "mookie",
+//         lastName:  "bets",
+//         nationalityArea: "MYS", // iso-3166-1 alpha3
+//         photo:     "",
+//         guestType: "300", // numbered key
+//         name:      "bets mookie", // full hanzi name
+//         nation:    "",
+//         sex:       "2", // 1=male, 2=female
+//         signDate:  "--",
+//         signOrg:   "",
+//         signPlace: "string",
+//         validDate: "1999-12-12"
+//     },
+//     message: ""
+// })
 
-/**
- *
- * @param {Event} e
- * @returns
- */
+
 function sendCommand(e) {
 	const option = e.target.id.replace('-btn', '');
 
@@ -158,3 +157,8 @@ readBtn.addEventListener('click', sendCommand);
 
 const scanBtn = document.getElementById('scan-btn');
 scanBtn.addEventListener('click', sendCommand);
+
+function onLaunch() {
+	connectOrDisconnect()
+}
+onLaunch()
