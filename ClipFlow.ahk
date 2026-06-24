@@ -15,7 +15,7 @@ if (!A_IsAdmin) {
 }
 
 ; version checking
-VERSION := "1.10.0"
+VERSION := "1.10.1"
 UNC_PATH := "\\10.0.2.13\fd"
 
 ; uncClipFlowPath := UNC_PATH . "\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow-SvanerTest-main\"
