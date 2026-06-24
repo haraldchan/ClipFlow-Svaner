@@ -84,16 +84,21 @@ class OrderedMap extends Map {
     }
 
     __Enum(NumberOfVars) {
-        return EnumKVI
+        index := 0
+        entries := this._entries
 
-        EnumKVI(&key, &value := 0, &index := 0) {
-            if (A_Index > this._entries.Length) {
+        EnumKVI(&key, &value := 0, &outIndex := 0) {
+            if (++index > entries.Length)
                 return false
-            }
 
-            key := this._entries[A_Index][1]
-            value := this._entries[A_Index][2]
+            entry := entries[index]
+            key := entry[1]
+            value := entry[2]
+            outIndex := index
+            return true
         }
+
+        return EnumKVI
     }
 
     ; methods
