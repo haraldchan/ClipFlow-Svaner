@@ -1,8 +1,8 @@
 // globals
 let socket = null;
-let currentData = null;
+let currentData = {};
 const identifier = '3ed542123e774d45203ff60175cb614e'; //MD5 hash: ProfileModifyNextLocal
-const ports = ['17181', '17182', '8080', '90'];
+const ports = ['17181', '17182', '8010', '90'];
 
 // WebSocket handlers
 async function findService() {
@@ -52,7 +52,7 @@ async function connectOrDisconnect() {
 			connBtn.classList.replace('status-connecting', 'status-connected');
 		} catch (error) {
 			if (error) {
-				connBtn.textContent = '✖ 无服务在线';
+				connBtn.textContent = '无服务在线';
 				connBtn.classList.replace('status-connecting', 'status-disconnected');
 				return;
 			}
@@ -72,7 +72,7 @@ async function connectOrDisconnect() {
 		};
 	} else if (socket.readyState === WebSocket.OPEN) {
 		socket.close();
-		connBtn.textContent = '✖ 已断开连接';
+		connBtn.textContent = '已断开连接';
 		connBtn.classList.replace('status-connected', 'status-disconnected');
 	}
 }
@@ -111,11 +111,8 @@ guestType.addEventListener(
 const regionList = document.getElementById('region-list');
 const region = document.getElementById('region');
 region.addEventListener('change', (e) => {
-	if (currentData.guestType === '内地旅客') {
-		currentData.nationalityArea = 'CHN';
-		return;
-	}
-	currentData.nationalityArea = e.target.value;
+	currentData.nationalityArea =
+		currentData.guestType === '内地旅客' ? 'CHN' : e.target.value;
 });
 
 const address = document.getElementById('address');
@@ -149,7 +146,6 @@ validDate.addEventListener(
 );
 
 // ui functions
-
 function createOption(select, textContent, value = null) {
 	const option = document.createElement('option');
 
@@ -163,11 +159,11 @@ function handleMessageDisplay(data) {
 	currentData = data.data;
 
 	// updated inputs & non-dynamic selects
-	passportPhotoImg.src = `data:image/jpeg;base64,${currentData.curPhoto}`;
+	passportPhotoImg.src = `data:image/jpeg;base64,${currentData.curPhoto.replace('data:image/jpeg;base64,', '')}`;
 	fullName.value = currentData.name ?? '';
 	lastName.value = currentData.lastName ?? '';
 	firstName.value = currentData.firstName ?? '';
-	address.value = currentData.address;
+	address.value = currentData.address ?? '';
 	idNum.value = currentData.cardNo;
 	birthday.value = currentData.birthday;
 	validDate.value = currentData.validDate;
@@ -175,7 +171,7 @@ function handleMessageDisplay(data) {
 	// update selects
 	gender.selectedIndex = currentData.sex;
 	idType.value = currentData.cardType;
-	region.value = nationalityAreas[currentData.nationalityArea];
+	region.value = nationalityAreas[currentData.nationalityArea] ?? '中国';
 
 	const curGuestType = getGuestType(
 		currentData.guestType,
@@ -237,9 +233,7 @@ function sendCommand(e) {
 }
 
 const connBtn = document.querySelector('.connection-btn');
-connBtn.addEventListener('click', async () => {
-	connectOrDisconnect();
-});
+connBtn.addEventListener('click', async () => connectOrDisconnect());
 
 const readBtn = document.getElementById('read-btn');
 readBtn.addEventListener('click', sendCommand);
