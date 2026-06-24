@@ -233,8 +233,8 @@ body {
 	border-radius: 999px;
 	border: 1px solid transparent;
 
-	font-size: 12px;
-	font-weight: 600;
+	font-size: 14px;
+	font-weight: bolder;
 
 	cursor: pointer;
 
@@ -283,11 +283,5 @@ body {
 .status-disconnected {
 	background: rgba(255, 255, 255, 0.18);
 	color: #de5664;
-	border-color: rgba(255, 255, 255, 0.25);
-}
-
-.status-reconnecting {
-	background: rgba(255, 255, 255, 0.18);
-	color: #ffc107;
 	border-color: rgba(255, 255, 255, 0.25);
 }
