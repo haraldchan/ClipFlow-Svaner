@@ -2,19 +2,6 @@ class WSMessageParser {
     static dict := useDict()
     static identifier := "3ed542123e774d45203ff60175cb614e" ; MD5 hash: ProfileModifyNextLocal
 
-    static guestTypes := Map(
-        "100", "内地旅客",
-        "200", "港澳台旅客",
-        "300", "国外旅客",
-    )
-
-    static parseIdType(code) {
-        return match(code, Map(
-            "11", "身份证",
-            "14", "普通护照",
-        ))
-    }
-
     static capture(identifier) {
         if (!InStr(A_Clipboard, identifier)) {
             return
@@ -25,43 +12,67 @@ class WSMessageParser {
             msgbox incoming.Message
         }
 
-        switch incoming.data.guestType {
-            case "100":
-                msgbox this.parseMainlander(incoming)
-            case "300":
+        switch incoming.guestType {
+            case "内地旅客":
+                msgbox this.parseMainlandTraveler(incoming)
+            case "港澳台旅客":
+            case "国外旅客":
                 msgbox this.parseForeignTraveler(incoming)
         }
     }
 
-    static parseMainlander(incoming) {
+    static parseMainlandTraveler(incoming) {
         guestProfile := {
             idendifier: ProfileModifyNext.identifier,
             addr: incoming.data.address,
             birthday: incoming.data.birthday,
             gender: incoming.data.sex == "1" ? "男" : "女",
-            guestType: this.guestTypes[incoming.data.guestType],
+            guestType: "内地旅客",
             idNum: incoming.data.cardNo,
-            idType: this.parseIdType(incoming.data.cardType) || "IDC",
+            idType: incoming.idType,
             isMod: false,
             name: incoming.data.name,
             roomNum: incoming.roomNum,
             tel: incoming.tel,
             tsId: incoming.tsId,
-            wsData: incoming.data
+            wsData: incoming.wsData
         }
 
         return JSON.stringify(guestProfile)
     }
 
+    static parseHkMoTwTraveler(incoming) {
+        guestProfile := {
+            idendifier: ProfileModifyNext.identifier,
+            addr: " ",
+            birthday: incoming.data.birthday,
+            gender: incoming.data.sex == "1" ? "男" : "女",
+            guestType: "港澳台旅客",
+            idNum: incoming.data.cardNo,
+            idType: incoming.idType,
+            isMod: false,
+            name: incoming.data.name,
+            nameLast: incoming.data.lastName,
+            nameFirst: incoming.data.firstName,
+            region: incoming.region,
+            roomNum: incoming.roomNum,
+            tel: incoming.tel,
+            tsId: incoming.tsId,
+            wsData: incoming.wsData
+        }
+
+    }
+
     static parseForeignTraveler(incoming) {
         guestProfile := {
             idendifier: ProfileModifyNext.identifier,
-            addr: this.dict.getCountryCodeAlpha3(incoming.data.nationalityArea),
+            addr: incoming.region,
+            country: incoming.region,
             birthday: incoming.data.birthday,
             gender: incoming.data.sex == "1" ? "男" : "女",
-            guestType: this.guestTypes[incoming.data.guestType],
+            guestType: incoming.guestType,
             idNum: incoming.data.cardNo,
-            idType: this.parseIdType(incoming.data.cardType) || "NOP",
+            idType: incoming.idType,
             isMod: false,
             name: Format("{1}, {2}", incoming.data.lastName, incoming.data.firstName),
             nameFirst: incoming.data.firstName,
@@ -69,7 +80,7 @@ class WSMessageParser {
             roomNum: incoming.roomNum,
             tel: incoming.tel,
             tsId: incoming.tsId,
-            wsData: incoming.data
+            wsData: incoming.wsData
         }
 
         return JSON.stringify(guestProfile)
