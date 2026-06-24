@@ -39,7 +39,7 @@ PMN_Settings(settingSignal) {
            .onClick((ctrl, _) => settingSignal.update("fillOverwrite", ctrl.value))
         
         ; launch ws reader
-        Win.AddText("x10 y+10 w90 h20 0x200", "使用 WS Reader"),
+        Win.AddText("x10 y+10 w90 h20 0x200", "WS Reader"),
         Win.AddButton("x+1 w80 h20", "启 动")
            .onClick((*) => Run(A_ScriptDir . "\ws-reader\ws-reader.html"))
     }
