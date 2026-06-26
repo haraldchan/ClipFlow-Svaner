@@ -8,6 +8,7 @@ class WSMessageParser {
         "93", "国内护照",
         "16", "台湾居民来往大陆通行证",
         "60", "港澳居民来往内地通行证",
+        "56", "港澳居民来往内地通行证（非中国籍）"
     )
 
     static capture(identifier) {
