@@ -15,7 +15,7 @@ if (!A_IsAdmin) {
 }
 
 ; version checking
-VERSION := "1.10.1"
+VERSION := "1.10.2"
 UNC_PATH := "\\10.0.2.13\fd"
 
 ; uncClipFlowPath := UNC_PATH . "\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow-SvanerTest-main\"
@@ -45,10 +45,6 @@ IMAGES := useImages(A_ScriptDir . "\assets")
 APP_DATA_DIR := A_AppData . "\ClipFlow"
 CONFIG := useJsonConfig("./clipflow.config.json", "clipflow.config.json", APP_DATA_DIR)
 USE_ERROR_LOG := CONFIG.read(["app", "errorLogging"])
-if (USE_ERROR_LOG is Error) {
-	USE_ERROR_LOG := false
-}
-
 FORCE_SUSPEND_MESSAGE := 0x2042
 SUSPEND_CONTROLLER := SuspendController(FORCE_SUSPEND_MESSAGE)
 
