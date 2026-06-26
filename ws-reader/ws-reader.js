@@ -265,6 +265,10 @@ function onLaunch() {
 		createOption(regionList, code, nationalityAreas[code]);
 	}
 
+	for (const [code, idTypeName] of cardTypes) {
+		createOption(idType, idTypeName, code);
+	}
+
 	connectOrDisconnect();
 }
 onLaunch();
