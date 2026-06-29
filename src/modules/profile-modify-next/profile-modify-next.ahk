@@ -10,6 +10,7 @@
 #Include components\db-selector.ahk
 ; macros
 #Include macros\fill-in.ahk
+#Include macros\fill-psb.ahk
 #Include macros\waterfall.ahk
 
 class ProfileModifyNext {
@@ -59,7 +60,7 @@ class ProfileModifyNext {
             type: "module",
             callback: (*) => WSMessageParser.capture(WSMessageParser.identifier)
         })
-        
+
         ; mount module component
         PMN_App(App, this.title, this.db, this.identifier)
     }
