@@ -20,9 +20,13 @@
 
             <div class="card-header">
                 <h2>证 件 登 记</h2>
-                <span class="connection-btn status-disconnected">
-                    未连接
-                </span>
+                <div class="header-controls">
+                    <select id="port-select" class="port-select">
+                    </select>
+                    <span class="connection-btn status-disconnected">
+                        未连接
+                    </span>
+                </div>
             </div>
 
             <div class="content">
@@ -128,6 +132,11 @@
     <script src="./dicts/misc-dict.js"></script>
     <script src="./dicts/nationality-areas.js"></script>
     <script src="./ws-reader.js"></script>
+    <script src="./js/socket-helpers.js"></script>
+    <script src="./js/form-content.js"></script>
+    <script src="./js/action-bar.js"></script>
+    <script>
+        onLaunch();
+    </script>
 </body>
-
 </html>
