@@ -15,28 +15,21 @@ if (!A_IsAdmin) {
 }
 
 ; version checking
-VERSION := "1.10.2"
+VERSION := "1.10.3"
 UNC_PATH := "\\10.0.2.13\fd"
 
-; uncClipFlowPath := UNC_PATH . "\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow-SvanerTest-main\"
-; SplitPath(A_ScriptDir, , , , , &OutDrive)
-; if (OutDrive == "C:" && DirExist("\\10.0.2.13\fd")) {
-; 	uncCF := FileRead(uncClipFlowPath . "\ClipFlow.ahk", "utf-8")
-
-; 	splitted := StrSplit(uncCF, "`n")
-; 	for line in splitted {
-; 		if (InStr(line, "VERSION := ")) {
-; 			uncVersion := StrReplace(line, "VERSION := ", "")
-; 		}
-; 	}
-
-; 	if (uncVersion != VERSION) {
-; 		if (!DirExist("C:\ClipFlow\")) {
-; 			DirCopy(uncClipFlowPath, "C:\ClipFlow\app", true)
-; 			Reload()
-; 		}
-; 	}
-; }
+uncScriptDir := UNC_PATH . "\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow-SvanerTest-main\"
+SplitPath(A_ScriptDir, , , , , &OutDrive)
+if (OutDrive == "C:" && DirExist(UNC_PATH)) {
+    ; compare version
+    uncVersion := JSON.parse(FileRead(uncScriptDir . "\qm.config.json"))["version"]
+    if (VERSION != uncVersion) {
+        if (!DirExist("C:\ClipFlow\app")) {
+            DirCopy(uncScriptDir, "C:\ClipFlow\app", true)
+            Reload()
+        }
+    }
+}
 
 ; global consts
 POPUP_TITLE := "ClipFlow " . VERSION
