@@ -60,7 +60,11 @@ class useJsonConfig {
             }
         }
         catch Error as err {
-            return err
+            if (FileExist(this.path)) {
+                FileDelete(this.path)
+            }
+            this.createLocal()
+            Reload()
         }
     }
 
@@ -111,9 +115,13 @@ class useJsonConfig {
 
             FileDelete(this.path)
             FileAppend(useJsonConfig.JSON.stringify(this.currentConfig), this.path, "UTF-8")
-        } 
+        }
         catch Error as err {
-            return err
+            if (FileExist(this.path)) {
+                FileDelete(this.path)
+            }
+            this.createLocal()
+            Reload()
         }
     }
 
