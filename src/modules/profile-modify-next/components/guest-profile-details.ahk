@@ -4,8 +4,16 @@
  * @param {Func} fillIn 
  */
 GuestProfileDetails(selectedGuest, fillIn) {
-    Profile := Gui("+AlwaysOnTop", "Profile Details")
-    Profile.SetFont(, "微软雅黑")
+    Profile := Svaner({
+        gui: {
+            options: "+AlwaysOnTop",
+            title: "Profile Details"
+        },
+        font: {
+            name: "微软雅黑"
+        }
+    })
+
     timeoutCount := 0
     TIMEOUT_MAX_SECOND := 60
 
@@ -42,7 +50,7 @@ GuestProfileDetails(selectedGuest, fillIn) {
     }
 
     detectWindowIsActive(*) {
-        timeoutCount := !WinActive(Profile.Hwnd) ? timeoutCount + 1 : 0
+        timeoutCount := !WinActive(Profile.gui.Hwnd) ? timeoutCount + 1 : 0
 
         if (timeoutCount >= TIMEOUT_MAX_SECOND) {
             SetTimer(, 0)
@@ -55,9 +63,24 @@ GuestProfileDetails(selectedGuest, fillIn) {
         Profile.Destroy()
     }
 
-    fillInPms(*){
+    fillMode := signal("填入Profile")
+    handleFillModeSwitch(*) {
+        fillMode.set(cur => cur == "填入Profile" ? "填入旅安" : "填入Profile")
+    }
+
+
+    fillInfo(*) {
         SetTimer(detectWindowIsActive, 0)
-        fillIn()
+        Profile.Hide()
+
+        if (fillMode.value == "填入Profile") {
+            fillIn()
+        }
+        else {
+            PMN_FillPSB.fill(selectedGuest)
+        }
+
+        Profile.Destroy()
     }
 
     onMount() {
@@ -69,10 +92,12 @@ GuestProfileDetails(selectedGuest, fillIn) {
 
     render() {
         Profile.AddListView("vprofile Grid w230 r10", ["信息字段", "证件信息"]).onDoubleClick(copyListField)
-        
+
         Profile.AddButton("h30 w110", "关 闭 (&C)").onClick(handleClose)
-        Profile.AddButton("x+10 h30 w110 Default", "填   入").onClick(fillInPms)
-        
+        Profile.AddButton("x+10 h30 w110 Default", "{1}", fillMode)
+            .onClick(fillInfo)
+            .onContextMenu(handleFillModeSwitch)
+
         onMount()
     }
 
