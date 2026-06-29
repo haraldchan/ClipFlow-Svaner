@@ -49,6 +49,7 @@ async function findService(definedPort = null) {
 
 async function connectOrDisconnect(definedPort = null) {
 	const connBtn = document.querySelector('.connection-btn');
+	
 	if (socket === null || socket.readyState === WebSocket.CLOSED) {
 		try {
 			const { port, ws } = await findService(definedPort);
@@ -65,21 +66,26 @@ async function connectOrDisconnect(definedPort = null) {
 			}
 		}
 
-		socket.onopen = function (event) {
-			console.log('已连接到端口: ' + port);
+		socket.onopen = (event) => console.log('已连接到端口: ' + port);
+
+		socket.onmessage = (event) => {
+			const data = JSON.parse(event.data);
+			console.log(data);
+
+			if (data.code === 1) {
+				alert(data.message);
+				return;
+			}
+
+			handleMessageDisplay(data);
 		};
 
-		socket.onmessage = function (event) {
-			console.log(JSON.parse(event.data));
-			handleMessageDisplay(JSON.parse(event.data));
-		};
+		socket.onclose = (event) => console.log('连接已关闭');
 
-		socket.onclose = function (event) {
-			console.log('连接已关闭');
-		};
 	} else if (socket.readyState === WebSocket.OPEN) {
 		socket.close();
 		connBtn.textContent = '已断开连接';
-		connBtn.classList.replace('status-connected', 'status-disconnected');
+		connBtn.classList.remove(...connStatusClasses);
+		connBtn.classList.add('status-disconnected');
 	}
 }
