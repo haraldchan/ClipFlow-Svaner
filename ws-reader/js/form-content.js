@@ -75,11 +75,6 @@ function createOption(select, textContent, value = null) {
 }
 
 function handleMessageDisplay(data) {
-	if (data.code === 1) {
-		alert(data.message);
-		return;
-	}
-
 	currentData = data.data;
 
 	// updated inputs & non-dynamic selects
