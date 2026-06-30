@@ -123,8 +123,8 @@ ${formContentStyle}
 
         <div class="field">
             <label>旅客类型</label>
-            <select id="guest-type" name="guest-type">
-                <option selected>---请选择类型---</option>
+            <select id="guest-type" name="guest-type" required>
+                <option value="" disabled hidden selected>---请选择类型---</option>
                 <option value="内地旅客">内地旅客</option>
                 <option value="港澳台旅客">港澳台旅客</option>
                 <option value="国外旅客">国外旅客</option>
@@ -151,17 +151,17 @@ ${formContentStyle}
 
         <div class="field">
             <label>证件类型</label>
-            <select id="id-type" name="id-type">
-                <option selected>---请选择类型---</option>
+            <select id="id-type" name="id-type" required>
+                <option value="" disabled hidden selected>---请选择类型---</option>
             </select>
         </div>
 
         <div class="field">
             <label>性别</label>
-            <select id="gender" name="gender">
-                <option selected>---请选择性别---</option>
-                <option>男</option>
-                <option>女</option>
+            <select id="gender" name="gender" required>
+                <option value="" disabled hidden selected>---请选择性别---</option>
+                <option value="男">男</option>
+                <option value="女">女</option>
             </select>
         </div>
 
