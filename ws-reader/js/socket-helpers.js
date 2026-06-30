@@ -1,3 +1,9 @@
+const connStatusClasses = [
+	'status-connecting',
+	'status-disconnected',
+	'status-connected',
+];
+
 async function connect(port) {
 	const ws = await ((url, timeout = 1000) => {
 		return new Promise((resolve, reject) => {
@@ -25,7 +31,7 @@ async function connect(port) {
 }
 
 async function findService(definedPort = null) {
-	const connBtn = document.querySelector('.connection-btn');
+	const connBtn = document.getElementById('card-header').connBtn;
 	connBtn.textContent = '● 连接中...';
 	connBtn.classList.remove(...connStatusClasses);
 	connBtn.classList.add('status-connecting');
@@ -35,8 +41,9 @@ async function findService(definedPort = null) {
 		return { definedPort, ws };
 	}
 
-	for (const port of ports) {
+	for (const [port, maker] of portsWithMakers) {
 		try {
+			console.log(`connecting to:${port}...`)
 			const ws = await connect(port);
 			return { port, ws };
 		} catch {
@@ -48,7 +55,7 @@ async function findService(definedPort = null) {
 }
 
 async function connectOrDisconnect(definedPort = null) {
-	const connBtn = document.querySelector('.connection-btn');
+	const connBtn = document.getElementById('card-header').connBtn;
 	
 	if (socket === null || socket.readyState === WebSocket.CLOSED) {
 		try {
@@ -58,6 +65,7 @@ async function connectOrDisconnect(definedPort = null) {
 			connBtn.classList.remove(...connStatusClasses);
 			connBtn.classList.add('status-connected');
 		} catch (error) {
+			console.log(error)
 			if (error) {
 				connBtn.textContent = '无服务在线';
 				connBtn.classList.remove(...connStatusClasses);
@@ -89,3 +97,42 @@ async function connectOrDisconnect(definedPort = null) {
 		connBtn.classList.add('status-disconnected');
 	}
 }
+
+function handleMessageDisplay(data) {
+	currentData = data.data;
+	const FormContent = document.getElementById('form-content')
+
+	// updated inputs & non-dynamic selects
+	FormContent.passportPhotoImg.src = `data:image/jpeg;base64,${currentData.curPhoto.replace('data:image/jpeg;base64,', '')}`;
+	FormContent.fullName.value = currentData.name ?? '';
+	FormContent.lastName.value = currentData.lastName ?? '';
+	FormContent.firstName.value = currentData.firstName ?? '';
+	FormContent.address.value = currentData.address ?? '';
+	FormContent.idNum.value = currentData.cardNo;
+	FormContent.birthday.value = currentData.birthday;
+	FormContent.validDate.value = currentData.validDate;
+
+	// update selects
+	FormContent.gender.selectedIndex = currentData.sex;
+	FormContent.idType.value = currentData.cardType;
+	FormContent.region.value = nationalityAreas[currentData.nationalityArea] ?? '中国';
+
+	const curGuestType = getGuestType(
+		currentData.guestType,
+		currentData.hasOwnProperty('nationalityArea')
+			? currentData.nationalityArea
+			: '',
+	);
+	switch (curGuestType) {
+		case '内地旅客':
+			guestType.selectedIndex = 1;
+			break;
+		case '港澳台旅客':
+			guestType.selectedIndex = 2;
+			break;
+		case '国外旅客':
+			guestType.selectedIndex = 3;
+			break;
+	}
+}
+

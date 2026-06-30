@@ -4,6 +4,13 @@
 <head>
     <title>ClipFlow 离线证件读取器</title>
     <link rel="stylesheet" href="./ws-reader.css">
+    <script src="./ws-reader.js"></script>
+    <script src="./js/socket-helpers.js"></script>
+    <script src="./dicts/misc-dict.js"></script>
+    <script src="./dicts/nationality-areas.js"></script>
+    <script src="./js/card-header.js"></script>
+    <script src="./js/action-bar.js"></script>
+    <script src="./js/form-content.js"></script>
 </head>
 
 <body>
@@ -16,127 +23,35 @@
             </div>
         </div>
 
-        <form class="passport-card">
+        <div class="passport-card">
+            <card-header id="card-header"></card-header>
+            <form-content id="form-content"></form-content>
 
-            <div class="card-header">
-                <h2>证 件 登 记</h2>
-                <div class="header-controls">
-                    <select id="port-select" class="port-select">
-                    </select>
-                    <span class="connection-btn status-disconnected">
-                        未连接
-                    </span>
-                </div>
-            </div>
-
-            <div class="content">
-                <div class="photo-panel">
-                    <img class="passport-photo" src="./no-avatar.png" alt="Passport Photo">
-                </div>
-
-                <div class="fields">
-
-                    <div class="field field-span-2">
-                        <label>全名</label>
-                        <input type="text" id="fullname" name="fullname">
-                    </div>
-
-                    <div class="field">
-                        <label>姓氏</label>
-                        <input type="text" id="lastname" name="lastname">
-                    </div>
-
-                    <div class="field">
-                        <label>名字</label>
-                        <input type="text" id="firstname" name="firstname">
-                    </div>
-
-                    <div class="field">
-                        <label>房号</label>
-                        <input type="text" id="room-num" name="room-num">
-                    </div>
-
-                    <div class="field">
-                        <label>电话</label>
-                        <input type="text" id="tel" name="tel">
-                    </div>
-
-                    <div class="field">
-                        <label>旅客类型</label>
-                        <select id="guest-type" name="guest-type">
-                            <option selected>---请选择类型---</option>
-                            <option value="内地旅客">内地旅客</option>
-                            <option value="港澳台旅客">港澳台旅客</option>
-                            <option value="国外旅客">国外旅客</option>
-                        </select>
-                    </div>
-
-                    <div class="field">
-                        <label>国籍/地区</label>
-                        <input id="region" type="text" list="region-list" placeholder="国籍或地区" name="region" required>
-                            <!-- create on launch -->
-                             <datalist id="region-list">
-                             </datalist>
-                        </input>
-                    </div>
-
-                    <div class="field field-span-2">
-                        <label>证件地址</label>
-                        <input type="text" id="address" name="address">
-                    </div>
-
-                    <div class="field">
-                        <label>证件号码</label>
-                        <input type="text" id="id-num" name="id-num" required>
-                    </div>
-
-                    <div class="field">
-                        <label>证件类型</label>
-                        <select id="id-type" name="id-type">
-                            <option selected>---请选择类型---</option>
-                        </select>
-                    </div>
-
-                    <div class="field">
-                        <label>性别</label>
-                        <select id="gender" name="gender">
-                            <option selected>---请选择性别---</option>
-                            <option>男</option>
-                            <option>女</option>
-                        </select>
-                    </div>
-
-                    <div class="field">
-                        <label>出生日期</label>
-                        <input type="date" id="birthday" name="birthday" required>
-                    </div>
-
-
-                    <div class="field">
-                        <label>证件有效期</label>
-                        <input type="date" id="valid-date" name="valid-date">
-                    </div>
-
-                </div>
-            </div>
-
-        </form>
-        <div class="action-bar">
-            <button class="btn btn-secondary" id="read-btn">读取证件</button>
-            <button class="btn btn-secondary" id="scan-btn">扫描证件</button>
-            <button class="btn btn-primary" id="send-btn" type="sumit">发  送</button>
         </div>
+        <action-bar></action-bar>
 
     </main>
 
-    <script src="./dicts/misc-dict.js"></script>
-    <script src="./dicts/nationality-areas.js"></script>
-    <script src="./ws-reader.js"></script>
-    <script src="./js/socket-helpers.js"></script>
-    <script src="./js/form-content.js"></script>
-    <script src="./js/action-bar.js"></script>
     <script>
-        onLaunch();
+        connectOrDisconnect()
+        // handleMessageDisplay(
+        //     {
+        //         data: {
+        //             curPhoto: "234q",
+        //             name:"Ohtani Shohei",
+        //             lastName: "Ohtani",
+        //             firstName: "Shohei",
+        //             address: "LA, USA",
+        //             cardNo: "3294829348230",
+        //             cardType: "14",
+        //             birthday: "1995-07-05",
+        //             sex: "1",
+        //             region: "USA"
+        //         }
+        //     }
+        // )
+
     </script>
 </body>
+
 </html>

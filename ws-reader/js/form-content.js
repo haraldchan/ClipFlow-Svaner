@@ -1,112 +1,280 @@
-const passportPhotoImg = document.querySelector('.passport-photo');
+const formContentStyle = /*html*/ `
+<style>
+    .form-content {
+        display: grid;
+        grid-template-columns: 140px 1fr;
+        gap: 18px;
+        padding: 18px;
+    }
 
-const fullName = document.getElementById('fullname');
-fullName.addEventListener(
-	'change',
-	(e) => (currentData.data.name = e.target.value),
-);
+    .photo-panel {
+        display: flex;
+        justify-content: center;
+    }
 
-const lastName = document.getElementById('lastname');
-lastName.addEventListener(
-	'change',
-	(e) => (currentData.lastName = e.target.value),
-);
+    .passport-photo {
+        width: 140px;
+        height: 100%;
+        aspect-ratio: 3 / 4;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 2px solid var(--primary);
+        object-fit: contain;
+    }
 
-const firstName = document.getElementById('firstname');
-firstName.addEventListener(
-	'change',
-	(e) => (currentData.firstName = e.target.value),
-);
+    .fields {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px 16px;
+    }
 
-const roomNum = document.getElementById('room-num');
-const tel = document.getElementById('tel');
+    .field {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
 
-const guestType = document.getElementById('guest-type');
-guestType.addEventListener(
-	'change',
-	(e) => (currentData.guestType = e.target.value),
-);
+    .field label {
+        width: 90px;
+        flex-shrink: 0;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--muted);
+    }
 
-const regionList = document.getElementById('region-list');
-const region = document.getElementById('region');
-region.addEventListener('change', (e) => {
-	currentData.nationalityArea =
-		currentData.guestType === '内地旅客' ? 'CHN' : e.target.value;
-});
+    .field input,
+    .field select {
+        width: 100%;
+        min-width: 0;
+        height: 32px;
+        padding: 0 10px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: white;
+        color: var(--text);
+        font-size: 13px;
+    }
 
-const address = document.getElementById('address');
-address.addEventListener(
-	'change',
-	(e) => (currentData.address = e.target.value),
-);
+    .field input:focus,
+    .field select:focus {
+        outline: none;
+        border-color: var(--primary-dark);
+        box-shadow: 0 0 0 3px rgba(99, 193, 246, 0.15);
+    }
 
-const idNum = document.getElementById('id-num');
-idNum.addEventListener('change', (e) => (currentData.cardNo = e.target.value));
+    .field-span-2 {
+        grid-column: span 2;
+    }
 
-const idType = document.getElementById('id-type');
-idType.addEventListener(
-	'change',
-	(e) => (currentData.cardType = e.target.value),
-);
+    @media (max-width: 700px) {
+        .content {
+            grid-template-columns: 1fr;
+        }
 
-const gender = document.getElementById('gender');
-gender.addEventListener('change', (e) => (currentData.sex = e.target.value));
+        .photo-panel {
+            justify-content: center;
+        }
 
-const birthday = document.getElementById('birthday');
-birthday.addEventListener(
-	'change',
-	(e) => (currentData.birthday = e.target.value),
-);
+        .fields {
+            grid-template-columns: 1fr;
+        }
 
-const validDate = document.getElementById('valid-date');
-validDate.addEventListener(
-	'change',
-	(e) => (currentData.validDate = e.target.value),
-);
+        .field-span-2 {
+            grid-column: auto;
+        }
+    }
+</style>
+`
 
-// ui functions
-function createOption(select, textContent, value = null) {
-	const option = document.createElement('option');
+const formContentTemplate = document.createElement('template')
+formContentTemplate.innerHTML = /*html*/ `
+${formContentStyle}
+<form class="form-content">
+    <div class="photo-panel">
+        <img class="passport-photo" src="./no-avatar.png" alt="Passport Photo">
+    </div>
 
-	if (value !== null) option.value = value;
-	option.textContent = textContent;
+    <div class="fields">
 
-	select.appendChild(option);
+        <div class="field field-span-2">
+            <label>全名</label>
+            <input type="text" id="fullname" name="fullname">
+        </div>
+
+        <div class="field">
+            <label>姓氏</label>
+            <input type="text" id="lastname" name="lastname">
+        </div>
+
+        <div class="field">
+            <label>名字</label>
+            <input type="text" id="firstname" name="firstname">
+        </div>
+
+        <div class="field">
+            <label>房号</label>
+            <input type="text" id="room-num" name="room-num">
+        </div>
+
+        <div class="field">
+            <label>电话</label>
+            <input type="text" id="tel" name="tel">
+        </div>
+
+        <div class="field">
+            <label>旅客类型</label>
+            <select id="guest-type" name="guest-type">
+                <option selected>---请选择类型---</option>
+                <option value="内地旅客">内地旅客</option>
+                <option value="港澳台旅客">港澳台旅客</option>
+                <option value="国外旅客">国外旅客</option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label>国籍/地区</label>
+            <input id="region" type="text" list="region-list" placeholder="国籍或地区" name="region" required>
+            <datalist id="region-list">
+            </datalist>
+            </input>
+        </div>
+
+        <div class="field field-span-2">
+            <label>证件地址</label>
+            <input type="text" id="address" name="address">
+        </div>
+
+        <div class="field">
+            <label>证件号码</label>
+            <input type="text" id="id-num" name="id-num" required>
+        </div>
+
+        <div class="field">
+            <label>证件类型</label>
+            <select id="id-type" name="id-type">
+                <option selected>---请选择类型---</option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label>性别</label>
+            <select id="gender" name="gender">
+                <option selected>---请选择性别---</option>
+                <option>男</option>
+                <option>女</option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label>出生日期</label>
+            <input type="date" id="birthday" name="birthday" required>
+        </div>
+
+
+        <div class="field">
+            <label>证件有效期</label>
+            <input type="date" id="valid-date" name="valid-date">
+        </div>
+
+    </div>
+</form>
+`;
+
+class FormContent extends HTMLElement {
+    constructor() {
+        super()
+        const shadow = this.attachShadow({
+            mode: 'open'
+        })
+        shadow.innerHTML = formContentTemplate.innerHTML
+    }
+
+    createOption(select, textContent, value = null) {
+        const option = document.createElement('option');
+
+        if (value !== null) option.value = value;
+        option.textContent = textContent;
+
+        select.appendChild(option);
+    }
+
+    connectedCallback() {
+        const shadow = this.shadowRoot
+
+        this.passportPhotoImg = shadow.querySelector('.passport-photo');
+
+        this.fullName = shadow.getElementById('fullname');
+        this.fullName.addEventListener(
+            'change',
+            (e) => (currentData.data.name = e.target.value),
+        );
+
+        this.lastName = shadow.getElementById('lastname');
+        this.lastName.addEventListener(
+            'change',
+            (e) => (currentData.lastName = e.target.value),
+        );
+
+        this.firstName = shadow.getElementById('firstname');
+        this.firstName.addEventListener(
+            'change',
+            (e) => (currentData.firstName = e.target.value),
+        );
+
+        this.roomNum = shadow.getElementById('room-num');
+        this.tel = shadow.getElementById('tel');
+
+        this.guestType = shadow.getElementById('guest-type');
+        this.guestType.addEventListener(
+            'change',
+            (e) => (currentData.guestType = e.target.value),
+        );
+
+        this.regionList = shadow.getElementById('region-list');
+        this.region = shadow.getElementById('region');
+        this.region.addEventListener('change', (e) => {
+            currentData.nationalityArea =
+                currentData.guestType === '内地旅客' ? 'CHN' : e.target.value;
+        });
+
+        this.address = shadow.getElementById('address');
+        this.address.addEventListener(
+            'change',
+            (e) => (currentData.address = e.target.value),
+        );
+
+        this.idNum = shadow.getElementById('id-num');
+        this.idNum.addEventListener('change', (e) => (currentData.cardNo = e.target.value));
+
+        this.idType = shadow.getElementById('id-type');
+        this.idType.addEventListener(
+            'change',
+            (e) => (currentData.cardType = e.target.value),
+        );
+
+        this.gender = shadow.getElementById('gender');
+        this.gender.addEventListener('change', (e) => (currentData.sex = e.target.value));
+
+        this.birthday = shadow.getElementById('birthday');
+        this.birthday.addEventListener(
+            'change',
+            (e) => (currentData.birthday = e.target.value),
+        );
+
+        this.validDate = shadow.getElementById('valid-date');
+        this.validDate.addEventListener(
+            'change',
+            (e) => (currentData.validDate = e.target.value),
+        );
+
+        for (const code in nationalityAreas) {
+            this.createOption(this.regionList, code, nationalityAreas[code]);
+        }
+
+        for (const [code, idTypeName] of cardTypes) {
+            this.createOption(this.idType, idTypeName, code);
+        }
+    }
 }
 
-function handleMessageDisplay(data) {
-	currentData = data.data;
-
-	// updated inputs & non-dynamic selects
-	passportPhotoImg.src = `data:image/jpeg;base64,${currentData.curPhoto.replace('data:image/jpeg;base64,', '')}`;
-	fullName.value = currentData.name ?? '';
-	lastName.value = currentData.lastName ?? '';
-	firstName.value = currentData.firstName ?? '';
-	address.value = currentData.address ?? '';
-	idNum.value = currentData.cardNo;
-	birthday.value = currentData.birthday;
-	validDate.value = currentData.validDate;
-
-	// update selects
-	gender.selectedIndex = currentData.sex;
-	idType.value = currentData.cardType;
-	region.value = nationalityAreas[currentData.nationalityArea] ?? '中国';
-
-	const curGuestType = getGuestType(
-		currentData.guestType,
-		currentData.hasOwnProperty('nationalityArea')
-			? currentData.nationalityArea
-			: '',
-	);
-	switch (curGuestType) {
-		case '内地旅客':
-			guestType.selectedIndex = 1;
-			break;
-		case '港澳台旅客':
-			guestType.selectedIndex = 2;
-			break;
-		case '国外旅客':
-			guestType.selectedIndex = 3;
-			break;
-	}
-}
+customElements.define('form-content', FormContent)
