@@ -82,7 +82,6 @@ class ActionBar extends HTMLElement {
         const shadow = this.attachShadow({
             mode: 'open'
         });
-        shadow.innerHTML = actionBarTemplate.innerHTML;
     }
 
     sendCommand(e) {
@@ -101,6 +100,7 @@ class ActionBar extends HTMLElement {
 
     connectedCallback() {
         const shadow = this.shadowRoot
+        shadow.appendChild(actionBarTemplate.content.cloneNode(true))
 
         this.readBtn = shadow.getElementById('read-btn');
         this.readBtn.addEventListener('click', this.sendCommand);
@@ -123,7 +123,6 @@ class ActionBar extends HTMLElement {
                 region: FormContent.region.value,
                 data: currentData,
             };
-
 
             await navigator.clipboard.writeText(JSON.stringify(sendClip));
         });

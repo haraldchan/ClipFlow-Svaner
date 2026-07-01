@@ -151,11 +151,11 @@ class CardHeader extends HTMLElement {
         const shadow = this.attachShadow({
             mode: 'open'
         });
-        shadow.innerHTML = cardHeaderTemplate.innerHTML;
     }
 
     connectedCallback() {
         const shadow = this.shadowRoot
+        shadow.appendChild(cardHeaderTemplate.content.cloneNode(true))
 
         this.connBtn = shadow.querySelector('.connection-btn');
         this.connBtn.addEventListener('click', async () => connectOrDisconnect());

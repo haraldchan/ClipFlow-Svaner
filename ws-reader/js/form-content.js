@@ -186,7 +186,6 @@ class FormContent extends HTMLElement {
         const shadow = this.attachShadow({
             mode: 'open'
         })
-        shadow.innerHTML = formContentTemplate.innerHTML
     }
 
     createOption(select, textContent, value = null) {
@@ -200,6 +199,7 @@ class FormContent extends HTMLElement {
 
     connectedCallback() {
         const shadow = this.shadowRoot
+        shadow.appendChild(formContentTemplate.content.cloneNode(true))
 
         this.passportPhotoImg = shadow.querySelector('.passport-photo');
 
