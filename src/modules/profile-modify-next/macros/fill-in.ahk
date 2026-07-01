@@ -78,7 +78,7 @@ class PMN_FillIn {
                 Send("!o")
             }
 
-            ( !keepGoing && this.end() )
+            (!keepGoing && this.end())
             return
         }
 
@@ -89,7 +89,7 @@ class PMN_FillIn {
             Sleep(100)
             Send("!o")
 
-            ( !keepGoing && this.end() )
+            (!keepGoing && this.end())
             return
         }
 
@@ -101,7 +101,7 @@ class PMN_FillIn {
             Sleep(100)
             Send("!o")
 
-            ( !keepGoing && this.end() )
+            (!keepGoing && this.end())
             return
         } else {
             Send("!c")
@@ -125,7 +125,7 @@ class PMN_FillIn {
             }
         }
 
-        ( !keepGoing && this.end() )
+        (!keepGoing && this.end())
     }
 
     static getCurrentId() {
@@ -140,7 +140,7 @@ class PMN_FillIn {
             }
             utils.cleanReload(WIN_GROUP)
         }
-        
+
         anchorX := found.outX - 10
         anchorY := found.outY
 
@@ -237,8 +237,8 @@ class PMN_FillIn {
         isTaiwanese := currentGuest["guestType"] == "港澳台旅客" && currentGuest["region"] == "台湾"
         if (currentGuest["guestType"] == "内地旅客" || isTaiwanese || currentGuest["idType"] == "港澳台居民居住证") {
             ; ethinic minority guests
-            fullName := currentGuest["name"].includes("·") 
-                ? currentGuest["name"].split("·").map(namePart => namePart.split("").map(hanzi => this.dict.getPinyin(hanzi)).join(" ")) 
+            fullName := currentGuest["name"].includes("·")
+                ? currentGuest["name"].split("·").map(namePart => namePart.split("").map(hanzi => this.dict.getPinyin(hanzi)).join(" "))
                 : this.dict.getFullnamePinyin(currentGuest["name"], isTaiwanese)
 
             nameLast := fullName[1]
@@ -248,18 +248,18 @@ class PMN_FillIn {
             nameLast := currentGuest["nameLast"]
             nameFirst := currentGuest["nameFirst"]
         }
-        
+
         ; fallback for incomplete info(hk/mo)
         if (currentGuest["guestType"] == "港澳台旅客" && !isTaiwanese && nameLast == " " && nameFirst == " ") {
             unpack(this.dict.getFullnamePinyinCantonese(currentGuest["name"]), [&nameLast, &nameFirst])
         }
-        
+
         ; address
         addr := currentGuest["guestType"] == "内地旅客" ? currentGuest["addr"] : " "
-        
+
         ; language
         language := currentGuest["guestType"] == "内地旅客" ? "C" : "E"
-        
+
         ; country
         country := currentGuest["guestType"] == "国外旅客" ? this.dict.getCountryCode(currentGuest["country"]) : "CN"
 
@@ -270,30 +270,30 @@ class PMN_FillIn {
         } else if (currentGuest["guestType"] == "港澳台旅客") {
             province := this.dict.getProvince(currentGuest["region"])
         }
-        
+
         ; id number
         idNum := currentGuest["idNum"]
-        
+
         ; id Type
         idType := this.dict.getIdTypeCode(currentGuest["idType"])
-        
+
         ; gender
         gender := currentGuest["gender"] == "男" ? "Mr" : "Ms"
-        
+
         ; birthday
         bd := StrSplit(currentGuest["birthday"], "-")
         birthday := bd[2] . bd[3] . bd[1]
-        
+
         ; tel number
         tel := currentGuest["tel"]
         if (StrLen(tel) == 11) {
             f := SubStr(tel, 1, 3)
             s := SubStr(tel, 4, 4)
             r := SubStr(tel, 8, 4)
-            
+
             tel := f . "-" . s . "-" . r
         }
-        
+
         return Map(
             "nameAlt", nameAlt,
             "nameLast", nameLast,
@@ -309,7 +309,7 @@ class PMN_FillIn {
             "tel", tel
         )
     }
-    
+
     static fillAction(guestProfileMap) {
         found := PmsImageFinder.find("AltNameAnchor.png")
         if (!found) {
@@ -394,7 +394,7 @@ class PMN_FillIn {
         Send("{Tab}")
         utils.waitLoading()
 
-        if (guestProfileMap["tel"] != " ") {
+        if (guestProfileMap["tel"] != " " && guestProfileMap["tel"] != "") {
             MouseMove(anchorX + 270, anchorY + 110)
             utils.waitLoading()
             Click(3)
