@@ -222,6 +222,14 @@ class FormContent extends HTMLElement {
         );
 
         this.roomNum = shadow.getElementById('room-num');
+        this.roomNum.addEventListener('change', e => {
+            let roomNum = e.target.value
+            if (roomNum.length === 3 && Number.isInteger(Number(e.target.value))) {
+                roomNum = '0' + roomNum
+            }
+            currentData.roomNum = roomNum
+        })
+
         this.tel = shadow.getElementById('tel');
 
         this.guestType = shadow.getElementById('guest-type');
