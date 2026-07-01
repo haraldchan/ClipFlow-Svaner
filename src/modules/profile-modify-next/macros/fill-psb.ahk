@@ -74,7 +74,7 @@ class PMN_FillPSB {
         Sleep(100)
         Send("{Tab}")
         Sleep(100)
-        
+
         ; birthday
         Send(guestProfile["birthday"])
         Sleep(100)
@@ -83,6 +83,8 @@ class PMN_FillPSB {
 
         ; address
         Send("{Text}" . guestProfile["addr"])
+        Sleep(200)
+        Send("{Tab}")
         Sleep(200)
         Send("{Tab}")
         Sleep(200)
@@ -103,7 +105,7 @@ class PMN_FillPSB {
         Send("{Text}" . guestProfile["idNum"])
         Sleep(100)
         Send("{Tab}")
-        Sleep(100) 
+        Sleep(100)
 
         ; roomNum
         Send("{Text}" . guestProfile["roomNum"])
@@ -181,7 +183,7 @@ class PMN_FillPSB {
         Send("{Text}" . guestProfile["idNum"])
         Sleep(100)
         Send("{Tab}")
-        Sleep(100) 
+        Sleep(100)
 
         ; region
         Send(guestProfile["region"])
@@ -203,7 +205,7 @@ class PMN_FillPSB {
     static fillForeignTraveler(guestProfile) {
         ; skip cn name
         Send("{Tab}")
-        Sleep(100) 
+        Sleep(100)
 
         ; gender
         Send(guestProfile["gender"])
@@ -253,7 +255,7 @@ class PMN_FillPSB {
         Send("{Text}" . guestProfile["idNum"])
         Sleep(100)
         Send("{Tab}")
-        Sleep(100) 
+        Sleep(100)
 
         ; country
         Send(guestProfile["country"])
