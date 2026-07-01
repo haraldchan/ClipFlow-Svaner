@@ -32,6 +32,8 @@ async function connect(port) {
 
 async function findService(definedPort = null) {
 	const connBtn = document.getElementById('card-header').connBtn;
+	const portSelect = document.getElementById('card-header').portSelect;
+
 	connBtn.textContent = '● 连接中...';
 	connBtn.classList.remove(...connStatusClasses);
 	connBtn.classList.add('status-connecting');
@@ -45,6 +47,7 @@ async function findService(definedPort = null) {
 		try {
 			console.log(`connecting to:${port}...`)
 			const ws = await connect(port);
+			portSelect.value = port
 			return { port, ws };
 		} catch {
 			// try next port
@@ -56,7 +59,7 @@ async function findService(definedPort = null) {
 
 async function connectOrDisconnect(definedPort = null) {
 	const connBtn = document.getElementById('card-header').connBtn;
-	
+
 	if (socket === null || socket.readyState === WebSocket.CLOSED) {
 		try {
 			const { port, ws } = await findService(definedPort);
@@ -101,6 +104,7 @@ async function connectOrDisconnect(definedPort = null) {
 function handleMessageDisplay(data) {
 	currentData = data.data;
 	const FormContent = document.getElementById('form-content')
+	FormContent.shadowRoot.querySelector('.form-content').reset()
 
 	// updated inputs & non-dynamic selects
 	FormContent.passportPhotoImg.src = `data:image/jpeg;base64,${currentData.curPhoto.replace('data:image/jpeg;base64,', '')}`;
@@ -116,23 +120,11 @@ function handleMessageDisplay(data) {
 	FormContent.gender.selectedIndex = currentData.sex;
 	FormContent.idType.value = currentData.cardType;
 	FormContent.region.value = nationalityAreas[currentData.nationalityArea] ?? '中国';
-
-	const curGuestType = getGuestType(
+	FormContent.guestType.value = getGuestType(
 		currentData.guestType,
 		currentData.hasOwnProperty('nationalityArea')
 			? currentData.nationalityArea
 			: '',
 	);
-	switch (curGuestType) {
-		case '内地旅客':
-			guestType.selectedIndex = 1;
-			break;
-		case '港澳台旅客':
-			guestType.selectedIndex = 2;
-			break;
-		case '国外旅客':
-			guestType.selectedIndex = 3;
-			break;
-	}
 }
 
