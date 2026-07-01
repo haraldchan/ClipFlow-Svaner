@@ -163,19 +163,17 @@ class JSON {
 	}
 }
 
-VERSION := "1.10.4"
+
+VERSION := JSON.parse(FileRead(A_AppData . "\ClipFlow\clipflow.config.json"))["version"]
 UNC_PATH := "\\10.0.2.13\fd"
 uncScriptDir := UNC_PATH . "\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow-SvanerTest-main\"
-SplitPath(A_ScriptDir, , , , , &OutDrive)
-if (OutDrive == "C:" && DirExist(UNC_PATH)) {
-	MsgBox("checking...")
+if (DirExist(UNC_PATH)) {
 	; compare version
-	uncVersion := JSON.parse(FileRead(uncScriptDir . "\qm.config.json"))["version"]
-	if (VERSION != uncVersion) {
-		if (!DirExist("C:\ClipFlow\app")) {
-			DirCopy(uncScriptDir, "C:\ClipFlow\app", true)
-			Reload()
-		}
+	uncVersion := JSON.parse(FileRead(uncScriptDir . "\clipflow.config.json"))["version"]
+	if (VERSION != uncVersion || !DirExist("C:\ClipFlow\app")) {
+		DirCopy(uncScriptDir, "C:\ClipFlow\app", true)
+		FileCopy(uncScriptDir . "\clipflow.config.json", A_AppData . "\ClipFlow\clipflow.config.json", true)
+		Reload()
 	}
 }
 
