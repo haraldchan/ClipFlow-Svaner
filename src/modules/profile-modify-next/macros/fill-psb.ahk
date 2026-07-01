@@ -51,7 +51,7 @@ class PMN_FillPSB {
 
     static fillMainlandTraveler(guestProfile) {
         ; name
-        Send("{Text}" . guestProfile["name"])
+        Send("{Text}" . guestProfile["name"].replace("👤", ""))
         Sleep(100)
         Send("{Tab}")
         Sleep(100)
@@ -130,7 +130,7 @@ class PMN_FillPSB {
         }
 
         ; name
-        Send("{Text}" . guestProfile["name"])
+        Send("{Text}" . guestProfile["name"].replace("👤", ""))
         Sleep(100)
         Send("{Tab}")
         Sleep(100)
