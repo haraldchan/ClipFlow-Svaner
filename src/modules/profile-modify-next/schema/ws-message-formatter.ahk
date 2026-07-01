@@ -71,6 +71,7 @@ class WSMessageParser {
             ; wsData: incoming.data
         }
 
+        return JSON.stringify(guestProfile)
     }
 
     static parseForeignTraveler(incoming) {
