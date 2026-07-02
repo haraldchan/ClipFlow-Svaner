@@ -19,6 +19,8 @@ GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile) {
     }
  
     handleUpdateItem(LV, row) {
+        db := ProfileModifyNext.db
+
         selectedItem := listContent.value.find(item => item["idNum"] == getSelectedCell(LV, row, "idNum"))
         selectedItem["roomNum"] := getSelectedCell(LV, row, "roomNum")
     
