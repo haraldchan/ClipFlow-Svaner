@@ -72,8 +72,8 @@ class useFileDB {
 	/**
 	 * 
 	 * @param {String} db 
-	 * @param {String}  queryDate 
-	 * @param {Number}  queryPeriodInput 
+	 * @param {yyyyMMdd}  queryDate 
+	 * @param {Integer}  queryPeriodInput 
 	 * @returns {String[]} 
 	 */
 	getPathsByPeriod(db, queryDate, queryPeriodInput) {
@@ -90,8 +90,8 @@ class useFileDB {
 	/**
 	 * 
 	 * @param {String} db 
-	 * @param {String}  queryDate 
-	 * @param {Number}  queryPeriodInput 
+	 * @param {yyyyMMdd} queryDate 
+	 * @param {Integer} queryPeriodInput 
 	 * @return {Array<Map>}
 	 */
 	load(db := this.main, queryDate := FormatTime(A_Now, "yyyyMMdd"), queryPeriodInput := 60) {
@@ -114,8 +114,8 @@ class useFileDB {
 	/**
 	 * 
 	 * @param {String} db 
-	 * @param {String}  queryDate 
-	 * @param {Number}  queryPeriodInput 
+	 * @param {yyyyMMdd} queryDate 
+	 * @param {Integer}  queryPeriodInput 
 	 * @return {Array<Map>}
 	 */
 	loadOneDay(db := this.main, queryDate := FormatTime(A_Now, "yyyyMMdd"), queryPeriodInput := 60) {
@@ -165,9 +165,9 @@ class useFileDB {
 
 	/**
 	 * 
-	 * @param newJsonString 
-	 * @param queryDate 
-	 * @param fileName 
+	 * @param {String} newJsonString 
+	 * @param {yyyyMMdd} queryDate 
+	 * @param {String} fileName 
 	 */
 	updateOne(newJsonString, queryDate, fileName) {
 		loop files, (this.main . "\" . queryDate . "\*.json") {
@@ -189,7 +189,7 @@ class useFileDB {
 
 	/**
 	 * 
-	 * @param archiveDate 
+	 * @param {yyyyMMdd} archiveDate 
 	 */
 	createArchive(archiveDate) {
 		archiveDataStr := JSON.stringify(this.loadOneDay(, archiveDate, 60 * 24 * this.cleanPeriodDays))
