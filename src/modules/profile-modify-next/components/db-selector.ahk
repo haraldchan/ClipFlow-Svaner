@@ -28,21 +28,32 @@ DBSelector(App) {
         uncData := uncDB.load(, , 60 * 24)
         uncValidateMap := Map()
         uncValidateMap.Default := ""
-        for item in uncData {
-            uncValidateMap[item["idNum"]] := item
+        for uncProfile in uncData {
+            uncValidateMap[uncProfile["idNum"]] := uncProfile
         }
 
         localData := localDB.load(, , 60 * 24)
-        for item in localData {
-            if (uncValidateMap[item["idNum"]]) {
-                continue
-            }
+        for localProfile in localData {
+            if (uncValidateMap[localProfile["idNum"]]) {
+                ; if matching idNum profile found, check each value
+                for key, val in localProfile {
+                    if (uncValidateMap[localProfile["idNum"]][key] != val) {
+                        newProfile := JSON.stringify(localProfile)
+                        date := FormatTime(uncValidateMap[localProfile["idNum"]]["regTime"], "yyyyMMdd")
+                        fileName := uncValidateMap[localProfile["idNum"]]["fileName"]
 
-            uncDB.add(JSON.stringify(item))
+                        uncDB.updateOne(newProfile, date, fileName)
+                        break
+                    }
+                }
+            }
+            else {
+                uncDB.add(JSON.stringify(localProfile))
+            }
             sentCount++
         }
 
-        MsgBox("已将本地数据发送至 Share 盘数据库。`n`n本次共发送 " . sentCount . " 条", POPUP_TITLE, "4096 T5 iconi")
+        MsgBox("已将本地数据同步至 Share 盘数据库。`n`n本次共发送 " . sentCount . " 条", POPUP_TITLE, "4096 T5 iconi")
     }
 
     render() {
