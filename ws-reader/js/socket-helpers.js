@@ -109,8 +109,9 @@ function handleMessageDisplay(data) {
 	// updated inputs & non-dynamic selects
 	FormContent.passportPhotoImg.src = `data:image/jpeg;base64,${currentData.curPhoto.replace('data:image/jpeg;base64,', '')}`;
 	FormContent.fullName.value = currentData.name ?? '';
-	FormContent.lastName.value = currentData.lastName ?? '';
-	FormContent.firstName.value = currentData.firstName ?? '';
+	// this might be a bug of the scanner drivers, lastname/firstname are mostly mismatch, so it has to be this way.
+	FormContent.lastName.value = currentData.firstName ?? '';
+	FormContent.firstName.value = currentData.lastName ?? '';
 	FormContent.address.value = currentData.address ?? '';
 	FormContent.idNum.value = currentData.cardNo;
 	FormContent.birthday.value = currentData.birthday;
