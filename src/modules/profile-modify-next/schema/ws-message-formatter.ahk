@@ -70,7 +70,7 @@ class WSMessageParser {
         ), "")
 
         ; only save when passport is available(scan mode)
-        if (passportImgKey) {
+        if (passportImgKey && incoming.data.%passportImgKey%) {
             this.base64ToFile(
                 StrReplace(incoming.data.%passportImgKey%, this.b64Prefix, ""),
                 Format("{1}\{2}-{3}.jpg", saveFolder, incoming.roomNum . incoming.data.name, "scan")
