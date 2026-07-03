@@ -1,7 +1,8 @@
 /**
  * @param {Svaner} App 
+ * @param {signal} queryFilter
  */
-DBSelector(App) {
+DBSelector(App, queryFilter) {
     dbMap := OrderedMap(
         "uncDB", "Share盘",
         "localDB", "本地硬盘"
@@ -26,14 +27,14 @@ DBSelector(App) {
         localDB := useFileDB(ProfileModifyNext.localDB)
         uncDB := useFileDB(ProfileModifyNext.uncDB)
 
-        uncData := uncDB.load(, , 60 * 24)
+        uncData := uncDB.load(, queryFilter.value["date"], queryFilter.value["range"])
         uncValidateMap := Map()
         uncValidateMap.Default := ""
         for uncProfile in uncData {
             uncValidateMap[uncProfile["idNum"]] := uncProfile
         }
 
-        localData := localDB.load(, , 60 * 24)
+        localData := localDB.load(, queryFilter.value["date"], queryFilter.value["range"])
         for localProfile in localData {
             if (uncValidateMap[localProfile["idNum"]]) {
                 ; if matching idNum profile found, check each value
