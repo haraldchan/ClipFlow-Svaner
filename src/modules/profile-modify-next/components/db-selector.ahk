@@ -38,6 +38,10 @@ DBSelector(App) {
             if (uncValidateMap[localProfile["idNum"]]) {
                 ; if matching idNum profile found, check each value
                 for key, val in localProfile {
+                    if (!uncValidateMap[localProfile["idNum"]].has(key)) {
+                        continue
+                    }
+
                     if (uncValidateMap[localProfile["idNum"]][key] != val) {
                         newProfile := JSON.stringify(localProfile)
                         date := FormatTime(uncValidateMap[localProfile["idNum"]]["regTime"], "yyyyMMdd")
