@@ -12,7 +12,8 @@ class WSMessageParser {
     )
 
     static b64Prefix := "data:image/jpeg;base64,"
-    static uncPicFolder := UNC_PATH . "\01 FO PASSPORT SCANNING"
+    static UNC_PATH := "\\10.0.2.13\fd"
+    static uncPicFolder := this.UNC_PATH . "\01 FO PASSPORT SCANNING"
     static localPicFolder := A_MyDocuments . "\01 FO PASSPORT SCANNING"
 
     static capture(identifier) {
@@ -59,19 +60,20 @@ class WSMessageParser {
         ; save profile pic
         this.base64ToFile(
             StrReplace(incoming.data.curPhoto, this.b64Prefix, ""), 
-            Format("{1}\{2}-{3}.jpg", saveFolder, incoming.roomNum . incoming.name, "head")
+            Format("{1}\{2}-{3}.jpg", saveFolder, incoming.roomNum . incoming.data.name, "head")
         )
 
         ; save scanned pic 
         passportImgKey := match(incoming.data, Map(
-            i => i.HasOwnProp("photo"), incoming.data.photo,
-            i => i.HasOwnProp("ocrPhoto"), incoming.data.ocrPhoto,
+            i => i.HasOwnProp("photo"), "photo",
+            i => i.HasOwnProp("ocrPhoto"), "ocrPhoto",
         ), "")
+
         ; only save when passport is available(scan mode)
         if (passportImgKey) {
             this.base64ToFile(
                 StrReplace(incoming.data.%passportImgKey%, this.b64Prefix, ""),
-                Format("{1}\{2}-{3}.jpg", saveFolder, incoming.roomNum . incoming.name, "scan")
+                Format("{1}\{2}-{3}.jpg", saveFolder, incoming.roomNum . incoming.data.name, "scan")
             )
         }
     }
