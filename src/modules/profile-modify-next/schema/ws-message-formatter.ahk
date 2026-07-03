@@ -2,15 +2,6 @@ class WSMessageParser {
     static dict := useDict()
     static identifier := "3ed542123e774d45203ff60175cb614e" ; MD5 hash: ProfileModifyNextLocal
 
-    static idTypes := Map(
-        "11", "身份证",
-        "14", "普通护照",
-        "93", "国内护照",
-        "16", "台湾居民来往大陆通行证",
-        "60", "港澳居民来往内地通行证",
-        "56", "港澳居民来往内地通行证（非中国籍）"
-    )
-
     static b64Prefix := "data:image/jpeg;base64,"
     static UNC_PATH := "\\10.0.2.13\fd"
     static uncPicFolder := this.UNC_PATH . "\01 FO PASSPORT SCANNING"
@@ -86,7 +77,7 @@ class WSMessageParser {
             gender: incoming.data.sex == "1" ? "男" : "女",
             guestType: "内地旅客",
             idNum: incoming.data.cardNo,
-            idType: this.idTypes[incoming.idType],
+            idType: incoming.idType,
             isMod: false,
             name: incoming.data.name,
             roomNum: incoming.roomNum,
@@ -106,7 +97,7 @@ class WSMessageParser {
             gender: incoming.data.sex == "1" ? "男" : "女",
             guestType: "港澳台旅客",
             idNum: incoming.data.cardNo,
-            idType: this.idTypes[incoming.idType],
+            idType: incoming.idType,
             isMod: false,
             name: incoming.data.name,
             nameLast: incoming.data.lastName,
@@ -130,7 +121,7 @@ class WSMessageParser {
             gender: incoming.data.sex == "1" ? "男" : "女",
             guestType: incoming.guestType,
             idNum: incoming.data.cardNo,
-            idType: this.idTypes[incoming.idType],
+            idType: incoming.idType,
             isMod: false,
             name: Format("{1}, {2}", incoming.data.lastName, incoming.data.firstName),
             nameFirst: incoming.data.firstName,
