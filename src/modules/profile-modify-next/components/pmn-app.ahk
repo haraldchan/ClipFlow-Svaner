@@ -459,35 +459,35 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         ; agent mode
         App.AddCheckBox("vdelegate-check-box x+10 Disabled", "后台代行", { check: isDelegate })
-            .bind()
-            .onClick(handleDelegateActivate)
+           .bind()
+           .onClick(handleDelegateActivate)
         App.AddText("vconnection-status x+20 w80 Hidden", " {1}", serverConnection)
 
         ; datetime
         App.AddDateTime("vdate xs15 yp+25 w90 h25", "yyyy/MM/dd")
-            .onChange((ctrl, _) => (
+           .onChange((ctrl, _) => (
                 queryFilter.update("date", FormatTime(ctrl.Value, "yyyyMMdd"))
                 handleListContentUpdate()
-            )),
-            ; search conditions
-            App.AddDDL("x+10 w80 Choose2", searchByMap.keys())
-            .onChange((ctrl, _) => searchBy.set(searchByMap[ctrl.Text]))
+           ))
+        ; search conditions
+        App.AddDDL("x+10 w80 Choose2", searchByMap.keys())
+           .onChange((ctrl, _) => searchBy.set(searchByMap[ctrl.Text]))
 
         ; search box
         App.AddEdit("vsearchBox x+5 w125 h25")
-            .onBlur((ctrl, _) => queryFilter.update("search", Trim(ctrl.Value)))
+           .onBlur((ctrl, _) => queryFilter.update("search", Trim(ctrl.Value)))
 
         ; range
         App.AddText("x+10 h25 0x200", "最近")
         App.AddEdit("vrange Number x+1 w30 h25", queryFilter.value["range"])
-            .onChange((ctrl, _) => queryFilter.update("range", !ctrl.Value ? 60 * 24 : ctrl.Value))
+           .onChange((ctrl, _) => queryFilter.update("range", !ctrl.Value ? 60 * 24 : ctrl.Value))
         App.AddText("x+1 h25 0x200", "分钟")
 
         ; refresh/fill
         App.AddButton("vrefresh x+10 w80 h25", "刷 新(&R)").onClick(handleRefresh)
         App.AddButton("vfillin x+5 w80 h25 Default", "{1}", fillBtnText)
-            .onClick(fillPmsProfile)
-            .onContextMenu((*) => settings.update("fillOverwrite", o => !o))
+           .onClick(fillPmsProfile)
+           .onContextMenu((*) => settings.update("fillOverwrite", o => !o))
 
         ; qm2 agent
         App.AddButton("vqm2-agent x+5 w80 h25 Disabled", "&QM2 Agent").onClick(showQm2Panel)
@@ -506,7 +506,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         ], searchBy, cur => cur == "waterfall")
 
         ; db selector(local/unc)
-        DBSelector(App)
+        DBSelector(App, queryFilter)
     }
 
     return (
