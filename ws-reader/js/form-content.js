@@ -197,6 +197,14 @@ class FormContent extends HTMLElement {
         select.appendChild(option);
     }
 
+    createOptGroup(select, label) {
+        const optGroup = document.createElement('optgroup')
+        optGroup.label = label
+        select.appendChild(optGroup)
+
+        return optGroup
+    }
+
     connectedCallback() {
         const shadow = this.shadowRoot
         shadow.appendChild(formContentTemplate.content.cloneNode(true))
@@ -279,8 +287,11 @@ class FormContent extends HTMLElement {
             this.createOption(this.regionList, code, nationalityAreas[code]);
         }
 
-        for (const [code, idTypeName] of cardTypes) {
-            this.createOption(this.idType, idTypeName, code);
+        for (const [guestType, cardTypes] of groupedCardTypes) {
+            const group = this.createOptGroup(this.idType, guestType)
+            for (const [code, idTypeName] of cardTypes) {
+                this.createOption(group, idTypeName, code)
+            }
         }
     }
 }
