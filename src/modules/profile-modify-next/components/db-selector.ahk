@@ -21,6 +21,7 @@ DBSelector(App) {
         }
 
         sentCount := 0
+        updatedCount := 0
 
         localDB := useFileDB(ProfileModifyNext.localDB)
         uncDB := useFileDB(ProfileModifyNext.uncDB)
@@ -43,17 +44,22 @@ DBSelector(App) {
                         fileName := uncValidateMap[localProfile["idNum"]]["fileName"]
 
                         uncDB.updateOne(newProfile, date, fileName)
+                        updatedCount++
                         break
                     }
                 }
             }
             else {
                 uncDB.add(JSON.stringify(localProfile))
+                sentCount++
             }
-            sentCount++
         }
 
-        MsgBox("已将本地数据同步至 Share 盘数据库。`n`n本次共发送 " . sentCount . " 条", POPUP_TITLE, "4096 T5 iconi")
+        MsgBox(
+            Format("已将本地数据同步至 Share 盘数据库。`n`n本次共发送 {1} 条，更新 {2} 条", sentCount, updatedCount),
+            POPUP_TITLE,
+            "4096 T5 iconi"
+        )
     }
 
     render() {
