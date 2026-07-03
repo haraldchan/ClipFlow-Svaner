@@ -103,15 +103,20 @@ async function connectOrDisconnect(definedPort = null) {
 
 function handleMessageDisplay(data) {
 	currentData = data.data;
+	// this might be a bug of the scanner drivers, lastname/firstname are mostly swapped, so it has to be this way.
+	const prevLast = currentData.lastName
+	const prevFirst = currentData.firstname
+	currentData.firstName = prevLast
+	currentData.lastName = prevFirst
+
 	const FormContent = document.getElementById('form-content')
 	FormContent.shadowRoot.querySelector('.form-content').reset()
 
 	// updated inputs & non-dynamic selects
 	FormContent.passportPhotoImg.src = `data:image/jpeg;base64,${currentData.curPhoto.replace('data:image/jpeg;base64,', '')}`;
 	FormContent.fullName.value = currentData.name ?? '';
-	// this might be a bug of the scanner drivers, lastname/firstname are mostly mismatch, so it has to be this way.
-	FormContent.lastName.value = currentData.firstName ?? '';
-	FormContent.firstName.value = currentData.lastName ?? '';
+	FormContent.lastName.value = currentData.lastName ?? '';
+	FormContent.firstName.value = currentData.firstName ?? '';
 	FormContent.address.value = currentData.address ?? '';
 	FormContent.idNum.value = currentData.cardNo;
 	FormContent.birthday.value = currentData.birthday;
