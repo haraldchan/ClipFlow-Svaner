@@ -119,7 +119,7 @@ class ActionBar extends HTMLElement {
                 roomNum: FormContent.roomNum.value,
                 tel: FormContent.tel.value,
                 guestType: FormContent.guestType.value,
-                idType: cardTypes.get(FormContent.idType.value),
+                idType: groupedCardTypes.get(FormContent.guestType.value).get(FormContent.idType.value),
                 region: FormContent.region.value,
                 data: currentData,
             };
