@@ -15,9 +15,10 @@ function getGuestType(typeCode, nationalityArea = '') {
 }
 
 const groupedCardTypes = new Map([
-	['国内旅客', new Map([
+	['内地旅客', new Map([
 		['11', '身份证'],
-		['93', '国内护照']
+		['93', '国内护照'],
+		['95', '港澳通行证']
 	])],
 	['国外旅客', new Map([
 		['14', '普通护照']
@@ -26,5 +27,6 @@ const groupedCardTypes = new Map([
 		['60', '港澳居民来往内地通行证'],
 		['16', '台湾居民来往大陆通行证'],
 		['56', '港澳居民来往内地通行证（非中国籍）'],
+		['55', '港澳台居民居住证']
 	])]
 ])
