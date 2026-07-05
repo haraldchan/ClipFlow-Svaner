@@ -238,6 +238,20 @@ PMN_App(App, moduleTitle, db, identifier) {
         listContent.set(handleSearchResultFilter(loadedItems))
         App["select-all-btn"].Value := false
     }
+    
+    /**
+     * Splits room number string with space and comma
+     * @param roomNums 
+     * @returns {Array<String>} 
+     */
+    roomNumSplitPipe(roomNums) {
+        return pipe(
+            i => StrSplit(i, ","),
+            i => i.map(item => Trim(item)),
+            i => i.map(item => StrSplit(item, " ")),
+            i => i.flat()
+        )(roomNums)
+    }
 
     handleSearchResultFilter(loadedItems) {
         filteredItems := []
@@ -285,7 +299,8 @@ PMN_App(App, moduleTitle, db, identifier) {
             }
         }
         else if (searchBy.value == "waterfall") {
-            roomNums := StrSplit(queryFilter.value["search"], " ")
+            ; roomNums := StrSplit(queryFilter.value["search"], " ")
+            roomNums := roomNumSplitPipe(queryFilter.value["search"].trim())
             ; filtering all entered room numbers
             for roomNum in roomNums {
                 for item in loadedItems {
@@ -316,7 +331,6 @@ PMN_App(App, moduleTitle, db, identifier) {
         return filteredItems
     }
 
-
     ; fill in profile by actions
     fillPmsProfile(*) {
         if (!WinExist("ahk_class SunAwtFrame")) {
@@ -339,7 +353,8 @@ PMN_App(App, moduleTitle, db, identifier) {
                 return
             }
 
-            rooms := StrSplit(queryFilter.value["search"].trim(), " ")
+            ; rooms := StrSplit(queryFilter.value["search"].trim(), " ")
+            rooms := roomNumSplitPipe(queryFilter.value["search"].trim())
             party := App["party-num"].Text
             App["party-num"].Text := ""
 
