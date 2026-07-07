@@ -91,7 +91,7 @@ formContentTemplate.innerHTML = /*html*/ `
 ${formContentStyle}
 <form class="form-content">
     <div class="photo-panel">
-        <img class="passport-photo" src="./no-avatar.png" alt="Passport Photo">
+        <img class="passport-photo" src="./assets/no-avatar.png" alt="Passport Photo">
     </div>
 
     <div class="fields">
