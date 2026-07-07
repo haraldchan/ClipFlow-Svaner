@@ -78,7 +78,7 @@ class utils {
         }
     }
 
-    static checkClearWin(msgboxTitle, operaLogo){
+    static checkClearWin(msgboxTitle, operaLogo) {
         isFound := ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, operaLogo)
         if (isFound = false) {
             WinSetAlwaysOnTop(false, "ahk_class SunAwtFrame")
@@ -90,6 +90,18 @@ class utils {
                 WinSetAlwaysOnTop(true, "ahk_class SunAwtFrame")
                 BlockInput("SendAndMouse")
                 return "OK"
+            }
+        }
+    }
+
+    static clearExistInstances() {
+        DetectHiddenWindows(true)
+        existInstances := WinGetList(A_ScriptName)
+        if (existInstances.Length > 0) {
+            for instanceID in existInstances {
+                if (instanceID != A_ScriptHwnd) {
+                    WinKill(instanceID)
+                }
             }
         }
     }
