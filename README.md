@@ -24,8 +24,13 @@ ClipFlow/
  |             |      |      |──── guest-profile-details.ahk
  |             |      |      |──── guest-profile-list.ahk
  |             |      |      └──── settings.ahk
+ |             |      |      └──── db-selector.ahk
+ |             |      |──── schema/
+ |             |      |      |──── guest-profile.ahk
+ |             |      |      └──── ws-message-formatter.ahk
  |             |      └──── macros/
  |             |             |──── fill-in.ahk
+ |             |             |──── fill-psb.ahk
  |             |             └──── waterfall.ahk
  |             |──── profile-modify-group/
  |             |      |──── profile-modify-group.ahk
@@ -77,12 +82,19 @@ ClipFlow/
  |                                  └──── transaction-entry-action.ahk
  |──── assets/
  |──── lib/
- |      |──── index.ahk/
+ |      |──── index.ahk
  |      |──── svaner/
  |      |──── system-icon/
  |      |──── use-dict/
  |      |──── use-json-config.ahk
  |      |──── use-server-agent.ahk
  |      └──── utils.ahk
+ |──── ws-reader
+ |      |──── assets/
+ |      |──── dicts/ (dictionaries)
+ |      |──── js/    (components & helpers)
+ |      |──── ws-reader.css
+ |      |──── ws-reader.html
+ |      └──── ws-reader.js
  └──── clipflow.config.json
 ```
