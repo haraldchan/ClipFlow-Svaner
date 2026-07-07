@@ -1,21 +1,18 @@
 #Requires AutoHotkey v2.0
-#SingleInstance Force
+#SingleInstance Off
 ; includes
 #Include lib\index.ahk
 #Include src\App.ahk
 
 ; acquire admin
 if (!A_IsAdmin) {
-	try {
-		Run("*RunAs " . A_ScriptFullPath)
-	}
-	catch {
-		ExitApp()
-	}
+	Run("*RunAs " . A_ScriptFullPath)
+	ExitApp()
 }
+utils.clearExistInstances()
 
 ; global consts
-VERSION := "1.10.10"
+VERSION := "1.10.11"
 POPUP_TITLE := "ClipFlow " . VERSION
 UNC_PATH := "\\10.0.2.13\fd"
 WIN_GROUP := ["ahk_class SunAwtFrame"]
