@@ -1,16 +1,16 @@
 function getGuestType(typeCode, nationalityArea = '') {
 	switch (typeCode) {
 		case '100':
-			return '内地旅客';
-			break;
+			return '内地旅客'
+			break
 		case '200':
-			return nationalityArea === 'CHN' ? '内地旅客' : '港澳台旅客';
-			break;
+			return nationalityArea === 'CHN' ? '内地旅客' : '港澳台旅客'
+			break
 		case '300':
-			return '国外旅客';
+			return '国外旅客'
 		default:
-			return '';
-			break;
+			return ''
+			break
 	}
 }
 
@@ -29,4 +29,11 @@ const groupedCardTypes = new Map([
 		['56', '港澳居民来往内地通行证（非中国籍）'],
 		['55', '港澳台居民居住证']
 	])]
+])
+
+const portsWithMakers = new Map([
+	['8010', '雄帝'],
+	['90', '文通'],
+	['17181', '科蓝'],
+	['17182', '科蓝'],
 ])

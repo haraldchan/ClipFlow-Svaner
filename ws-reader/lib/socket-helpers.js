@@ -109,28 +109,37 @@ function handleMessageDisplay(data) {
 	currentData.firstName = prevLast
 	currentData.lastName = prevFirst
 
-	const FormContent = document.getElementById('form-content')
-	FormContent.shadowRoot.querySelector('.form-content').reset()
+	const form = document.getElementById('form-content').shadowRoot.querySelector('.form-content')
+	form.reset()
 
-	// updated inputs & non-dynamic selects
-	FormContent.passportPhotoImg.src = `data:image/jpeg;base64,${currentData.curPhoto.replace('data:image/jpeg;base64,', '')}`;
-	FormContent.fullName.value = currentData.name ?? '';
-	FormContent.lastName.value = currentData.lastName ?? '';
-	FormContent.firstName.value = currentData.firstName ?? '';
-	FormContent.address.value = currentData.address ?? '';
-	FormContent.idNum.value = currentData.cardNo;
-	FormContent.birthday.value = currentData.birthday;
-	FormContent.validDate.value = currentData.validDate;
+	for (const [name, value] of Object.entries(currentData)) {
+		if (name.includes('nation')) {
+			console.log('yes')
+			const region = form.elements.namedItem('region')
+			currentData.guestType === '100' ? region.value = '中国' : region.value = nationalityAreas[currentData.nationalityArea]
+			continue
+		}
+		
+		const field = form.elements.namedItem(name);
+		if (!field) continue
 
-	// update selects
-	FormContent.gender.selectedIndex = currentData.sex;
-	FormContent.idType.value = currentData.cardType;
-	FormContent.region.value = nationalityAreas[currentData.nationalityArea] ?? '中国';
-	FormContent.guestType.value = getGuestType(
-		currentData.guestType,
-		currentData.hasOwnProperty('nationalityArea')
-			? currentData.nationalityArea
-			: '',
-	);
+		switch (name) {
+			case 'curPhoto':
+				const photo = form.querySelector('.passport-photo')
+				photo.src = `data:image/jpeg;base64,${currentData.curPhoto.replace('data:image/jpeg;base64,', '')}`;
+				break
+			case 'sex':
+				field.value = currentData.sex === '1' ? '男' : '女'
+				break
+			case 'guestType':
+				field.value = getGuestType(
+					currentData.guestType,
+					currentData.hasOwnProperty('nationalityArea') ? currentData.nationalityArea : ''
+				);
+				break
+			default:
+				field.value = currentData[name] ?? ''
+				break
+		}
+	}
 }
-
