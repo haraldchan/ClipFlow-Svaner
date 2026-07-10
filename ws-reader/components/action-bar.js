@@ -113,13 +113,15 @@ class ActionBar extends HTMLElement {
             const FormContent = document.getElementById('form-content')
             if (!FormContent.shadowRoot.querySelector('.form-content').reportValidity()) return
 
+            const formattedGuestType = getGuestType(currentData.guestType, currentData.hasOwnProperty('nationalityArea') ? currentData.nationalityArea : '')
+
             const sendClip = {
                 identifier: identifier,
                 tsId: Date.now(),
-                roomNum: currentData.roomNum,
-                tel: currentData.tel,
-                guestType: currentData.guestType,
-                idType: groupedCardTypes.get(currentData.guestType).get(currentData.cardType),
+                roomNum: currentData.roomNum ?? '',
+                tel: currentData.tel ?? '',
+                guestType: formattedGuestType,
+                idType: groupedCardTypes.get(formattedGuestType).get(currentData.cardType),
                 region: currentData.region,
                 data: currentData,
             }
