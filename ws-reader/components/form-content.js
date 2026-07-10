@@ -25,7 +25,7 @@ const formContentStyle = html`
     .fields {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px 16px;
+        gap: 20px 16px;
     }
 
     .field {
@@ -59,6 +59,13 @@ const formContentStyle = html`
     .field select:focus {
         outline: none;
         border-color: var(--primary-dark);
+        box-shadow: 0 0 0 3px rgba(99, 193, 246, 0.15);
+    }
+
+    .field-invalid {
+        outline: none;
+        border-color: var(--danger) !important;
+        color: var(--danger)  !important;
         box-shadow: 0 0 0 3px rgba(99, 193, 246, 0.15);
     }
 
@@ -136,9 +143,8 @@ ${formContentStyle}
             <label>国籍/地区</label>
             <input id="region" type="text" list="region-list" placeholder="国籍或地区" name="region" required>
             <datalist id="region-list">
-                ${
-                Object.entries(nationalityAreas).map(([code, regionName]) => html`<option value="${regionName}">${code}</option>`)
-                }
+                ${Object.entries(nationalityAreas).map(([code, regionName]) => html`<option value="${regionName}">${code}</option>`)
+    }
             </datalist>
             </input>
         </div>
@@ -163,7 +169,7 @@ ${formContentStyle}
                     <option value="${cardTypeCode}">${cardTypeName}</option>
                     `)}
                 </optgroup>`
-                )}
+    )}
             </select>
         </div>
 
@@ -213,6 +219,12 @@ class FormContent extends HTMLElement {
                         field.value = '0' + field.value
                     }
                     currentData.roomNum = field.value
+                    break
+                case 'validDate':
+                    const today = new Date()
+                    today.setHours(0, 0, 0, 0)
+                    const dateToValidate = new Date(field.value)
+                    field.classList.toggle('field-invalid', today.getTime() > dateToValidate.getTime())
                     break
                 default:
                     currentData[field.name] = field.value
