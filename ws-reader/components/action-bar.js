@@ -110,18 +110,22 @@ class ActionBar extends HTMLElement {
 
         this.sendBtn = shadow.getElementById('send-btn')
         this.sendBtn.addEventListener('click', async () => {
-            const FormContent = document.getElementById('form-content')
-            if (!FormContent.shadowRoot.querySelector('.form-content').reportValidity()) return
-
-            const formattedGuestType = getGuestType(currentData.guestType, currentData.hasOwnProperty('nationalityArea') ? currentData.nationalityArea : '')
+            const form = document.getElementById('form-content').shadowRoot.querySelector('.form-content')
+            if (!form.reportValidity()) {
+                const invalidFields = form.querySelectorAll(":invalid")
+                for (const field of form.elements) {
+                    field.classList.toggle('field-invalid', !field.validity.valid)
+                }
+                return
+            }
 
             const sendClip = {
                 identifier: identifier,
                 tsId: Date.now(),
                 roomNum: currentData.roomNum ?? '',
                 tel: currentData.tel ?? '',
-                guestType: formattedGuestType,
-                idType: groupedCardTypes.get(formattedGuestType).get(currentData.cardType),
+                guestType: currentData.guestType,
+                idType: groupedCardTypes.get(currentData.guestType).get(currentData.cardType),
                 region: currentData.region,
                 data: currentData,
             }
