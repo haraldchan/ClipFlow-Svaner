@@ -66,7 +66,7 @@ const formContentStyle = html`
         outline: none;
         border-color: var(--danger) !important;
         color: var(--danger)  !important;
-        box-shadow: 0 0 0 3px rgba(99, 193, 246, 0.15);
+        box-shadow: 0 0 0 3px rgba(246, 99, 99, 0.15) !important;
     }
 
     .field-span-2 {
@@ -205,12 +205,63 @@ class FormContent extends HTMLElement {
         })
     }
 
+    validateDate(field, message) {
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        const dateToValidate = new Date(field.value)
+        const isInvalid = today.getTime() > dateToValidate.getTime()
+        field.classList.toggle('field-invalid', isInvalid)
+        if (isInvalid) {
+            field.setCustomValidity(message)
+            field.reportValidity()
+            return false
+        }
+        
+        field.setCustomValidity('')
+        return true
+    }
+
+    getAge(birthday) {
+        const today = new Date()
+        let age = today.getFullYear() - birthday.getFullYear()
+
+        const hasHadBirthday =
+            today.getMonth() > birthday.getMonth() ||
+            (
+                today.getMonth() === birthday.getMonth() &&
+                today.getDate() >= birthday.getDate()
+            )
+
+        if (!hasHadBirthday) age--
+        
+        return age
+    }
+
+    validateBirthday(field, message) {
+        const birthday = new Date(field.value)
+        const isUnder18 = this.getAge(birthday) < 18
+
+        if (isUnder18) {
+            field.classList.add('field-invalid', isUnder18)
+            field.setCustomValidity(message)
+            field.reportValidity()
+            return false
+        }
+        
+        field.classList.remove('field-invalid', isUnder18)
+        field.setCustomValidity('')
+        return true
+    }
+
     connectedCallback() {
         const shadow = this.shadowRoot
         shadow.appendChild(formContentTemplate.content.cloneNode(true))
 
         this.form = shadow.querySelector('form')
         this.form.addEventListener('change', e => {
+            /**
+             * @type {HTMLInputElement | HTMLSelectElement}
+             */
             const field = e.target
 
             switch (field.name) {
@@ -220,12 +271,17 @@ class FormContent extends HTMLElement {
                     }
                     currentData.roomNum = field.value
                     break
-                case 'validDate':
-                    const today = new Date()
-                    today.setHours(0, 0, 0, 0)
-                    const dateToValidate = new Date(field.value)
-                    field.classList.toggle('field-invalid', today.getTime() > dateToValidate.getTime())
+                 
+                case 'birthday':
+                    this.validateBirthday(field, '此客人为未成年人，请记录监护人信息并核实')
+                    currentData.birthday = field.value 
                     break
+
+                case 'validDate':
+                    this.validateDate(field, '证件已过期，请核验原件')
+                    currentData.validDate = field.value
+                    break
+
                 default:
                     currentData[field.name] = field.value
                     break
