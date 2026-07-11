@@ -131,10 +131,13 @@ function handleMessageDisplay(data) {
 				field.value = currentData.sex === '1' ? '男' : '女'
 				break
 			case 'guestType':
-				field.value = getGuestType(
+				formattedGuestType = getGuestType(
 					currentData.guestType,
 					currentData.hasOwnProperty('nationalityArea') ? currentData.nationalityArea : ''
 				)
+
+				field.value = formattedGuestType
+				currentData.guestType = formattedGuestType
 				break
 			default:
 				field.value = currentData[name] ?? ''
