@@ -36,7 +36,9 @@
 :root {
 	--primary: #63c1f6;
 	--primary-dark: #4592d8;
+	--warning: #ffc107;
 	--danger: #e5484d;
+	--success: #71ff6f;
 	--border: #d9eaf7;
 	--bg: #f6fbff;
 	--text: #233445;
@@ -50,10 +52,51 @@ body {
 }
 
 .passport-card {
+	position: relative;
 	max-width: 800px;
 	background: #fff;
 	border: 1px solid var(--border);
 	border-radius: 12px;
 	overflow: hidden;
 	box-shadow: 0 4px 18px rgba(69, 146, 216, 0.08);
+}
+
+.loading-overlay {
+	position: absolute;
+    inset: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: rgba(245, 248, 251, 0.72);
+    backdrop-filter: blur(2px);
+
+    opacity: 1;
+    pointer-events: none;
+
+    transition:
+        opacity .2s ease,
+        visibility .2s ease;
+
+    border-radius: inherit;
+    z-index: 100;
+}
+
+.loading-spinner {
+    width: 42px;
+    height: 42px;
+
+    border: 4px solid rgba(69, 146, 216, .2);
+    border-top-color: #4592D8;
+
+    border-radius: 50%;
+
+    animation: loading-spin .8s linear infinite;
+}
+
+@keyframes loading-spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
