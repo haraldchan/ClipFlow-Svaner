@@ -27,11 +27,6 @@ PMN_Settings(settingSignal) {
         =========== 设置选项 ===========
     )"
 
-    handleLaunchWSReader(*) {
-        Run(A_ScriptDir . "\ws-reader\ws-reader.html")
-        Win.Destroy()
-    }
-
     onMount() {
         Win["ow"].Value := settingSignal.value["fillOverwrite"]
     }
@@ -42,10 +37,6 @@ PMN_Settings(settingSignal) {
         ; overwrite fill-in
         Win.AddCheckbox("vow x10 w260", "默认覆盖填入（直接在原 Profile 修改）")
            .onClick((ctrl, _) => settingSignal.update("fillOverwrite", ctrl.value))
-        
-        ; launch ws reader
-        Win.AddText("x10 y+10 w90 h20 0x200", "WS Reader")
-        Win.AddButton("x+1 w80 h20", "启 动").onClick(handleLaunchWSReader)
     }
 
     return (
