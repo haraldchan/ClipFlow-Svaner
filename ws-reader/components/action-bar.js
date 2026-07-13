@@ -63,6 +63,11 @@ const actionBarStyle = html`
         outline: none;
         box-shadow: 0 0 0 3px rgba(99, 193, 246, 0.25);
     }
+
+    .btn-disabled {
+        border: 1px solid var(--muted);
+        color: var(--muted);
+    }
 </style>
 `
 
@@ -79,23 +84,42 @@ ${actionBarStyle}
 class ActionBar extends HTMLElement {
     constructor() {
         super()
-        const shadow = this.attachShadow({
-            mode: 'open'
-        })
+        const shadow = this.attachShadow({ mode: 'open' })
     }
 
-    sendCommand(e) {
-        const option = e.target.id.replace('-btn', '')
+    disable() {
+        this.readBtn.classList.replace('btn-secondary', 'btn-disabled')
+        this.scanBtn.classList.replace('btn-secondary', 'btn-disabled')
+        this.sendBtn.classList.replace('btn-primary', 'btn-disabled')
+        this.readBtn.disabled = true
+        this.scanBtn.disabled = true
+        this.sendBtn.disabled = true
+    }
 
+    enable() {
+        this.readBtn.classList.replace('btn-disabled', 'btn-secondary')
+        this.scanBtn.classList.replace('btn-disabled', 'btn-secondary')
+        this.sendBtn.classList.replace('btn-disabled', 'btn-primary')
+        this.readBtn.disabled = false
+        this.scanBtn.disabled = false
+        this.sendBtn.disabled = false
+    }
+
+    /** 
+     * @param {Event} e
+     */
+    sendCommand(e) {        
         if (socket === null || socket.readyState !== WebSocket.OPEN) {
             alert('尚未连接到WebSocket服务器')
             return
         }
-
-        const message = `{"command":"${option}"}`
-
+        
+        const message = `{"command":"${e.target.id.replace('-btn', '') }"}`
         console.log(message)
         socket.send(message)
+        
+        this.disable()
+        document.querySelector('.loading-overlay').style.display = 'flex'
     }
 
     connectedCallback() {
@@ -103,20 +127,18 @@ class ActionBar extends HTMLElement {
         shadow.appendChild(actionBarTemplate.content.cloneNode(true))
 
         this.readBtn = shadow.getElementById('read-btn')
-        this.readBtn.addEventListener('click', this.sendCommand)
+        this.readBtn.addEventListener('click', this.sendCommand.bind(this))
 
         this.scanBtn = shadow.getElementById('scan-btn')
-        this.scanBtn.addEventListener('click', this.sendCommand)
+        this.scanBtn.addEventListener('click', this.sendCommand.bind(this))
 
         this.sendBtn = shadow.getElementById('send-btn')
         this.sendBtn.addEventListener('click', async () => {
-            const form = document.getElementById('form-content').shadowRoot.querySelector('.form-content')
-            if (!form.reportValidity()) {
-                const invalidFields = form.querySelectorAll(":invalid")
-                for (const field of form.elements) {
-                    field.classList.toggle('field-invalid', !field.validity.valid)
-                }
-                return
+            /** @type {HTMLFormElement} */
+            const form = document.querySelector('form-content').shadowRoot.querySelector('.form-content')
+            const validateResult = FormValidator.handleFormValidate(form)
+            if (!validateResult.isValid) {
+                console.log([...validateResult.invalidFields])
             }
 
             const sendClip = {
