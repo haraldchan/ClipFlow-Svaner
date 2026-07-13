@@ -106,7 +106,7 @@ ${formContentStyle}
 
         <div class="field field-span-2">
             <label>全名</label>
-            <input type="text" id="fullname" name="name">
+            <input type="text" id="name" name="name">
         </div>
 
         <div class="field">
@@ -175,7 +175,7 @@ ${formContentStyle}
 
         <div class="field">
             <label>性别</label>
-            <select id="gender" name="sex" required>
+            <select id="gender" name="gender" required>
                 <option value="" disabled hidden selected>---请选择性别---</option>
                 <option value="男">男</option>
                 <option value="女">女</option>
@@ -200,57 +200,7 @@ ${formContentStyle}
 class FormContent extends HTMLElement {
     constructor() {
         super()
-        const shadow = this.attachShadow({
-            mode: 'open'
-        })
-    }
-
-    validateDate(field, message) {
-        const today = new Date()
-        today.setHours(0, 0, 0, 0)
-        const dateToValidate = new Date(field.value)
-        const isInvalid = today.getTime() > dateToValidate.getTime()
-        field.classList.toggle('field-invalid', isInvalid)
-        if (isInvalid) {
-            field.setCustomValidity(message)
-            field.reportValidity()
-            return false
-        }
-        
-        field.setCustomValidity('')
-        return true
-    }
-
-    getAge(birthday) {
-        const today = new Date()
-        let age = today.getFullYear() - birthday.getFullYear()
-
-        const hasHadBirthday =
-            today.getMonth() > birthday.getMonth() ||
-            (
-                today.getMonth() === birthday.getMonth() &&
-                today.getDate() >= birthday.getDate()
-            )
-
-        if (!hasHadBirthday) age--
-        
-        return age
-    }
-
-    validateBirthday(field, message) {
-        const birthday = new Date(field.value)
-        const isUnder18 = this.getAge(birthday) < 18
-
-        if (isUnder18) {
-            field.classList.add('field-invalid', isUnder18)
-            field.setCustomValidity(message)
-            field.reportValidity()
-            return false
-        }
-        
-        field.classList.remove('field-invalid', isUnder18)
-        field.setCustomValidity('')
-        return true
+        const shadow = this.attachShadow({ mode: 'open' })
     }
 
     connectedCallback() {
@@ -271,20 +221,18 @@ class FormContent extends HTMLElement {
                     }
                     currentData.roomNum = field.value
                     break
-                 
-                case 'birthday':
-                    this.validateBirthday(field, '此客人为未成年人，请记录监护人信息并核实')
-                    currentData.birthday = field.value 
-                    break
 
-                case 'validDate':
-                    this.validateDate(field, '证件已过期，请核验原件')
-                    currentData.validDate = field.value
-                    break
+                case 'region':
+                    currentData.region = field.value
 
                 default:
                     currentData[field.name] = field.value
                     break
+            }
+            
+            const validateResult = FormValidator.handleFormValidate(form)
+            if (!validateResult.isValid) {
+                console.log([...validateResult.invalidFields])
             }
         })
     }
