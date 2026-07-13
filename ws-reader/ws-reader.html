@@ -9,6 +9,7 @@
     <script src="./lib/nationality-areas.js"></script>
     <script src="./lib/socket-helpers.js"></script>
     <script src="./lib/html-helpers.js"></script>
+    <script src="./lib/form-validator.js"></script>
     <script src="./components/card-header.js"></script>
     <script src="./components/action-bar.js"></script>
     <script src="./components/form-content.js"></script>
@@ -20,14 +21,16 @@
             <img width="50" height="50" src="../assets/CFicon.jpg" alt="cf-icon">
             <div style="padding-left: 10px;">
                 <p class="icon-title-text">ClipFlow WS Reader</p>
-                <p style="color: gray;">v0.1.1</p>
+                <p style="color: gray;">v0.1.2</p>
             </div>
         </div>
 
         <div class="passport-card">
-            <card-header id="card-header"></card-header>
-            <form-content id="form-content"></form-content>
-
+            <card-header></card-header>
+            <form-content></form-content>
+            <div class="loading-overlay" style="display: none;">
+                <div class="loading-spinner"></div>
+            </div>
         </div>
         <action-bar></action-bar>
 
