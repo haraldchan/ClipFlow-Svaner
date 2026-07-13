@@ -92,7 +92,7 @@ const cardHeaderStyle = html`
 
     .status-connected {
         background: rgba(255, 255, 255, 0.18);
-        color: #71ff6f;
+        color: var(--success);
         border-color: rgba(255, 255, 255, 0.25);
     }
 
@@ -102,7 +102,7 @@ const cardHeaderStyle = html`
 
     .status-connecting {
         background: rgba(255, 255, 255, 0.12);
-        color: #ffc107;
+        color: var(--warning);
         border-color: rgba(255, 255, 255, 0.25);
     }
 
@@ -124,7 +124,7 @@ const cardHeaderStyle = html`
 
     .status-disconnected {
         background: rgba(255, 255, 255, 0.18);
-        color: #de5664;
+        color: var(--danger);
         border-color: rgba(255, 255, 255, 0.25);
     }
 </style>
@@ -149,9 +149,7 @@ ${cardHeaderStyle}
 class CardHeader extends HTMLElement {
     constructor() {
         super()
-        const shadow = this.attachShadow({
-            mode: 'open'
-        })
+        const shadow = this.attachShadow({ mode: 'open' })
     }
 
     connectedCallback() {
