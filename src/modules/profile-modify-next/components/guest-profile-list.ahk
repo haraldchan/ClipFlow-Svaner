@@ -2,7 +2,7 @@
 
 /**
  * @param {Svaner} App 
- * @param {useFileDB} db 
+ * @param {()=>useFileDB} db 
  * @param {signal} listContent 
  * @param {signal} queryFilter 
  * @param {signal} searchBy 
@@ -19,12 +19,10 @@ GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile) {
     }
  
     handleUpdateItem(LV, row) {
-        db := ProfileModifyNext.db
-
         selectedItem := listContent.value.find(item => item["idNum"] == getSelectedCell(LV, row, "idNum"))
         selectedItem["roomNum"] := getSelectedCell(LV, row, "roomNum")
     
-        SetTimer(() => db.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], selectedItem["fileName"]), -1)
+        SetTimer(() => db().updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], selectedItem["fileName"]), -1)
     }
 
     showProfileDetails(LV, row, *) {
@@ -51,7 +49,7 @@ GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile) {
 
         LV.Modify(row,,, selectedItem["name"])
 
-        SetTimer(() => db.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], selectedItem["fileName"]), -1)
+        SetTimer(() => db().updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], selectedItem["fileName"]), -1)
     }
 
     return App.AddListView(

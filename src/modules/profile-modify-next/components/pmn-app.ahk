@@ -1,7 +1,7 @@
 /**
  * @param {Svaner} App 
  * @param {String} moduleTitle 
- * @param {useFileDB} db 
+ * @param {()=>useFileDB} db 
  * @param {String} identifier 
  */
 PMN_App(App, moduleTitle, db, identifier) {
@@ -60,14 +60,8 @@ PMN_App(App, moduleTitle, db, identifier) {
 
 
     ; data states
-    /**
-     * @prop {Array<ProfileMainland | ProfileHkMoTw | ProfileAbroad>} value
-     */
-    listContent := signal(db.load(), { asMap: true })
+    listContent := signal(db().load(), { asMap: true })
 
-    /**
-     * @prop { {date: String, search: String, range: Integer} } value
-     */
     queryFilter := signal({ date: FormatTime(A_Now, "yyyyMMdd"), search: "", range: 60 }, { asMap: true })
 
     ; list UI states/effect
@@ -103,8 +97,6 @@ PMN_App(App, moduleTitle, db, identifier) {
         callback: (*) => handleCaptured(identifier)
     })
     handleCaptured(identifier) {
-        db := ProfileModifyNext.db
-
         if (!InStr(A_Clipboard, identifier)) {
             return
         }
@@ -130,7 +122,7 @@ PMN_App(App, moduleTitle, db, identifier) {
             incomingGuest["fileName"] := A_Now . "==" . Random(10000, 99999)
             incomingGuest["regTime"] := A_Now
 
-            db.add(JSON.stringify(incomingGuest))
+            db().add(JSON.stringify(incomingGuest))
 
             isBirthday := incomingGuest["birthday"] == FormatTime(A_Now, "yyyy-MM-dd")
             MsgBox(
@@ -155,24 +147,20 @@ PMN_App(App, moduleTitle, db, identifier) {
     }
 
     handleGuestInfoUpdateFromAdd(captured) {
-        db := ProfileModifyNext.db
-
-        recentGuests := db.load()
+        recentGuests := db().load()
         for guest in recentGuests {
             if (guest["idNum"] == captured["idNum"]) {
                 captured["regTime"] := guest["regTime"]
                 captured["fileName"] := guest["fileName"]
 
-                db.updateOne(JSON.stringify(captured), queryFilter.value["date"], guest["fileName"])
+                db().updateOne(JSON.stringify(captured), queryFilter.value["date"], guest["fileName"])
                 return
             }
         }
     }
 
-    handleGuestInfoUpdateFromMod(updater) {
-        db := ProfileModifyNext.db
-        
-        recentGuests := db.load(, , 60 * 24)
+    handleGuestInfoUpdateFromMod(updater) {        
+        recentGuests := db().load(, , 60 * 24)
         matchedGuest := Map()
         items := updater.keys()
 
@@ -195,7 +183,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         }
 
         try {
-            db.updateOne(JSON.stringify(matchedGuest), queryFilter.value["date"], matchedGuest["fileName"])
+            db().updateOne(JSON.stringify(matchedGuest), queryFilter.value["date"], matchedGuest["fileName"])
         } catch {
             MsgBox("无匹配目标...", POPUP_TITLE, "4096 T1.5")
             return
@@ -222,13 +210,12 @@ PMN_App(App, moduleTitle, db, identifier) {
 
     effect(ProfileModifynext.usingDB, handleListContentUpdate)
     handleListContentUpdate(*) {
-        db := ProfileModifyNext.db
-
         colTitles := App["guest-profile-list"].svanerWrapper.titleKeys
         useListPlaceholder(listContent, colTitles, "Loading...")
 
         App["range"].Enabled := (queryFilter.value["date"] == FormatTime(A_Now, "yyyyMMdd"))
-        loadedItems := db.load(, queryFilter.value["date"], queryFilter.value["range"])
+
+        loadedItems := db().load(, queryFilter.value["date"], queryFilter.value["range"])
 
         if (!loadedItems.Length) {
             useListPlaceholder(listContent, colTitles, "No Data")
@@ -273,10 +260,6 @@ PMN_App(App, moduleTitle, db, identifier) {
             else {
                 ; searching by name fragment
                 for item in loadedItems {
-                    ; if (!item.satisfies(ProfileMainland) || !item.satisfies(ProfileAbroad) || !item.satisfies(ProfileHkMoTw)) {
-                    ;     continue
-                    ; }
-
                     ; from mainland
                     if (item["guestType"] == "内地旅客") {
                         if (InStr(item["name"], searchInput)) {
@@ -520,8 +503,8 @@ PMN_App(App, moduleTitle, db, identifier) {
             App.AddEdit("vparty-num Hidden x+1 w100 h25", "")
         ], searchBy, cur => cur == "waterfall")
 
-        ; db selector(local/unc)
-        DBSelector(App, queryFilter)
+        ; offline controls
+        OfflineControls(App, queryFilter)
     }
 
     return (
