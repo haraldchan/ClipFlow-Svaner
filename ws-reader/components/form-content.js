@@ -230,7 +230,7 @@ class FormContent extends HTMLElement {
                     break
             }
             
-            const validateResult = FormValidator.handleFormValidate(form)
+            const validateResult = FormValidator.handleFormValidate(e.currentTarget)
             if (!validateResult.isValid) {
                 console.log([...validateResult.invalidFields])
             }
