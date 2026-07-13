@@ -7,7 +7,7 @@
 #Include components\guest-profile-details.ahk
 #Include components\sent-posts.ahk
 #Include components\settings.ahk
-#Include components\db-selector.ahk
+#Include components\offline-controls.ahk
 ; macros
 #Include macros\fill-in.ahk
 #Include macros\fill-psb.ahk
@@ -38,10 +38,10 @@ class ProfileModifyNext {
         }
 
         ; initialize db
-        try {
+        if (DirExist(this.uncDB.main)) {
             this.db := useFileDB(this.uncDB)
         }
-        catch {
+        else {
             this.db := useFileDB(this.localDB)
             this.usingDB.set("localDB")
         }
@@ -62,6 +62,14 @@ class ProfileModifyNext {
         })
 
         ; mount module component
-        PMN_App(App, this.title, this.db, this.identifier)
+        PMN_App(App, this.title, this.getDB.Bind(this), this.identifier)
+    }
+
+    static getDB() {
+        if (this.usingDB.value == "uncDB" && !DirExist(this.uncDB.main)) {
+            this.usingDB.set("localDB")
+        }
+
+        return this.db
     }
 }
