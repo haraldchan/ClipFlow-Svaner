@@ -16,7 +16,7 @@ OfflineControls(App, queryFilter) {
     }
 
     handleSendToUNC(*) {
-        if (!DirExist(UNC_PATH)) {
+        if (!DirExist(ProfileModifyNext.getDB().main)) {
             MsgBox("无法连接到 Share 盘", POPUP_TITLE, "4096 T2 iconx")
             return
         }
