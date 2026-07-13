@@ -12,7 +12,7 @@ if (!A_IsAdmin) {
 utils.clearExistInstances()
 
 ; global consts
-VERSION := "1.10.12"
+VERSION := "1.10.13"
 POPUP_TITLE := "ClipFlow " . VERSION
 UNC_PATH := "\\10.0.2.13\fd"
 WIN_GROUP := ["ahk_class SunAwtFrame"]
@@ -38,7 +38,10 @@ ClipFlowApp := Svaner({
 	events: {
 		close: (*) => utils.quitApp("ClipFlow", POPUP_TITLE, WIN_GROUP),
 		escape: app => app.Hide()
-	}
+	},
+	; devOpt: {
+	; 	border: true
+	; }
 })
 
 App(ClipFlowApp)
