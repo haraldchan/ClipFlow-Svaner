@@ -137,8 +137,20 @@ class ActionBar extends HTMLElement {
             /** @type {HTMLFormElement} */
             const form = document.querySelector('form-content').shadowRoot.querySelector('.form-content')
             const validateResult = FormValidator.handleFormValidate(form)
+            // allow under18 as valid
+            const birthdayField = [...validateResult.invalidFields].find(field => field.name === 'birthday')
+            if (birthdayField && birthdayField.value) {
+                const filteredFields = [...validateResult.invalidFields].filter(field => field.name !== 'birthday')
+                validateResult.invalidFields = filteredFields
+                if (!filteredFields.length) {
+                    validateResult.isValid = true
+                }
+            }
+
             if (!validateResult.isValid) {
                 console.log([...validateResult.invalidFields])
+                return
+                
             }
 
             const sendClip = {
