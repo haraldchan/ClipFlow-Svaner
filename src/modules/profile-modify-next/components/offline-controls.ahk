@@ -2,7 +2,7 @@
  * @param {Svaner} App 
  * @param {signal} queryFilter
  */
-DBSelector(App, queryFilter) {
+OfflineControls(App, queryFilter) {
     dbMap := OrderedMap(
         "uncDB", "Share盘",
         "localDB", "本地硬盘"
@@ -67,8 +67,13 @@ DBSelector(App, queryFilter) {
         )
     }
 
+    handleLaunchWSReader(*) {
+        Run(A_ScriptDir . "\ws-reader\ws-reader.html")
+    }
+
     render() {
-        App.AddText("@align[y]:select-all-btn xs498 w70 h25 0x200", "当前数据库")
+        App.AddButton("@align[y]:select-all-btn xs410 w70 h25", "WS Reader").onClick(handleLaunchWSReader)
+        App.AddText("@align[y]:select-all-btn x+15 w70 h25 0x200", "当前数据库")
         App.AddDDL(
             "x+1 w80 Choose" . dbMap.keys().findIndex(k => k == ProfileModifyNext.usingDB.value), 
             dbMap.values()
