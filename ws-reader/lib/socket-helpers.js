@@ -31,8 +31,8 @@ async function connect(port) {
 }
 
 async function findService(definedPort = null) {
-	const connBtn = document.getElementById('card-header').connBtn
-	const portSelect = document.getElementById('card-header').portSelect
+	const connBtn = document.querySelector('card-header').connBtn
+	const portSelect = document.querySelector('card-header').portSelect
 
 	connBtn.textContent = '● 连接中...'
 	connBtn.classList.remove(...connStatusClasses)
@@ -58,7 +58,7 @@ async function findService(definedPort = null) {
 }
 
 async function connectOrDisconnect(definedPort = null) {
-	const connBtn = document.getElementById('card-header').connBtn
+	const connBtn = document.querySelector('card-header').connBtn
 
 	if (socket === null || socket.readyState === WebSocket.CLOSED) {
 		try {
@@ -89,6 +89,8 @@ async function connectOrDisconnect(definedPort = null) {
 			}
 
 			handleMessageDisplay(data)
+			document.querySelector('action-bar').enable()
+			document.querySelector('.loading-overlay').style.display = 'none'
 		}
 
 		socket.onclose = (event) => console.log('连接已关闭')
@@ -109,39 +111,37 @@ function handleMessageDisplay(data) {
 	currentData.firstName = prevLast
 	currentData.lastName = prevFirst
 
-	const form = document.getElementById('form-content').shadowRoot.querySelector('.form-content')
-	form.reset()
+	const guestType = Number.isInteger(parseInt(currentData.guestType))
+		? getGuestType(currentData.guestType, currentData.hasOwnProperty('nationalityArea') ? currentData.nationalityArea : '')
+		: currentData.guestType
+	currentData.guestType = guestType
 
-	for (const [name, value] of Object.entries(currentData)) {
-		if (name.includes('nation')) {
-			const region = form.elements.namedItem('region')
-			currentData.guestType === '100' ? region.value = '中国' : region.value = nationalityAreas[currentData.nationalityArea]
-			continue
-		}
+	/** @type {HTMLFormElement} */
+	const form = document.querySelector('form-content').shadowRoot.querySelector('.form-content')
 
-		const field = form.elements.namedItem(name)
-		if (!field) continue
-
-		switch (name) {
+	for (const field of form.elements) {
+		switch (field.name) {
 			case 'curPhoto':
 				const photo = form.querySelector('.passport-photo')
 				photo.src = `data:image/jpeg;base64,${currentData.curPhoto.replace('data:image/jpeg;base64,', '')}`
 				break
-			case 'sex':
+
+			case 'region':
+				field.value = guestType === '内地旅客' ? '中国' : nationalityAreas[currentData.nationalityArea] 
+				break
+				
+			case 'gender':
 				field.value = currentData.sex === '1' ? '男' : '女'
 				break
-			case 'guestType':
-				formattedGuestType = getGuestType(
-					currentData.guestType,
-					currentData.hasOwnProperty('nationalityArea') ? currentData.nationalityArea : ''
-				)
 
-				field.value = formattedGuestType
-				currentData.guestType = formattedGuestType
-				break
 			default:
-				field.value = currentData[name] ?? ''
+				field.value = currentData[field.name] ?? ''
 				break
 		}
+	}
+
+	const validateResult = FormValidator.handleFormValidate(form)
+	if (!validateResult.isValid) {
+		console.log([...validateResult.invalidFields])
 	}
 }
