@@ -85,10 +85,10 @@ async function connectOrDisconnect(definedPort = null) {
 
 			if (data.code === 1) {
 				alert(data.message)
-				return
+			} else {
+				handleMessageDisplay(data)
 			}
 
-			handleMessageDisplay(data)
 			document.querySelector('action-bar').enable()
 			document.querySelector('.loading-overlay').style.display = 'none'
 		}
@@ -127,9 +127,9 @@ function handleMessageDisplay(data) {
 				break
 
 			case 'region':
-				field.value = guestType === '内地旅客' ? '中国' : nationalityAreas[currentData.nationalityArea] 
+				field.value = guestType === '内地旅客' ? '中国' : nationalityAreas[currentData.nationalityArea]
 				break
-				
+
 			case 'gender':
 				field.value = currentData.sex === '1' ? '男' : '女'
 				break
