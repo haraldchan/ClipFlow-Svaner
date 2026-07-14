@@ -25,17 +25,41 @@ class PMN_FillPSB {
         this.isRunning := false
         Hotkey("F12", "Off")
 
+        WinSetAlwaysOnTop(false, "ahk_exe 360se.exe")
         BlockInput(false)
 
         SUSPEND_CONTROLLER.restoreAllScripts()
     }
 
     /**
+     * @param {"内地旅客" | "港澳台旅客" | "国外旅客"} guestProfile
+     */
+    static anchorField(guestType) {
+        yOffset := Map(
+            "内地旅客", -346,
+            "港澳台旅客", -287,
+            "国外旅客", -276
+        )
+
+        CoordMode("Pixel", "Screen")
+        CoordMode("Mouse", "Screen")
+        if (ImageSearch(&x, &y, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["psb-photo-icon.png"])) {
+            Click(x, y + yOffset[guestType])
+        }
+        else {
+            MsgBox("旅业系统界面定位失败，请重试。", POPUP_TITLE, "4096 T2 icon!")
+            return
+        }
+    }
+
+    /**
      * @param {Map} guestProfile
      */
     static fill(guestProfile) {
-        this.start()
         Sleep(200)
+        this.start()
+
+        this.anchorField(guestProfile["guestType"])
 
         switch guestProfile["guestType"] {
             case "内地旅客":
@@ -85,6 +109,8 @@ class PMN_FillPSB {
         Send("{Text}" . guestProfile["addr"])
         Sleep(200)
         Send("{Tab}")
+        Sleep(200)
+        Send("{Down}")
         Sleep(200)
         Send("{Tab}")
         Sleep(200)
