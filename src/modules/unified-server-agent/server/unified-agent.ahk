@@ -56,7 +56,7 @@ class UnifiedAgent extends useServerAgent {
      * <Agent>
      */
     abort() {
-        serverOnlineStatus := JSON.parse(FileRead(this.onlineStatusIndicator, "utf-8"),, false)
+        serverOnlineStatus := JSON.parse(FileRead(this.onlineStatusIndicator, "utf-8"), , false)
         if (serverOnlineStatus.activeServer != A_ComputerName) {
             return
         }
@@ -150,7 +150,9 @@ class UnifiedAgent extends useServerAgent {
      * <Agent>
      */
     recoverPMS() {
-        BROWSER := "F:\360\360se6\Application\360se.exe"
+        BROWSER := FileExist("F:\360\360se6\Application\360se.exe")
+            ? "F:\360\360se6\Application\360se.exe"
+            : A_AppData . "\360se6\Application\360se.exe"
         PMS_URL := "https://wsh-opr-app1"
         PMS_USERNAME := "FOHARALDC"
         PMS_PASSWORD := "sxzc123456"
@@ -166,7 +168,7 @@ class UnifiedAgent extends useServerAgent {
         Send("{Tab}")
         Sleep(100)
         Send("{TEXT}" . PMS_PASSWORD)
-        Sleep(100) 
+        Sleep(100)
         loop 3 {
             Send("{Tab}")
             Sleep(100)
