@@ -5,23 +5,26 @@
     <title>ClipFlow 离线证件读取器</title>
     <link rel="stylesheet" href="./ws-reader.css">
     <script src="./ws-reader.js"></script>
-    <script src="./lib/misc-dict.js"></script>
-    <script src="./lib/nationality-areas.js"></script>
-    <script src="./lib/socket-helpers.js"></script>
-    <script src="./lib/html-helpers.js"></script>
-    <script src="./lib/form-validator.js"></script>
+    <script src="./scripts/misc-dict.js"></script>
+    <script src="./scripts/nationality-areas.js"></script>
+    <script src="./scripts/profile-db.js"></script>
+    <script src="./scripts/socket-helpers.js"></script>
+    <script src="./scripts/html-helpers.js"></script>
+    <script src="./scripts/form-validator.js"></script>
+    <script src="./components/side-nav.js"></script>
     <script src="./components/card-header.js"></script>
     <script src="./components/action-bar.js"></script>
     <script src="./components/form-content.js"></script>
+    <script src="./components/history-card.js"></script>
 </head>
 
 <body>
+    <side-nav></side-nav>
     <main class="layout">
         <div class="icon-title">
-            <img width="50" height="50" src="../assets/CFicon.jpg" alt="cf-icon">
             <div style="padding-left: 10px;">
                 <p class="icon-title-text">ClipFlow WS Reader</p>
-                <p style="color: gray;">v0.1.2</p>
+                <p style="color: gray;">v0.2.0</p>
             </div>
         </div>
 
@@ -33,7 +36,7 @@
             </div>
         </div>
         <action-bar></action-bar>
-
+        <history-card></history-card>
     </main>
 
     <script>
