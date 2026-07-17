@@ -72,7 +72,7 @@ OfflineControls(App, queryFilter) {
     }
 
     render() {
-        App.AddButton("@align[y]:select-all-btn xs410 w70 h25", "WS Reader").onClick(handleLaunchWSReader)
+        App.AddButton("@align[y]:select-all-btn xs410 w80 h25", "WS Reader").onClick(handleLaunchWSReader)
         App.AddText("@align[y]:select-all-btn x+15 w70 h25 0x200", "当前数据库")
         App.AddDDL(
             "x+1 w80 Choose" . dbMap.keys().findIndex(k => k == ProfileModifyNext.usingDB.value), 
