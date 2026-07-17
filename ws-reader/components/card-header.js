@@ -24,20 +24,14 @@ const cardHeaderStyle = html`
     .port-select {
         height: 30px;
         min-width: 92px;
-
         padding: 0 10px;
-
         border: 1px solid rgba(255, 255, 255, .3);
         border-radius: 999px;
-
         background: rgba(255, 255, 255, .12);
         color: white;
-
         font-size: 12px;
         font-weight: 600;
-
         cursor: pointer;
-
         transition:
             background-color .2s,
             border-color .2s,
@@ -73,12 +67,9 @@ const cardHeaderStyle = html`
         padding: 0 12px;
         border-radius: 999px;
         border: 1px solid transparent;
-
         font-size: 14px;
         font-weight: bolder;
-
         cursor: pointer;
-
         transition:
             background-color 0.2s ease,
             color 0.2s ease,
@@ -111,14 +102,12 @@ const cardHeaderStyle = html`
     }
 
     @keyframes pulse {
-
         0%,
-        100% {
-            opacity: 1;
-        }
-
         50% {
             opacity: 0.65;
+        }
+        100% {
+            opacity: 1;
         }
     }
 
