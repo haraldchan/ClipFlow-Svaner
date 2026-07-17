@@ -17,5 +17,6 @@ let currentData = {
     beginDate: "",
     signDate: "",
     signOrg: "",
-    validDate: ""
+    validDate: "",
+    checkinDate: ""
 }
