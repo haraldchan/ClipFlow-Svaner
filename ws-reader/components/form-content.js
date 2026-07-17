@@ -229,10 +229,12 @@ class FormContent extends HTMLElement {
                     currentData[field.name] = field.value
                     break
             }
-            
+
             const validateResult = FormValidator.handleFormValidate(e.currentTarget)
             if (!validateResult.isValid) {
                 console.log([...validateResult.invalidFields])
+            } else {
+                PDB.add(currentData)
             }
         })
     }
