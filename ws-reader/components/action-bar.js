@@ -108,16 +108,16 @@ class ActionBar extends HTMLElement {
     /** 
      * @param {Event} e
      */
-    sendCommand(e) {        
+    sendCommand(e) {
         if (socket === null || socket.readyState !== WebSocket.OPEN) {
             alert('尚未连接到WebSocket服务器')
             return
         }
-        
-        const message = `{"command":"${e.target.id.replace('-btn', '') }"}`
+
+        const message = `{"command":"${e.target.id.replace('-btn', '')}"}`
         console.log(message)
         socket.send(message)
-        
+
         this.disable()
         document.querySelector('.loading-overlay').style.display = 'flex'
     }
@@ -150,7 +150,6 @@ class ActionBar extends HTMLElement {
             if (!validateResult.isValid) {
                 console.log([...validateResult.invalidFields])
                 return
-                
             }
 
             const sendClip = {
