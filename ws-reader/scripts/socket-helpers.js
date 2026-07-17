@@ -116,6 +116,19 @@ function handleMessageDisplay(data) {
 		: currentData.guestType
 	currentData.guestType = guestType
 
+	currentData.checkinDate = (new Date())
+		.toLocaleString(
+			'cn-ZH', { 
+				year: 'numeric', 
+				month: '2-digit', 
+				day: '2-digit', 
+				hour: '2-digit', 
+				minute: '2-digit', 
+				hour12: false 
+			}
+		)
+		.replaceAll('/', '-')
+
 	/** @type {HTMLFormElement} */
 	const form = document.querySelector('form-content').shadowRoot.querySelector('.form-content')
 
@@ -128,10 +141,12 @@ function handleMessageDisplay(data) {
 
 			case 'region':
 				field.value = guestType === '内地旅客' ? '中国' : nationalityAreas[currentData.nationalityArea]
+				currentData.region = field.value
 				break
 
 			case 'gender':
 				field.value = currentData.sex === '1' ? '男' : '女'
+				currentData.gender = field.value
 				break
 
 			default:
@@ -143,5 +158,7 @@ function handleMessageDisplay(data) {
 	const validateResult = FormValidator.handleFormValidate(form)
 	if (!validateResult.isValid) {
 		console.log([...validateResult.invalidFields])
+	} else {
+		PDB.add(currentData)
 	}
 }
