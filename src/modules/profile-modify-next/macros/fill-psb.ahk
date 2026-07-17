@@ -47,7 +47,7 @@ class PMN_FillPSB {
             Click(x, y + yOffset[guestType])
         }
         else {
-            MsgBox("旅业系统界面定位失败，请重试。", POPUP_TITLE, "4096 T2 icon!")
+            ; MsgBox("旅业系统界面定位失败，请重试。", POPUP_TITLE, "4096 T2 icon!")
             return
         }
     }
