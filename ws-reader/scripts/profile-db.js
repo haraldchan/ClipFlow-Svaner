@@ -43,9 +43,9 @@ class ProfileDB {
         DBOpenRequest.onsuccess = (e) => this.db = e.target.result
         DBOpenRequest.onupgradeneeded = (e) => {
             this.db = e.target.result
-    
+
             this.db.onerror = (e) => console.log("Error loading database.")
-    
+
             const objectStore = this.db.createObjectStore("guestProfiles", { keyPath: "cardNo" })
             for (const index of objectStoreIndexes) {
                 objectStore.createIndex(index, index, { unique: index === 'cardNo' ? true : false })
@@ -129,7 +129,11 @@ class ProfileDB {
                 list.appendChild(HistoryCard.createHistoryListItem(record).content)
             }
 
-            list.firstElementChild.click()
+            if (list.firstElementChild) {
+                list.firstElementChild.click()
+            } else {
+                HistoryCard.handleHistoryDetailUpdate()
+            }
         }
     }
 }
