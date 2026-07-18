@@ -93,7 +93,11 @@ async function connectOrDisconnect(definedPort = null) {
 			document.querySelector('.loading-overlay').style.display = 'none'
 		}
 
-		socket.onclose = (event) => console.log('连接已关闭')
+		socket.onclose = (event) => {
+			connBtn.textContent = '已断开连接'
+			connBtn.classList.remove(...connStatusClasses)
+			connBtn.classList.add('status-disconnected')
+		}
 
 	} else if (socket.readyState === WebSocket.OPEN) {
 		socket.close()
@@ -118,14 +122,14 @@ function handleMessageDisplay(data) {
 
 	currentData.checkinDate = (new Date())
 		.toLocaleString(
-			'cn-ZH', { 
-				year: 'numeric', 
-				month: '2-digit', 
-				day: '2-digit', 
-				hour: '2-digit', 
-				minute: '2-digit', 
-				hour12: false 
-			}
+			'cn-ZH', {
+			year: 'numeric',
+			month: '2-digit',
+			day: '2-digit',
+			hour: '2-digit',
+			minute: '2-digit',
+			hour12: false
+		}
 		)
 		.replaceAll('/', '-')
 
@@ -156,9 +160,17 @@ function handleMessageDisplay(data) {
 	}
 
 	const validateResult = FormValidator.handleFormValidate(form)
-	if (!validateResult.isValid) {
-		console.log([...validateResult.invalidFields])
-	} else {
+	const birthdayField = [...validateResult.invalidFields].find(field => field.name === 'birthday')
+	// allow under18 as valid
+	if (birthdayField && birthdayField.value) {
+		const filteredFields = [...validateResult.invalidFields].filter(field => field.name !== 'birthday')
+		validateResult.invalidFields = filteredFields
+		if (!filteredFields.length) {
+			validateResult.isValid = true
+		}
+	}
+
+	if (validateResult.isValid) {
 		PDB.add(currentData)
 	}
 }
