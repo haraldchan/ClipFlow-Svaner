@@ -168,7 +168,7 @@ ${formContentStyle}
                             <option value="${cardTypeCode}">${cardTypeName}</option>
                         `)}
                     </optgroup>`
-)}
+                )}
             </select>
         </div>
 
