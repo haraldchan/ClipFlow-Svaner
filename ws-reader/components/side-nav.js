@@ -132,8 +132,9 @@ class SideNav extends HTMLElement {
 
         this.tabState = { showing: 'reader' }
         this.tabs = new Proxy(this.tabState, {
-            set(obj, prop, value) {
-                if (prop === 'showing') {
+            set(target, key, value, receiver) {
+                const ok = Reflect.set(target, key, value, receiver)
+                if (ok) {
                     switch (value) {
                         case 'reader':
                             document.querySelector('.passport-card').style.display = 'block'
@@ -147,7 +148,7 @@ class SideNav extends HTMLElement {
                             break
                     }
                 }
-                return true
+                return ok
             }
         })
     }
