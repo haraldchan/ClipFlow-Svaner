@@ -142,9 +142,9 @@ ${formContentStyle}
         <div class="field">
             <label>国籍/地区</label>
             <input id="region" type="text" list="region-list" placeholder="国籍或地区" name="region" required>
-            <datalist id="region-list">
-                ${Object.entries(nationalityAreas).map(([code, regionName]) => html`<option value="${regionName}">${code}</option>`)}
-            </datalist>
+                <datalist id="region-list">
+                    ${Object.entries(nationalityAreas).map(([code, regionName]) => html`<option value="${regionName}">${code}</option>`)}
+                </datalist>
             </input>
         </div>
 
