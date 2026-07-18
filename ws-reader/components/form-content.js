@@ -143,8 +143,7 @@ ${formContentStyle}
             <label>国籍/地区</label>
             <input id="region" type="text" list="region-list" placeholder="国籍或地区" name="region" required>
             <datalist id="region-list">
-                ${Object.entries(nationalityAreas).map(([code, regionName]) => html`<option value="${regionName}">${code}</option>`)
-    }
+                ${Object.entries(nationalityAreas).map(([code, regionName]) => html`<option value="${regionName}">${code}</option>`)}
             </datalist>
             </input>
         </div>
@@ -161,15 +160,15 @@ ${formContentStyle}
 
         <div class="field">
             <label>证件类型</label>
-            <select id="id-type" name="cardType" required>
+            <select id="card-type" name="cardType" required>
                 <option value="" disabled hidden selected>---请选择类型---</option>
                 ${each(groupedCardTypes, ([guestType, cardTypes]) => html`
-                <optgroup label="${guestType}">
-                    ${each(cardTypes, ([cardTypeCode, cardTypeName]) => html`
-                    <option value="${cardTypeCode}">${cardTypeName}</option>
-                    `)}
-                </optgroup>`
-    )}
+                    <optgroup label="${guestType}">
+                        ${each(cardTypes, ([cardTypeCode, cardTypeName]) => html`
+                            <option value="${cardTypeCode}">${cardTypeName}</option>
+                        `)}
+                    </optgroup>`
+)}
             </select>
         </div>
 
@@ -201,6 +200,70 @@ class FormContent extends HTMLElement {
     constructor() {
         super()
         const shadow = this.attachShadow({ mode: 'open' })
+
+        this.guestTypeState = { selected: '' }
+        this.curGuestType = new Proxy(this.guestTypeState, {
+            set(target, key, value, receiver) {
+                const ok = Reflect.set(target, key, value, receiver)
+                if (ok) {
+                    // swap card type group
+                    const cardTypeSelect = shadow.getElementById('card-type')
+                    cardTypeSelect.innerHTML = html`
+                        <option value="" disabled hidden selected>---请选择类型---</option>
+                        ${each(groupedCardTypes.get(value), ([cardTypeCode, cardTypeName]) => html`
+                            <option value="${cardTypeCode}">${cardTypeName}</option>
+                        `)}
+                    `
+
+                    // swap region
+                    const regionInput = shadow.getElementById('region')
+                    const regionList = shadow.getElementById('region-list')
+                    switch (value) {
+                        case '内地旅客':
+                            regionList.innerHTML = html`<option value="中国">CHN</option>`
+                            regionInput.value = '中国'
+                            break
+                        case '港澳台旅客':
+                            regionList.innerHTML = html`
+                                <option value="香港">HKG</option>
+                                <option value="澳门">MAC</option>
+                                <option value="台湾">TWN</option>
+                            `
+                            break
+                        case '国外旅客':
+                            regionList.innerHTML = html`
+                                ${Object.entries(nationalityAreas).map(([code, regionName]) => {
+                                    if (!['CHN', 'HKG', 'MAC', 'TWN'].find(chinaRegion => chinaRegion === code)) {
+                                        return html`<option value="${regionName}">${code}</option>`
+                                    }
+                                })}
+                            `
+                            break
+                    }
+                }
+                return ok
+            }
+        })
+
+        this.cardTypeState = { selected: '' }
+        this.curCardType = new Proxy(this.cardTypeState, {
+            set(target, key, value, receiver) {
+                const ok = Reflect.set(target,key, value, receiver)
+                if (ok) {
+                        // change guest type
+                        const guestTypeSelect = shadow.getElementById('guest-type')
+                        const cardTypeCodes = [...groupedCardTypes.values()].map(m => [...m.keys()])
+                        let index = 1
+                        for (const codeGroup of cardTypeCodes) {
+                            if (codeGroup.find(code => code === value)) {
+                                guestTypeSelect.selectedIndex = index
+                            }
+                            index++
+                        }
+                }
+                return ok
+            }
+        })
     }
 
     connectedCallback() {
@@ -224,6 +287,13 @@ class FormContent extends HTMLElement {
 
                 case 'region':
                     currentData.region = field.value
+                    break
+
+                case 'guestType':
+                    this.curGuestType.selected = field.value
+
+                case 'cardType':
+                    this.curCardType.selected = field.value
 
                 default:
                     currentData[field.name] = field.value
@@ -231,9 +301,7 @@ class FormContent extends HTMLElement {
             }
 
             const validateResult = FormValidator.handleFormValidate(e.currentTarget)
-            if (!validateResult.isValid) {
-                console.log([...validateResult.invalidFields])
-            } else {
+            if (validateResult.isValid) {
                 PDB.add(currentData)
             }
         })
