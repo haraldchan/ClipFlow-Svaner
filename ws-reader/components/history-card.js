@@ -400,7 +400,11 @@ class HistoryCard extends HTMLElement {
 		const historyItem = document.createElement('template')
 		historyItem.innerHTML = html`
 			<div class="history-item">
-				<img class="history-photo" src="data:image/jpeg;base64,${data.data.curPhoto}" alt="head" />
+				<img 
+					class="history-photo" 
+					src="${data.data.curPhoto.startsWith('data:image/jpeg;base64,') ? data.data.curPhoto : 'data:image/jpeg;base64,' + data.data.curPhoto}" 
+					alt="head" 
+				/>
 				<div class="history-info">
 					<div class="history-name" title="${data.name}">${data.name}</div>
 					<div class="history-meta">${data.roomNum && (data.roomNum + ' • ')} ${data.region} • ${data.birthday}</div>
@@ -414,19 +418,24 @@ class HistoryCard extends HTMLElement {
 
 			const item = e.target.closest('.history-item')
 			if (!item) return
+		
 			item.classList.add('active')
-
 			HistoryCard.handleHistoryDetailUpdate(data)
 		})
 
 		return historyItem
 	}
 
-	static handleHistoryDetailUpdate(data) {
+	static handleHistoryDetailUpdate(data = null) {
 		HistoryCard.selectedHistoryData = data
+		console.log(data)
 		const historyDetailContainer = document.querySelector('history-card').shadowRoot.querySelector('.history-detail')
-		historyDetailContainer.innerHTML = ''
+		if (!data) {
+			[...historyDetailContainer.querySelectorAll('span')].forEach(span => span.innerText = '')
+			return
+		}
 
+		historyDetailContainer.innerHTML = ''
 		const historyDetailContent = document.createElement('template')
 		historyDetailContent.innerHTML = html`
 				<div class="detail-row">
@@ -466,7 +475,7 @@ class HistoryCard extends HTMLElement {
 
 				<div class="detail-row">
 					<label>证件地址</label>
-					<span>${data.address ?? '(无)'}</span>
+					<span>${data.address}</span>
 				</div>
 
 				<div class="detail-row">
