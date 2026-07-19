@@ -176,7 +176,10 @@ class SideNav extends HTMLElement {
         // switch tab
         this.tabs.showing = thisBtn
         if (thisBtn === 'history') {
-            PDB.getAll()
+            const searchKey = document.querySelector('history-card').searchKey
+            const searchInput = document.querySelector('history-card').searchInput
+
+            PDB.getAll(searchKey.value, searchInput.value)
         }
     }
 }
