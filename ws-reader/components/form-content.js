@@ -168,7 +168,7 @@ ${formContentStyle}
                             <option value="${cardTypeCode}">${cardTypeName}</option>
                         `)}
                     </optgroup>`
-                )}
+)}
             </select>
         </div>
 
@@ -233,10 +233,10 @@ class FormContent extends HTMLElement {
                         case '国外旅客':
                             regionList.innerHTML = html`
                                 ${Object.entries(nationalityAreas).map(([code, regionName]) => {
-                                    if (!['CHN', 'HKG', 'MAC', 'TWN'].find(chinaRegion => chinaRegion === code)) {
-                                        return html`<option value="${regionName}">${code}</option>`
-                                    }
-                                })}
+                                if (!['CHN', 'HKG', 'MAC', 'TWN'].find(chinaRegion => chinaRegion === code)) {
+                                    return html`<option value="${regionName}">${code}</option>`
+                                }
+                            })}
                             `
                             break
                     }
@@ -248,18 +248,18 @@ class FormContent extends HTMLElement {
         this.cardTypeState = { selected: '' }
         this.curCardType = new Proxy(this.cardTypeState, {
             set(target, key, value, receiver) {
-                const ok = Reflect.set(target,key, value, receiver)
+                const ok = Reflect.set(target, key, value, receiver)
                 if (ok) {
-                        // change guest type
-                        const guestTypeSelect = shadow.getElementById('guest-type')
-                        const cardTypeCodes = [...groupedCardTypes.values()].map(m => [...m.keys()])
-                        let index = 1
-                        for (const codeGroup of cardTypeCodes) {
-                            if (codeGroup.find(code => code === value)) {
-                                guestTypeSelect.selectedIndex = index
-                            }
-                            index++
+                    // change guest type
+                    const guestTypeSelect = shadow.getElementById('guest-type')
+                    const cardTypeCodes = [...groupedCardTypes.values()].map(m => [...m.keys()])
+                    let index = 1
+                    for (const codeGroup of cardTypeCodes) {
+                        if (codeGroup.find(code => code === value)) {
+                            guestTypeSelect.selectedIndex = index
                         }
+                        index++
+                    }
                 }
                 return ok
             }
@@ -301,6 +301,16 @@ class FormContent extends HTMLElement {
             }
 
             const validateResult = FormValidator.handleFormValidate(e.currentTarget)
+            const birthdayField = [...validateResult.invalidFields].find(field => field.name === 'birthday')
+            // allow under18 as valid
+            if (birthdayField && birthdayField.value) {
+                const filteredFields = [...validateResult.invalidFields].filter(field => field.name !== 'birthday')
+                validateResult.invalidFields = filteredFields
+                if (!filteredFields.length) {
+                    validateResult.isValid = true
+                }
+            }
+
             if (validateResult.isValid) {
                 PDB.add(currentData)
             }
