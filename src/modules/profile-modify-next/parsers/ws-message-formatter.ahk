@@ -50,11 +50,11 @@ class WSMessageParser {
 
         ; save profile pic
         this.base64ToFile(
-            StrReplace(incoming.data.curPhoto, this.b64Prefix, ""), 
+            StrReplace(incoming.data.curPhoto, this.b64Prefix, ""),
             Format("{1}\{2}-{3}.jpg", saveFolder, incoming.roomNum . incoming.data.name, "head")
         )
 
-        ; save scanned pic 
+        ; save scanned pic
         passportImgKey := match(incoming.data, Map(
             i => i.HasOwnProp("photo"), "photo",
             i => i.HasOwnProp("ocrPhoto"), "ocrPhoto",
@@ -74,7 +74,7 @@ class WSMessageParser {
             idendifier: ProfileModifyNext.identifier,
             addr: incoming.data.address,
             birthday: incoming.data.birthday,
-            gender: incoming.data.gender,
+            gender: incoming.gender,
             guestType: "内地旅客",
             idNum: incoming.data.cardNo,
             idType: incoming.idType,
@@ -94,7 +94,7 @@ class WSMessageParser {
             idendifier: ProfileModifyNext.identifier,
             addr: " ",
             birthday: incoming.data.birthday,
-            gender: incoming.data.gender,
+            gender: incoming.gender,
             guestType: "港澳台旅客",
             idNum: incoming.data.cardNo,
             idType: incoming.idType,
@@ -118,7 +118,7 @@ class WSMessageParser {
             addr: incoming.region,
             country: incoming.region,
             birthday: incoming.data.birthday,
-            gender: incoming.data.gender,
+            gender: incoming.gender,
             guestType: incoming.guestType,
             idNum: incoming.data.cardNo,
             idType: incoming.idType,
