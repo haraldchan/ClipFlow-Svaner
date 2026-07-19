@@ -94,19 +94,17 @@ class ProfileDB {
         const list = document.querySelector('history-card').shadowRoot.querySelector('.history-list')
         list.innerHTML = ''
 
-        const initialize = true
+
         const objectStore = this.db.transaction('guestProfiles').objectStore('guestProfiles')
         objectStore.index('checkinDate').openCursor(null, 'prev').onsuccess = e => {
             /** @type {IDBCursorWithValue | null} */
             const cursor = e.target.result
-            if (!cursor) return
+            if (!cursor) {
+                list.firstElementChild.click()
+                return
+            }
 
             list.appendChild(HistoryCard.createHistoryListItem(cursor.value).content)
-            if (initialize) {
-                list.firstElementChild.click()
-            } else {
-                initialize = false
-            }
             cursor.continue()
         }
     }
