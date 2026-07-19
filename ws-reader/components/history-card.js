@@ -223,35 +223,69 @@ const historyCardStyle = html`
 			padding-top: 14px;
 			margin-top: 10px;
 			border-top: 1px solid #E6EEF5;
+			gap: 12px;
 		}
 
-		.send-btn {
-			min-width: 120px;
-			height: 40px;
-			border: none;
-			border-radius: 8px;
-			background: #4592D8;
-			color: white;
-			font-size: 15px;
-			font-weight: 600;
-			cursor: pointer;
-			transition:
-				background .2s,
-				transform .15s,
-				box-shadow .2s;
-		}
+	    .btn {
+	        height: 38px;
+	        min-width: 100px;
+	        padding: 0 18px;
+	        border-radius: 8px;
+	        font-size: 14px;
+	        font-weight: 600;
+	        cursor: pointer;
 
-		.send-btn:hover {
-			background: #63C1F6;
-			transform: translateY(-2px);
-			box-shadow:
-				0 4px 12px rgba(69,146,216,.25);
-		}
+	        transition:
+	            transform 0.18s ease,
+	            border-color 0.18s ease,
+	            color 0.18s ease,
+	            background-color 0.18s ease,
+	            box-shadow 0.18s ease;
 
-		.send-btn:active {
-			transform: translateY(0);
-			box-shadow: none;
-		}
+	        position: relative;
+	    }
+
+	    .btn:hover {
+	        transform: translateY(-2px);
+	    }
+
+	    .btn:active {
+	        transform: translateY(0);
+	    }
+
+	    .btn-primary {
+	        border: 1px solid var(--primary-dark);
+	        background: linear-gradient(135deg,
+	                var(--primary),
+	                var(--primary-dark));
+	        color: white;
+	    }
+
+	    .btn-primary:hover {
+	        box-shadow: 0 6px 18px rgba(69, 146, 216, 0.25);
+	    }
+
+	    .btn-secondary {
+	        border: 1px solid var(--border);
+	        background: white;
+	        color: var(--text);
+	    }
+
+	    .btn-secondary:hover {
+	        color: var(--primary-dark);
+	        border-color: var(--primary-dark);
+	        box-shadow: 0 4px 12px rgba(69, 146, 216, 0.12);
+	    }
+
+	    .btn:focus-visible {
+	        outline: none;
+	        box-shadow: 0 0 0 3px rgba(99, 193, 246, 0.25);
+	    }
+
+	    .btn-disabled {
+	        border: 1px solid var(--muted);
+	        color: var(--muted);
+	    }
 	</style>
 `
 
@@ -337,12 +371,15 @@ historyCardTemplate.innerHTML = html`
 
 		</div>
 		<div class="history-actions">
-			<button class="send-btn">重新发送</button>
+			<button id="edit-btn" class="btn btn-secondary">编 辑</button>
+			<button id="send-btn" class="btn btn-primary">重新发送</button>
 		</div>
 	</section>
 `
 
 class HistoryCard extends HTMLElement {
+	static selectedHistoryData = {}
+
 	constructor() {
 		super()
 		const shadow = this.attachShadow({ mode: 'open' })
@@ -373,7 +410,27 @@ class HistoryCard extends HTMLElement {
 			PDB.getAll(e.target.value, this.searchInput.value)
 		})
 
-		this.sendBtn = shadow.querySelector('.send-btn')
+		this.editBtn = shadow.getElementById('edit-btn')
+		this.editBtn.addEventListener('click', () => {
+			currentData = HistoryCard.selectedHistoryData.data
+
+			const form = document.querySelector('form-content').shadowRoot.querySelector('.form-content')
+			for (const field of form.elements) {
+				switch (field.name) {
+					case 'curPhoto':
+						const photo = form.querySelector('.passport-photo')
+						photo.src = `data:image/jpeg;base64,${currentData.curPhoto.replace('data:image/jpeg;base64,', '')}`
+						break
+					default:
+						field.value = currentData[field.name] ?? ''
+						break
+				}
+			}
+
+			document.querySelector('side-nav').readerBtn.click()
+		})
+
+		this.sendBtn = shadow.getElementById('send-btn')
 		this.sendBtn.addEventListener('click', async () => {
 			const sendClip = {
 				identifier: identifier,
@@ -390,8 +447,6 @@ class HistoryCard extends HTMLElement {
 			await navigator.clipboard.writeText(JSON.stringify(sendClip))
 		})
 	}
-
-	static selectedHistoryData = {}
 
 	static createHistoryListItem(data) {
 		if (!data.name) {
@@ -418,7 +473,7 @@ class HistoryCard extends HTMLElement {
 
 			const item = e.target.closest('.history-item')
 			if (!item) return
-		
+
 			item.classList.add('active')
 			HistoryCard.handleHistoryDetailUpdate(data)
 		})
@@ -428,7 +483,6 @@ class HistoryCard extends HTMLElement {
 
 	static handleHistoryDetailUpdate(data = null) {
 		HistoryCard.selectedHistoryData = data
-		console.log(data)
 		const historyDetailContainer = document.querySelector('history-card').shadowRoot.querySelector('.history-detail')
 		if (!data) {
 			[...historyDetailContainer.querySelectorAll('span')].forEach(span => span.innerText = '')
