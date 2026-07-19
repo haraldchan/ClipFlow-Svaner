@@ -274,7 +274,10 @@ PMN_App(App, moduleTitle, db, identifier) {
                     }
                     ; from abroad
                     else {
-                        if (InStr(item["nameLast"], searchInput) || InStr(item["nameFirst"], searchInput)) {
+                        if ( 
+                            (item.Has("nameLast") || item.Has("nameFirst"))
+                            && (InStr(item["nameLast"], searchInput) || InStr(item["nameFirst"], searchInput))
+                        ) {
                             filteredItems.InsertAt(1, item)
                         }
                     }
@@ -453,7 +456,7 @@ PMN_App(App, moduleTitle, db, identifier) {
 
     render() {
         App.AddGroupBox("Section y+20 w685 h420", "")
-        App.AddText("xp15", moduleTitle . " ⓘ ").onClick((*) => PMN_Settings(settings))
+        App.AddText("xp15", moduleTitle . " ⓘ ").onClick((*) => PMN_Settings(settings, listContent))
 
         ; agent mode
         App.AddCheckBox("vdelegate-check-box x+10 Disabled", "后台代行", { check: isDelegate })
