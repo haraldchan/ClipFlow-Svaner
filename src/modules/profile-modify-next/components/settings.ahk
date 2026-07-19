@@ -3,13 +3,13 @@
  * @param {signal} profiles 
  */
 PMN_Settings(settingSignal, profiles) {
-    if (WinExist("Settings")) {
+    if (WinExist("PMN Settings")) {
         return
     }
 
     Win := Svaner({
         gui: {
-            title: "Settings"
+            title: "PMN Settings"
         },
         font: {
             name: "微软雅黑"
