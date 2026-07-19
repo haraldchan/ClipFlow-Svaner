@@ -160,6 +160,7 @@ class ActionBar extends HTMLElement {
                 guestType: currentData.guestType,
                 idType: groupedCardTypes.get(currentData.guestType).get(currentData.cardType),
                 region: currentData.region,
+                gender: currentData.gender,
                 data: currentData,
             }
 
