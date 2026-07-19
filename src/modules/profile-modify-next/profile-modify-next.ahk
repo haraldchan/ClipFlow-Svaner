@@ -1,6 +1,8 @@
 ; schema
 #Include schema\guest-profile.ahk
-#Include schema\ws-message-formatter.ahk
+; parsers
+#Include parsers\ws-message-formatter.ahk
+#Include parsers\psb-sheet-exporter.ahk
 ; components
 #Include components\pmn-app.ahk
 #Include components\guest-profile-list.ahk
