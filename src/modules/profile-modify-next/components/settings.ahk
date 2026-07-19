@@ -3,7 +3,7 @@
  * @param {signal} profiles 
  */
 PMN_Settings(settingSignal, profiles) {
-    if (WinExist("PMN Settings")) {
+    if (WinExist("Settings")) {
         return
     }
 
