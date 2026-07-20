@@ -63,6 +63,9 @@ class PsbSheetExporter {
             "staff", "登记人员*",
             "region", "地区*",
             "country", "国籍/地区*",
+            "guardianName", "监护人",
+            "guardianTel", "监护人电话",
+            "guardianRelation", "关系",
         )
 
         cols := Map()
@@ -100,6 +103,13 @@ class PsbSheetExporter {
             row := sheet.Cells(sheet.Rows.Count, "A").End(-4162).Row + 1
 
             for key, val in profile {
+                if (key == "guardianInfo") {
+                    for guardianInfoKey, guardianInfoValue in val {
+                        sheet.Cells(row, cols[guardianInfoKey]).Value := guardianInfoValue
+                    }
+                    continue
+                }
+
                 if (cols.Has(key)) {
                     if (guestType == "港澳台旅客" && (key == "lastName" || key == "firstName")) {
                         sheet.Cells(row, cols[key . "NonRequired"]).Value := val

@@ -86,6 +86,10 @@ class WSMessageParser {
             ; wsData: incoming.data
         }
 
+        if (incoming.HasOwnProp("guardianInfo")) {
+            guestProfile.guardianInfo := incoming.guardianInfo
+        }
+
         return JSON.stringify(guestProfile)
     }
 
@@ -107,6 +111,10 @@ class WSMessageParser {
             tel: incoming.tel,
             tsId: incoming.tsId,
             ; wsData: incoming.data
+        }
+
+        if (incoming.HasOwnProp("guardianInfo")) {
+            guestProfile.guardianInfo := incoming.guardianInfo
         }
 
         return JSON.stringify(guestProfile)

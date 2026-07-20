@@ -27,11 +27,23 @@ GuestProfileDetails(selectedGuest, fillIn) {
         "idNum", "证件号码",
         "addr", "地址",
         "tel", "联系电话",
-        "regTime", "登记时间"
+        "regTime", "登记时间",
     )
 
+    guardianFieldIndex := OrderedMap(
+        "guardianName", "监护人姓名",
+        "guardianTel", "监护人电话",
+        "guardianRelation", "监护人关系",
+    ) 
+
     listInitialize(selectedGuest, fieldIndex) {
+        /**
+         * @type {Gui.ListView}
+         */
         LV := Profile["profile"]
+        
+        LV.ModifyCol(1, 70)
+        LV.ModifyCol(2, 150)
 
         for key, field in fieldIndex {
             val := selectedGuest.has(key) ? selectedGuest[key] : ""
@@ -40,6 +52,12 @@ GuestProfileDetails(selectedGuest, fillIn) {
             }
 
             LV.Add(, field, val)
+        }
+
+        if (selectedGuest.has("guardianInfo")) {
+            for key, field in guardianFieldIndex {
+                LV.Add(, field, selectedGuest["guardianInfo"][key])
+            }
         }
     }
 
@@ -91,7 +109,7 @@ GuestProfileDetails(selectedGuest, fillIn) {
     }
 
     render() {
-        Profile.AddListView("vprofile Grid w230 r10", ["信息字段", "证件信息"]).onDoubleClick(copyListField)
+        Profile.AddListView("vprofile Grid @lv:label-tip w230 " . (selectedGuest.has("guardianInfo") ? "r13" : "r10"), ["信息字段", "证件信息"]).onDoubleClick(copyListField)
 
         Profile.AddButton("h30 w110", "关 闭 (&C)").onClick(handleClose)
         Profile.AddButton("x+10 h30 w110 Default", "{1}", fillMode)
