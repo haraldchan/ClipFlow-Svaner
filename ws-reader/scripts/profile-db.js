@@ -13,7 +13,8 @@
  * @property {string} birthday
  * @property {string} validDate
  * @property {object} data
- * @property {string} checkinDate
+ * @property {string} regTime
+ * @property {object} [guardianInfo]
  */
 
 class ProfileDB {
@@ -36,7 +37,8 @@ class ProfileDB {
             'birthday',
             'validDate',
             'data',
-            'checkinDate',
+            'regTime',
+            'guardianInfo'
         ]
 
         const DBOpenRequest = window.indexedDB.open("guestProfiles")
@@ -53,8 +55,10 @@ class ProfileDB {
         }
     }
 
+    /**
+     * @param {object} data 
+     */
     add(data) {
-        /** @type {Profile} */
         const newItem = {
             name: data.name ?? '',
             lastName: data.lastName ?? '',
@@ -70,7 +74,10 @@ class ProfileDB {
             birthday: data.birthday,
             validDate: data.validDate ?? '',
             data: data,
-            checkinDate: data.checkinDate,
+            regTime: data.regTime,
+        }
+        if (data.hasOwnProperty('guardianInfo')) {
+            newItem.guardianInfo = data.guardianInfo
         }
 
         const transaction = this.db.transaction(['guestProfiles'], 'readwrite')
@@ -96,7 +103,7 @@ class ProfileDB {
 
 
         const objectStore = this.db.transaction('guestProfiles').objectStore('guestProfiles')
-        objectStore.index('checkinDate').openCursor(null, 'prev').onsuccess = e => {
+        objectStore.index('regTime').openCursor(null, 'prev').onsuccess = e => {
             /** @type {IDBCursorWithValue | null} */
             const cursor = e.target.result
             if (!cursor) {
@@ -122,7 +129,7 @@ class ProfileDB {
         objectStore.index(index).getAll().onsuccess = e => {
             const result = e.target.result
             const filteredRecords = result.filter(record => record[index].toLowerCase().includes(keyword.toLowerCase()))
-
+            
             for (const record of filteredRecords) {
                 list.appendChild(HistoryCard.createHistoryListItem(record).content)
             }

@@ -1,9 +1,9 @@
 ﻿class FormValidator {
     /**
-* @param {HTMLInputElement | HTMLSelectElement} field
-* @param {string} message
-* @returns {boolean} true: is expired
-*/
+    * @param {HTMLInputElement | HTMLSelectElement} field
+    * @param {string} message
+    * @returns {boolean} true: is expired
+    */
     static validateDate(field, message) {
         const today = new Date()
         today.setHours(0, 0, 0, 0)
@@ -19,9 +19,34 @@
         return isExpired
     }
 
+    static isUnder18 = new Proxy({ yes: false }, {
+        set(target, key, isTrue, receiver) {
+            const ok = Reflect.set(target, key, isTrue, receiver)
+            if (ok) {
+                const FormContent = document.querySelector('form-content')
+                const isForeigner = FormContent.curGuestType.selected === '国外旅客'
+
+                if (!isTrue && currentData.hasOwnProperty('guardianInfo')) {
+                    delete currentData.guardianInfo
+                }
+
+                FormContent.guardianFields.forEach(field => {
+                    /** @type {HTMLInputElement} */
+                    const f = field
+                    f.parentElement.style.display = (isTrue && !isForeigner) ? 'flex' : 'none'
+                    f.required = (isTrue && !isForeigner)
+                    if (!(isTrue && !isForeigner)) {
+                        f.value = ''
+                    }
+                })
+            }
+            return ok
+        }
+    })
+
     /**
-* @param {string} birthday
-*/
+    * @param {string} birthday
+    */
     static getAge(birthday) {
         const today = new Date()
         let age = today.getFullYear() - birthday.getFullYear()
@@ -39,28 +64,13 @@
     }
 
     /**
-* @param {HTMLInputElement} field
-* @param {string} message	 
-* @return {boolean} true: is under 18.
-*/
-    static validateBirthday(field, message) {
-        if (!field.value) {
-            field.setCustomValidity('缺少生日字段，请补全')
-            field.reportValidity()
-            return true
-        }
-
+    * @param {HTMLInputElement} field
+    */
+    static validateBirthday(field) {
         const birthday = new Date(field.value)
         const isUnder18 = this.getAge(birthday) < 18
 
-        if (isUnder18) {
-            field.setCustomValidity(message)
-            field.reportValidity()
-        } else {
-            field.setCustomValidity('')
-        }
-
-        return isUnder18
+        this.isUnder18.yes = isUnder18
     }
 
     /**
@@ -88,19 +98,15 @@
                     field.classList.toggle('field-invalid', !field.checkValidity())
                     break
 
-                case 'region':
-                    if (!field.checkValidity()) field.reportValidity()
-                    field.classList.toggle('field-invalid', !field.checkValidity())
-                    break
-
-                case 'birthday':
-                    const isUnder18 = this.validateBirthday(field, '此客人为未成年人，请记录监护人信息并核实')
-                    field.classList.toggle('field-invalid', isUnder18)
-                    break
-
                 case 'validDate':
                     const isExpired = this.validateDate(field, '证件已过期，请核验原件')
                     field.classList.toggle('field-invalid', isExpired)
+                    break
+
+                case 'birthday':
+                    this.validateBirthday(field)
+                    if (!field.checkValidity()) field.reportValidity()
+                    field.classList.toggle('field-invalid', !field.checkValidity())
                     break
 
                 default:

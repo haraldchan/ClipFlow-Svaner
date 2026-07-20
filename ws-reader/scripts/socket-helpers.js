@@ -120,7 +120,7 @@ function handleMessageDisplay(data) {
 		: currentData.guestType
 	currentData.guestType = guestType
 
-	currentData.checkinDate = (new Date())
+	currentData.regTime = (new Date())
 		.toLocaleString(
 			'cn-ZH', {
 			year: 'numeric',
@@ -160,16 +160,6 @@ function handleMessageDisplay(data) {
 	}
 
 	const validateResult = FormValidator.handleFormValidate(form)
-	const birthdayField = [...validateResult.invalidFields].find(field => field.name === 'birthday')
-	// allow under18 as valid
-	if (birthdayField && birthdayField.value) {
-		const filteredFields = [...validateResult.invalidFields].filter(field => field.name !== 'birthday')
-		validateResult.invalidFields = filteredFields
-		if (!filteredFields.length) {
-			validateResult.isValid = true
-		}
-	}
-
 	if (validateResult.isValid) {
 		PDB.add(currentData)
 	}

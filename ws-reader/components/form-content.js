@@ -186,6 +186,27 @@ ${formContentStyle}
             <input type="date" id="birthday" name="birthday" required>
         </div>
 
+        <div class="field" style="display:none;">
+            <label>监护人姓名</label>
+            <input type="text" id="guardian-name" name="guardianName">
+        </div>
+        
+        <div class="field" style="display:none;">
+            <label>监护人电话</label>
+            <input type="text" id="guardian-tel" name="guardianTel">
+        </div>
+        
+        <div class="field" style="display:none;">
+            <label>监护人关系</label>
+            <input type="text" id="guardian-relation" name="guardianRelation" list="relation-list">
+                <datalist id="relation-list">
+                    <option value="父亲"></option>
+                    <option value="母亲"></option>
+                    <option value="其他"></option>
+                </datalist>
+            </input>
+        </div>
+
 
         <div class="field">
             <label>证件有效期</label>
@@ -203,7 +224,11 @@ class FormContent extends HTMLElement {
 
         this.guestTypeState = { selected: '' }
         this.curGuestType = new Proxy(this.guestTypeState, {
-            set(target, key, value, receiver) {
+            set: (target, key, value, receiver) => {              
+                if (target[key] === value) {
+                    return true
+                }
+
                 const ok = Reflect.set(target, key, value, receiver)
                 if (ok) {
                     // swap card type group
@@ -238,7 +263,12 @@ class FormContent extends HTMLElement {
                                 }
                             })}
                             `
+                            FormValidator.isUnder18.yes = false
                             break
+                    }
+
+                    if (this.curCardType.selected && groupedCardTypes.get(value).get(this.curCardType.selected)) {
+                        cardTypeSelect.value = this.curCardType.selected
                     }
                 }
                 return ok
@@ -247,7 +277,11 @@ class FormContent extends HTMLElement {
 
         this.cardTypeState = { selected: '' }
         this.curCardType = new Proxy(this.cardTypeState, {
-            set(target, key, value, receiver) {
+            set: (target, key, value, receiver) => { 
+                if (target[key] === value) {
+                    return true
+                }
+                
                 const ok = Reflect.set(target, key, value, receiver)
                 if (ok) {
                     // change guest type
@@ -257,6 +291,7 @@ class FormContent extends HTMLElement {
                     for (const codeGroup of cardTypeCodes) {
                         if (codeGroup.find(code => code === value)) {
                             guestTypeSelect.selectedIndex = index
+                            this.curGuestType.selected = guestTypeSelect.value
                         }
                         index++
                     }
@@ -291,9 +326,24 @@ class FormContent extends HTMLElement {
 
                 case 'guestType':
                     this.curGuestType.selected = field.value
+                    currentData.guestType = field.value
+                    break
 
                 case 'cardType':
                     this.curCardType.selected = field.value
+                    currentData.cardType = field.value
+                    break
+
+                case 'guardianName':
+                case 'guardianTel':
+                case 'guardianRelation':
+                    if (field.value) {
+                        if (!currentData.hasOwnProperty('guardianInfo')) {
+                            currentData.guardianInfo = {}
+                        }
+                        currentData.guardianInfo[field.name] = field.value
+                    }
+                    break
 
                 default:
                     currentData[field.name] = field.value
@@ -301,20 +351,16 @@ class FormContent extends HTMLElement {
             }
 
             const validateResult = FormValidator.handleFormValidate(e.currentTarget)
-            const birthdayField = [...validateResult.invalidFields].find(field => field.name === 'birthday')
-            // allow under18 as valid
-            if (birthdayField && birthdayField.value) {
-                const filteredFields = [...validateResult.invalidFields].filter(field => field.name !== 'birthday')
-                validateResult.invalidFields = filteredFields
-                if (!filteredFields.length) {
-                    validateResult.isValid = true
-                }
-            }
-
             if (validateResult.isValid) {
                 PDB.add(currentData)
             }
         })
+
+        this.guardianFields = [
+            this.form.elements.namedItem("guardianName"),
+            this.form.elements.namedItem("guardianTel"),
+            this.form.elements.namedItem("guardianRelation"),
+        ]
     }
 }
 

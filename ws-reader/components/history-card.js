@@ -301,7 +301,7 @@ historyCardTemplate.innerHTML = html`
 					<option value="tel">联系电话</option>
 					<option value="address">证件地址</option>
 					<option value="cardNo">证件号码</option>
-					<option value="checkinDate">登记日期</option>
+					<option value="regTime">登记日期</option>
 				</select>
 
 				<input
@@ -319,12 +319,32 @@ historyCardTemplate.innerHTML = html`
 
 			<section class="history-detail">
 				<div class="detail-row">
+					<label>姓名</label>
+					<span></span>
+				</div>
+
+				<div class="detail-row">
+					<label>房号</label>
+					<span></span>
+				</div>
+
+				<div class="detail-row">
+					<label>联系电话</label>
+					<span></span>
+				</div>
+
+				<div class="detail-row">
 					<label>旅客类型</label>
 					<span></span>
 				</div>
 				
 				<div class="detail-row">
 					<label>国籍/地区</label>
+					<span></span>
+				</div>
+
+				<div class="detail-row">
+					<label>证件地址</label>
 					<span></span>
 				</div>
 
@@ -339,22 +359,12 @@ historyCardTemplate.innerHTML = html`
 				</div>
 
 				<div class="detail-row">
-					<label>生日</label>
-					<span></span>
-				</div>
-
-				<div class="detail-row">
 					<label>性别</label>
 					<span></span>
 				</div>
 
 				<div class="detail-row">
-					<label>联系电话</label>
-					<span></span>
-				</div>
-
-				<div class="detail-row">
-					<label>证件地址</label>
+					<label>生日</label>
 					<span></span>
 				</div>
 
@@ -364,7 +374,7 @@ historyCardTemplate.innerHTML = html`
 				</div>
 
 				<div class="detail-row">
-					<label>登记日期</label>
+					<label>登记时间</label>
 					<span></span>
 				</div>
 			</section>
@@ -397,8 +407,8 @@ class HistoryCard extends HTMLElement {
 		this.searchKey = shadow.querySelector('.search-key')
 		this.searchKey.addEventListener('change', e => {
 			switch (e.target.value) {
-				case 'checkinDate':
-					const dateFormat = new Date().toLocaleDateString('cn-ZH', { year: '2-digit', month: '2-digit', day: '2-digit' }).replaceAll('/', '-')
+				case 'regTime':
+					const dateFormat = new Date().toLocaleDateString('cn-ZH', { year: 'numeric', month: '2-digit', day: '2-digit' }).replaceAll('/', '-')
 					const timeFormat = new Date().toLocaleTimeString('cn-ZH', { hour: '2-digit', minute: '2-digit', hour12: false })
 					this.searchInput.placeholder = `如：${dateFormat} 或 ${timeFormat}`
 					break
@@ -414,19 +424,29 @@ class HistoryCard extends HTMLElement {
 		this.editBtn.addEventListener('click', () => {
 			currentData = HistoryCard.selectedHistoryData.data
 
-			const form = document.querySelector('form-content').shadowRoot.querySelector('.form-content')
+			const form = document.querySelector('form-content').form
 			for (const field of form.elements) {
 				switch (field.name) {
 					case 'curPhoto':
 						const photo = form.querySelector('.passport-photo')
 						photo.src = `data:image/jpeg;base64,${currentData.curPhoto.replace('data:image/jpeg;base64,', '')}`
 						break
+
+					case 'guardianName':
+					case 'guardianTel':
+					case 'guardianRelation':
+						if (currentData.hasOwnProperty('guardianInfo')) {
+							field.value = currentData.guardianInfo[field.name] ?? ''
+						}
+						break
+
 					default:
 						field.value = currentData[field.name] ?? ''
 						break
 				}
 			}
-
+			
+			FormValidator.handleFormValidate(form)
 			document.querySelector('side-nav').readerBtn.click()
 		})
 
@@ -442,6 +462,10 @@ class HistoryCard extends HTMLElement {
 				region: HistoryCard.selectedHistoryData.region,
 				gender: HistoryCard.selectedHistoryData.gender,
 				data: HistoryCard.selectedHistoryData.data,
+			}
+			
+			if (FormValidator.getAge(new Date(sendClip.data.birthday)) < 18 && sendClip.guestType !== '国外旅客') {
+				sendClip.guardianInfo = HistoryCard.selectedHistoryData.guardianInfo
 			}
 
 			await navigator.clipboard.writeText(JSON.stringify(sendClip))
@@ -492,14 +516,54 @@ class HistoryCard extends HTMLElement {
 		historyDetailContainer.innerHTML = ''
 		const historyDetailContent = document.createElement('template')
 		historyDetailContent.innerHTML = html`
+				${data.guestType !== '国外旅客' 
+					? html`
+						<div class="detail-row">
+							<label>姓名</label>
+							<span>${data.name}</span>
+						</div>
+					`
+					: ''
+				}
+
+				${data.guestType !== '内地旅客' 
+					? html`
+						<div class="detail-row">
+							<label>英文姓</label>
+							<span>${data.lastName}</span>
+						</div>
+						
+						<div class="detail-row">
+							<label>英文名</label>
+							<span>${data.firstName}</span>
+						</div>
+					`
+					: ''
+				}
+
+				<div class="detail-row">
+					<label>房号</label>
+					<span>${data.roomNum}</span>
+				</div>
+
+				<div class="detail-row">
+					<label>联系电话</label>
+					<span>${data.tel}</span>
+				</div>
+
 				<div class="detail-row">
 					<label>旅客类型</label>
 					<span>${data.guestType}</span>
 				</div>
-				
+
 				<div class="detail-row">
 					<label>国籍/地区</label>
 					<span>${data.region}</span>
+				</div>
+
+				<div class="detail-row">
+					<label>证件地址</label>
+					<span>${data.address}</span>
 				</div>
 
 				<div class="detail-row">
@@ -513,24 +577,31 @@ class HistoryCard extends HTMLElement {
 				</div>
 
 				<div class="detail-row">
+					<label>性别</label>
+					<span></span>
+				</div>
+
+				<div class="detail-row">
 					<label>生日</label>
 					<span>${data.birthday}</span>
 				</div>
 
-				<div class="detail-row">
-					<label>性别</label>
-					<span>${data.gender}</span>
-				</div>
+				${data.hasOwnProperty('guardianInfo') ? html`
+					<div class="detail-row">
+						<label>监护人姓名</label>
+						<span>${data.guardianInfo.guardianName}</span>
+					</div>
 
-				<div class="detail-row">
-					<label>联系电话</label>
-					<span>${data.tel}</span>
-				</div>
+					<div class="detail-row">
+						<label>监护人电话</label>
+						<span>${data.guardianInfo.guardianTel}</span>
+					</div>
 
-				<div class="detail-row">
-					<label>证件地址</label>
-					<span>${data.address}</span>
-				</div>
+					<div class="detail-row">
+						<label>监护人关系</label>
+						<span>${data.guardianInfo.guardianRelation}</span>
+					</div>
+				` : ''}
 
 				<div class="detail-row">
 					<label>证件有效期</label>
@@ -538,8 +609,8 @@ class HistoryCard extends HTMLElement {
 				</div>
 
 				<div class="detail-row">
-					<label>登记日期</label>
-					<span>${data.checkinDate}</span>
+					<label>登记时间</label>
+					<span>${data.regTime}</span>
 				</div>
 		`
 
