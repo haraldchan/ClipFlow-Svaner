@@ -1,6 +1,12 @@
 PostDetails_QM2(post, moduleName, props) {
+    title := "Post Details - " . post["id"]
+    if (WinExist(title)) {
+        WinActivate(title)
+        return
+    }
+
     App := Svaner({
-        gui: { title: "Post Details - " . post["id"] },
+        gui: { title: title },
         font: { name: "微软雅黑" },
         events: {
             close: (thisGui) => thisGui.Destroy()

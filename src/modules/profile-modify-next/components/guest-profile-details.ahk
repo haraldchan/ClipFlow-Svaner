@@ -1,9 +1,13 @@
 /**
  * 
- * @param {Mao} selectedGuest 
+ * @param {Map} selectedGuest 
  * @param {Func} fillIn 
  */
 GuestProfileDetails(selectedGuest, fillIn) {
+    if (selectedGuest["idNum"] == 'No Data') {
+        return
+    }
+
     Profile := Svaner({
         gui: {
             options: "+AlwaysOnTop",

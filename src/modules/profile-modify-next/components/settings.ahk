@@ -4,6 +4,7 @@
  */
 PMN_Settings(settingSignal, profiles) {
     if (WinExist("PMN Settings")) {
+        WinActivate("PMN Settings")
         return
     }
 
