@@ -30,7 +30,6 @@ GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile) {
             return
         }
 
-        App.Hide()
         selectedItem := listContent.value.find(item => item["idNum"] == getSelectedCell(LV, row, "idNum"))
         GuestProfileDetails(selectedItem, fillPmsProfile)
     }
