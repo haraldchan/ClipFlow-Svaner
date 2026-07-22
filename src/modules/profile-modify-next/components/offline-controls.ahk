@@ -35,6 +35,10 @@ OfflineControls(App, queryFilter) {
         }
 
         localData := localDB.load(, queryFilter.value["date"], queryFilter.value["range"])
+        if (!localData.Length) {
+            return
+        }
+        
         for localProfile in localData {
             if (uncValidateMap[localProfile["idNum"]]) {
                 ; if matching idNum profile found, check each value
