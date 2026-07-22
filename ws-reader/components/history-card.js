@@ -578,7 +578,7 @@ class HistoryCard extends HTMLElement {
 
 				<div class="detail-row">
 					<label>性别</label>
-					<span></span>
+					<span>${data.gender}</span>
 				</div>
 
 				<div class="detail-row">
