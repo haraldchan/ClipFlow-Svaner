@@ -123,22 +123,15 @@ class FedexBookingEntry {
         crewName := StrSplit(crewNames[index], " ")
 
         ; open profile
-        loop 10 {
-            if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["AltNameAnchor.png"])) {
-                anchorX := FoundX - 10
-                anchorY := FoundY
-                break
-            }
-            Sleep(100)
+        found := PmsImageFinder.find("AltNameAnchor.png", 5)
+        if (!found) {
+            MsgBox("界面定位失败，请重新打开预订界面。", POPUP_TITLE, "4096 T2")
+            this.end()
         }
-        MouseMove(anchorX, anchorY)
-        utils.waitLoading()
-        Click()
-        utils.waitLoading()
 
-        MouseMove(initX - 91, initY + 338) ; 380, 555 ; search existing profile
+        Click(found.outX - 10, found.outY)
         utils.waitLoading()
-        Click()
+        Click(found.outX - 91, found.outY + 338)
         utils.waitLoading()
         Send(Format("{Text}{1}", crewName[2]))
         utils.waitLoading()
@@ -151,7 +144,7 @@ class FedexBookingEntry {
 
         ; check profile existence
         CoordMode("Pixel", "Screen")
-        if (PixelGetColor(initX + 109, initY + 288) != "0x0000FF") { ; profile is found 580, 505
+        if (PixelGetColor(found.outX + 109, found.outY + 288) != "0x0000FF") { ; profile is found 580, 505
             Send("{Enter}")
             utils.waitLoading()
         } else { ; profile not found, create a new one
@@ -161,14 +154,10 @@ class FedexBookingEntry {
             utils.waitLoading()
             Send("{Esc}")
             utils.waitLoading()
-            MouseMove(initX - 39, initY + 68) ; 432, 285
-            utils.waitLoading()
-            Click(3)
+            Click(found.outX - 39, found.outY + 68, 3) ; 432, 285
             utils.waitLoading()
             Send(Format("{Text}{1}", crewName[2]))
-            MouseMove(initX - 72, initY + 95) ; 399, 312
-            utils.waitLoading()
-            Click(3)
+            Click(found.outX - 72, found.outY + 95, 3) ; 399, 312
             utils.waitLoading()
             Send(Format("{Text}{1}", crewName[1]))
             utils.waitLoading()
@@ -179,15 +168,28 @@ class FedexBookingEntry {
 
 
     static dateTimeEntry(checkin, checkout, ETA, ETD, isCheckedIn) {
-        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
+        found := PmsImageFinder.find("opera-active-win.png", 5)
+        if (!found) {
+            MsgBox("界面定位失败，请重新打开预订界面。", POPUP_TITLE, "4096 T2")
+            this.end()
+        }
 
-        ; TODO: better to set nts to 1 as init
+        ; set nts to 0 as init
+        Click(found.outX + 88, found.outY + 194, 3)
+        utils.waitLoading()
+        Send("{Delete}")
+        utils.waitLoading()
+        Send("{Tab}")
+        utils.waitLoading()
+        Send("{Delete}")
+        utils.waitLoading()
+        Send("!s")
+        utils.waitLoading()
+        this.dismissPopup()
 
         ; fill-in checkin/checkout
         if (!isCheckedIn) {
-            MouseMove(initX + 154, initY + 176)
-            utils.waitLoading()
-            Click(1)
+            Click(found.outX + 154, found.outY + 176)
             utils.waitLoading()
             Send("!c")
             utils.waitLoading()
@@ -198,9 +200,7 @@ class FedexBookingEntry {
             this.dismissPopup()
         }
 
-        MouseMove(initX + 154, initY + 220)
-        utils.waitLoading()
-        Click()
+        Click(found.outX + 154, found.outY + 220)
         utils.waitLoading()
         Send("!c")
         utils.waitLoading()
@@ -211,9 +211,7 @@ class FedexBookingEntry {
         this.dismissPopup()
 
         if (!isCheckedIn) {
-            MouseMove(initX + 124, initY + 415)
-            utils.waitLoading()
-            Click(3)
+            Click(found.outX + 124, found.outY + 415, 3)
             utils.waitLoading()
             Send(Format("{Text}{1}", ETA))
             utils.waitLoading()
@@ -221,9 +219,7 @@ class FedexBookingEntry {
             utils.waitLoading()
         }
 
-        MouseMove(initX + 258, initY + 415)
-        utils.waitLoading()
-        Click(3)
+        Click(found.outX + 258, found.outY + 415, 3)
         utils.waitLoading()
         Send(Format("{Text}{1}", ETD))
         Send("{Tab}")
@@ -231,16 +227,18 @@ class FedexBookingEntry {
     }
 
 
-    static moreFieldsEntry(sCheckin, sCheckout, ETA, ETD, flightIn, flightOut) {
+    static moreFieldsEntry(scheduledCheckin, scheduledCheckout, ETA, ETD, flightIn, flightOut) {
         Send("!i")
         utils.waitLoading()
         Sleep(250)
         
-        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
+        found := PmsImageFinder.find("opera-active-win.png", 5)
+        if (!found) {
+            MsgBox("界面定位失败，请重新打开预订界面。", POPUP_TITLE, "4096 T2")
+            this.end()
+        }
 
-        MouseMove(initX + 475, initY + 113)
-        utils.waitLoading()
-        Click(3)
+        Click(found.outX + 475, found.outY + 113, 3)
         utils.waitLoading()
         Send(Format("{Text}{1}", flightIn))
         utils.waitLoading()
@@ -249,16 +247,14 @@ class FedexBookingEntry {
             utils.waitLoading()
         }
 
-        Send(Format("{Text}{1}", sCheckin))
+        Send(Format("{Text}{1}", scheduledCheckin))
         Sleep(100)
         Send("{Tab}")
         utils.waitLoading()
         Send(Format("{Text}{1}", ETA))
         utils.waitLoading()
 
-        MouseMove(initX + 713, initY + 113)
-        utils.waitLoading()
-        Click(2)
+        Click(found.outX + 713, found.outY + 113, 2)
         utils.waitLoading()
         Send(Format("{Text}{1}", flightOut))
         utils.waitLoading()
@@ -267,7 +263,7 @@ class FedexBookingEntry {
             utils.waitLoading()
         }
         utils.waitLoading()
-        Send(Format("{Text}{1}", sCheckout))
+        Send(Format("{Text}{1}", scheduledCheckout))
         utils.waitLoading()
         Send("{Tab}")
         utils.waitLoading()
@@ -280,16 +276,19 @@ class FedexBookingEntry {
 
 
     static commentEntry(infoObj) {
-        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
+        found := PmsImageFinder.find("opera-active-win.png", 5)
+        if (!found) {
+            MsgBox("界面定位失败，请重新打开预订界面。", POPUP_TITLE, "4096 T2")
+            this.end()
+        }
         comment := ""
 
         ; select current comment
-        MouseMove(initX + 426, initY + 412)
+        MouseMove(found.outX + 426, found.outY + 412)
         Click("Down")
-        MouseMove(initX + 944, initY + 421)
+        MouseMove(found.outX + 944, found.outY + 421)
         Sleep(1000) ; hold to cover long comment
         Click("Up")
-
         utils.waitLoading()
         Send("^x")
         utils.waitLoading()
@@ -320,9 +319,7 @@ class FedexBookingEntry {
         utils.waitLoading()
 
         ; fill-in new flight and trip
-        MouseMove(initX + 733, initY + 370) ; 929, 554
-        utils.waitLoading()
-        Click(3)
+        Click(found.outX + 733, found.outY + 370, 3) ; 929, 554
         utils.waitLoading()
         Send(Format("{Text}{1}  {2}", infoObj["flightIn"], infoObj["tripNum"]))
         utils.waitLoading()
@@ -330,11 +327,13 @@ class FedexBookingEntry {
 
 
     static dailyDetailsEntry(daysActual, pmsNts) {
-        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
+        found := PmsImageFinder.find("opera-active-win.png", 5)
+        if (!found) {
+            MsgBox("界面定位失败，请重新打开预订界面。", POPUP_TITLE, "4096 T2")
+            this.end()
+        }
 
-        MouseMove(initX + 176, initY + 340) ; 372, 524
-        utils.waitLoading()
-        Click()
+        Click(found.outX + 176, found.outY + 340, 3) ; 372, 524
         utils.waitLoading()
         Send("!d")
         utils.waitLoading()
@@ -346,9 +345,14 @@ class FedexBookingEntry {
         utils.waitLoading()
         Sleep(100)
 
-        ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
-        MouseMove(FoundX + 226, FoundY + 142)
-        Click(3)
+        ; opend daily details editor
+        found := PmsImageFinder.find("opera-active-win.png", 5)
+        if (!found) {
+            MsgBox("界面定位失败，请重新打开预订界面。", POPUP_TITLE, "4096 T2")
+            this.end()
+        }
+
+        Click(found.outX + 226, found.outY + 142, 3)
         Send("{Text}" . (daysActual < pmsNts ? "NRR" : "FEDEXN"))
         utils.waitLoading()
         Send("{Tab}")
@@ -365,7 +369,6 @@ class FedexBookingEntry {
     }
 
     static postRoomChargeAlertEntry(pmsNts, daysActual) {
-
         Send("!t")
         utils.waitLoading()
         loop 3 {
@@ -375,8 +378,13 @@ class FedexBookingEntry {
         Send("{Enter}")
         utils.waitLoading()
 
-        ImageSearch(&popX, &popY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
-        if (PixelGetColor(popX + 55, popY + 55) == "0x000080") {
+        found := PmsImageFinder.find("opera-active-win.png", 5)
+        if (!found) {
+            MsgBox("界面定位失败，请重新打开预订界面。", POPUP_TITLE, "4096 T2")
+            this.end()
+        }
+
+        if (PixelGetColor(found.outX + 55, found.outY + 55) == "0x000080") {
             Send("!n")
             utils.waitLoading()
         }
@@ -406,19 +414,30 @@ class FedexBookingEntry {
 
 
     static crsNumEntry(tracking) {
-        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
+        found := PmsImageFinder.find("opera-active-win.png", 5)
+        if (!found) {
+            MsgBox("界面定位失败，请重新打开预订界面。", POPUP_TITLE, "4096 T2")
+            this.end()
+        }
 
-        MouseMove(initX + 543, initY + 321)
-        utils.waitLoading()
-        Click()
+        ; MouseMove(initX + 543, initY + 321)
+        ; utils.waitLoading()
+        ; Click()
+        Click(found.outX + 543, found.outY + 321)
         utils.waitLoading()
 
         ; check if record exists
         Send("!e")
         utils.waitLoading()
 
-        ImageSearch(&popX, &popY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
-        if (PixelGetColor(popX + 64, popY + 55) == "0xD7D7D7") {
+        ; open crs. number editor
+        found := PmsImageFinder.find("opera-active-win.png", 5)
+        if (!found) {
+            MsgBox("界面定位失败，请重新打开预订界面。", POPUP_TITLE, "4096 T2")
+            this.end()
+        }
+
+        if (PixelGetColor(found.outX + 64, found.outY + 55) == "0xD7D7D7") {
             Send("{Tab}")
             utils.waitLoading()
             Send("^c")
