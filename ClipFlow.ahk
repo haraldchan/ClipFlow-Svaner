@@ -12,7 +12,7 @@ if (!A_IsAdmin) {
 utils.clearExistInstances()
 
 ; global consts
-VERSION := "1.11.2"
+VERSION := "1.11.3"
 POPUP_TITLE := "ClipFlow " . VERSION
 UNC_PATH := "\\10.0.2.13\fd"
 WIN_GROUP := ["ahk_class SunAwtFrame"]
