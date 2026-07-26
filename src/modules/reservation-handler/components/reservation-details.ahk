@@ -17,15 +17,22 @@ ReservationDetails(App, curResv) {
 
                 LV.Add(, field, val)
             }
-        } else {
+        }
+        else {
             for key, field in RH_Models.otaListFields {
-                if (key == "guestNames" || key == "roomRates") {
+                if (key == "guestNames") {
                     val := curResv[key].join(", ")
-                } else if (key == "ciDate" || key == "coDate") {
+                } 
+                else if (key == "ciDate" || key == "coDate") {
                     val := FormatTime(curResv[key], "yyyy-MM-dd")
-                } else if (key == "bbf") {
-                    val := match(curResv[key], { 0: "不含早", 1: "单早", 2: "双早" })
-                } else {
+                }
+                else if (key == "bbf") {
+                    val := match(curResv[key], Map("0", "不含早", "1", "单早", "2", "双早"))
+                }
+                else if (key == "roomRates") {
+                    val := curResv[key].map(rate => Format("{:.2f}", rate)).join(", ")
+                }
+                else {
                     val := curResv.has(key) ? curResv[key] : ""
                 }
 
