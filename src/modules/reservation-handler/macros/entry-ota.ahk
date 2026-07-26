@@ -181,32 +181,25 @@ class RH_OtaBookingEntry {
 
     static profileEntry(guestName) {
         ; open profile
-        loop 10 {
-            if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["AltNameAnchor.png"])) {
-                anchorX := FoundX - 10
-                anchorY := FoundY
-                break
-            }
-            Sleep(100)
-
-            if (A_Index == 10 && !IsSet(anchorX)) {
-                MsgBox("界面定位失败，请重新打开预订界面。", POPUP_TITLE, "4096 T2")
-                utils.cleanReload(WIN_GROUP)
-            }
+        found := PmsImageFinder.find("AltNameAnchor.png", 5)
+        if (!found) {
+            MsgBox("界面定位失败，请重新打开预订界面。", POPUP_TITLE, "4096 T2")
+            this.end()
         }
-        MouseMove(anchorX, anchorY)
-        utils.waitLoading()
-        Click()
+
+        ; MouseMove(anchorX, anchorY)
+        Click(found.outX - 10, found.outY)
         utils.waitLoading()
 
         ; create new profile
         Send("!n")
         utils.waitLoading()
-        ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["AltNameAnchor.png"])
-        Sleep(100)
-        MouseMove(FoundX - 20, FoundY)
-        utils.waitLoading()
-        Click(3)
+        found := PmsImageFinder.find("AltNameAnchor.png")
+        if (!found) {
+            this.end()
+        }
+
+        Click(found.outX - 20, found.outY, 3)
         utils.waitLoading()
         Send(Format("{Text}{1}", guestName[1]))
         utils.waitLoading()
@@ -215,9 +208,7 @@ class RH_OtaBookingEntry {
         Send(Format("{Text}{1}", guestName[2]))
         utils.waitLoading()
         if (guestName.Length == 3) {
-            MouseMove(FoundX, FoundY)
-            utils.waitLoading()
-            Click()
+            Click(found.outX, found.outY)
             utils.waitLoading()
             Send(Format("{Text}{1}", guestName[3]))
             utils.waitLoading()
@@ -232,11 +223,13 @@ class RH_OtaBookingEntry {
 
 
     static roomQtyEntry(roomQty) {
-        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
+        found := PmsImageFinder.find("opera-active-win.png", 5)
+        if (!found) {
+            MsgBox("界面定位失败，请重新打开预订界面。", POPUP_TITLE, "4096 T2")
+            this.end()
+        }
 
-        MouseMove(initX + 93, initY + 259)
-        utils.waitLoading()
-        Click(3)
+        Click(found.outX + 93, found.outY + 259)
         utils.waitLoading()
         Send(Format("{Text}{1}", roomQty))
         utils.waitLoading()
@@ -248,11 +241,13 @@ class RH_OtaBookingEntry {
 
     static routingEntry(payment, configFields) {
         ; clear fields: Agent, Company
-        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
+        found := PmsImageFinder.find("opera-active-win.png", 5)
+        if (!found) {
+            MsgBox("界面定位失败，请重新打开预订界面。", POPUP_TITLE, "4096 T2")
+            this.end()
+        }
 
-        MouseMove(initX + 673, initY + 35)
-        utils.waitLoading()
-        Click(3)
+        Click(found.outX + 673, found.outY + 35, 3)
         utils.waitLoading()
         Send("{Delete}")
         utils.waitLoading()
@@ -265,13 +260,10 @@ class RH_OtaBookingEntry {
         this.dismissPopup()
 
         if (configFields["profileType"] == "Travel Agent") {
-            MouseMove(initX + 673, initY + 35)
+            Click(found.outX + 673, found.outY + 35)
         } else {
-            MouseMove(initX + 673, initY + 55)
+            Click(found.outX + 673, found.outY + 35)
         }
-
-        utils.waitLoading()
-        Click()
         utils.waitLoading()
         Send("{Text}" . (payment.includes("现付") ? configFields["profileNamePoa"] : configFields["profileName"]))
         utils.waitLoading()
@@ -282,8 +274,13 @@ class RH_OtaBookingEntry {
         this.dismissPopup()
 
         ; check if default routing exist
-        ImageSearch(&drX, &drY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
-        if (PixelGetColor(drX+481, drY+64) == "0x000080") {
+        found := PmsImageFinder.find("opera-active-win.png", 5)
+        if (!found) {
+            MsgBox("界面定位失败，请重新打开预订界面。", POPUP_TITLE, "4096 T2")
+            this.end()
+        }
+
+        if (PixelGetColor(found.outX + 481, found.outY + 64) == "0x000080") {
             Send("{Space}")
             utils.waitLoading()
             Send("!o")
@@ -322,10 +319,13 @@ class RH_OtaBookingEntry {
 
 
     static roomTypeEntry(roomType, isCheckedIn) {
-        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
-        MouseMove(initX + 302, initY + 282) ; RTC btn
-        utils.waitLoading()
-        Click()
+        found := PmsImageFinder.find("opera-active-win.png", 5)
+        if (!found) {
+            MsgBox("界面定位失败，请重新打开预订界面。", POPUP_TITLE, "4096 T2")
+            this.end()
+        }
+
+        Click(found.outX + 302, found.outY + 282) ; RTC btn
         utils.waitLoading()
         Send(Format("{Text}{1}", roomType))
         utils.waitLoading()
@@ -333,9 +333,7 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
         this.dismissPopup()
         if (!isCheckedIn) {
-            MouseMove(initX + 154, initY + 282) ; Room Type btn
-            utils.waitLoading()
-            Click()
+            Click(found.outX + 154, found.outY + 282) ; Room Type btn
             utils.waitLoading()
             Send(Format("{Text}{1}", roomType))
             utils.waitLoading()
@@ -351,14 +349,17 @@ class RH_OtaBookingEntry {
 
 
     static dateTimeEntry(checkin, checkout, isCheckedIn) {
-        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
+        found := PmsImageFinder.find("opera-active-win.png", 5)
+        if (!found) {
+            MsgBox("界面定位失败，请重新打开预订界面。", POPUP_TITLE, "4096 T2")
+            this.end()
+        }
+
         pmsCiDate := FormatTime(checkin, "MMddyyyy")
         pmsCoDate := FormatTime(checkout, "MMddyyyy")
 
         if (!isCheckedIn) {
-            MouseMove(initX + 154, initY + 176)
-            utils.waitLoading()
-            Click()
+            Click(found.outX + 154, found.outY +176)
             utils.waitLoading()
             Send("!c")
             utils.waitLoading()
@@ -369,9 +370,7 @@ class RH_OtaBookingEntry {
             this.dismissPopup()
         }
 
-        MouseMove(initX + 154, initY + 220)
-        utils.waitLoading()
-        Click()
+        Click(found.outX + 154, found.outY + 220)
         utils.waitLoading()
         Send("!c")
         utils.waitLoading()
@@ -385,12 +384,13 @@ class RH_OtaBookingEntry {
 
 
     static commentOrderIdSpecialEntry(orderId, comment, remarks) {
-        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
+        found := PmsImageFinder.find("opera-active-win.png", 5)
+        if (!found) {
+            MsgBox("界面定位失败，请重新打开预订界面。", POPUP_TITLE, "4096 T2")
+            this.end()
+        }
 
-        ; fill-in orderId
-        MouseMove(initX + 643, initY + 371)
-        utils.waitLoading()
-        Click(3)
+        Click(found.outX + 643, found.outY + 371, 3)
         utils.waitLoading()
         Send(Format("{Text}{1}", orderId))
         utils.waitLoading()
@@ -420,14 +420,16 @@ class RH_OtaBookingEntry {
 
 
     static roomRatesEntry(rateCode, roomRates, nts, isCheckedIn, bbf, configFields, wf) {
-        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
+        found := PmsImageFinder.find("opera-active-win.png", 5)
+        if (!found) {
+            MsgBox("界面定位失败，请重新打开预订界面。", POPUP_TITLE, "4096 T2")
+            this.end()
+        }
 
         if (wf["resType"]) {
             ; mkt/src code
             if (!isCheckedIn) {
-                MouseMove(initX + 440, initY + 177) ; 636, 361
-                utils.waitLoading()
-                Click(3)
+                Click(found.outX + 440, found.outY + 177, 3) ; 636, 361
                 utils.waitLoading()
                 Send("{Text}" . configFIelds["resType"])
                 utils.waitLoading()
@@ -436,9 +438,7 @@ class RH_OtaBookingEntry {
             } 
         }
         if (wf["market"]) {
-            MouseMove(initX + 440, initY + 197)
-            utils.waitLoading()
-            Click(3)
+            Click(found.outX + 440, found.outY + 197, 3)
             utils.waitLoading()
             Send("{Text}" . configFields["market"])
             utils.waitLoading()
@@ -448,9 +448,7 @@ class RH_OtaBookingEntry {
             utils.waitLoading()
         }
         if (wf["source"]) {
-            MouseMove(initX + 440, initY + 217)
-            utils.waitLoading()
-            Click(3)
+            Click(found.outX + 440, found.outY + 217, 3)
             utils.waitLoading()
             Send("{Text}" . configFields["source"])
             utils.waitLoading()
@@ -459,7 +457,7 @@ class RH_OtaBookingEntry {
         }
 
         if (nts == 1 || roomRates.every(rate => rate == roomRates[1])) {
-            MouseClickDrag("left", initX + 129, initY + 322, initX + 29, initY + 322)
+            MouseClickDrag("left", found.outX + 129, found.outY + 322, found.outX + 29, found.outY + 322)
             utils.waitLoading()
             Send("{Text}" . rateCode)
             utils.waitLoading()
@@ -473,9 +471,7 @@ class RH_OtaBookingEntry {
             this.dismissPopup()
         } else {
             ; daily details
-            MouseMove(initX + 176, initY + 340) ;372, 524
-            utils.waitLoading()
-            Click()
+            Click(found.outX + 176, found.outY + 340)
             utils.waitLoading()
             this.dismissPopup()
             utils.waitLoading()
@@ -485,25 +481,30 @@ class RH_OtaBookingEntry {
                 Send("!e")
                 utils.waitLoading()
 
-                ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
+                found := PmsImageFinder.find("opera-active-win.png", 5)
+                if (!found) {
+                    MsgBox("界面定位失败，请重新打开预订界面。", POPUP_TITLE, "4096 T2")
+                    this.end()
+                }
+
                 if (bbf > 1) {
-                    MouseMove(FoundX + 143, FoundY + 69)
-                    Click(3)
+                    Click(found.outX + 143, found.outY + 69, 3)
+                    utils.waitLoading
                     Send("{Text}" . bbf)
                     utils.waitLoading()
                     this.dismissPopup()
                 }
 
-                MouseMove(FoundX + 226, FoundY + 142)
-                Click(3)
+                Click(found.outX + 226, found.outY + 142, 3)
+                utils.waitLoading()
                 Send("{Text}" . rateCode)
                 utils.waitLoading()
                 Send("{Tab}")
                 utils.waitLoading()
                 this.dismissPopup()
 
-                MouseMove(FoundX + 176, FoundY + 165)
-                Click(3)
+                Click(found.outX + 176, found.outY + 165, 3)
+                utils.waitLoading()
                 Send("{Text}" . roomRates[A_Index])
                 utils.waitLoading()
                 Send("{Tab}")
@@ -524,14 +525,16 @@ class RH_OtaBookingEntry {
 
 
     static breakfastEntry(bbf, packageBounded, isCBF) {
-        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
+        found := PmsImageFinder.find("opera-active-win.png", 5)
+        if (!found) {
+            MsgBox("界面定位失败，请重新打开预订界面。", POPUP_TITLE, "4096 T2")
+            this.end()
+        }
 
         ; if ratecode is bound with packages(blue text) or club floor rooms, skip adding BFNP
         if (!packageBounded && !isCBF) {
             ;entry bbf package
-            MouseMove(initX + 156, initY + 364)
-            utils.waitLoading()
-            Click()
+            Click(found.outX + 156, found.outY + 364)
             utils.waitLoading()
             Send("!n")
             utils.waitLoading()
@@ -546,9 +549,8 @@ class RH_OtaBookingEntry {
         }
 
         ; change "Adults"
-        MouseMove(initX + 89, initY + 240) ; 285, 424
+        Click(found.outX + 89, found.outY + 240, 3)
         utils.waitLoading()
-        Click(3)
         Send("{Text}" . bbf)
         utils.waitLoading()
         Send("{Tab}")
@@ -558,12 +560,14 @@ class RH_OtaBookingEntry {
 
 
     static packageEntry(package) {
-        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
+        found := PmsImageFinder.find("opera-active-win.png", 5)
+        if (!found) {
+            MsgBox("界面定位失败，请重新打开预订界面。", POPUP_TITLE, "4096 T2")
+            this.end()
+        }
 
         ;entry extra package
-        MouseMove(initX + 156, initY + 364)
-        utils.waitLoading()
-        Click()
+        Click(found.outX + 156, found.outY + 364)
         utils.waitLoading()
         Send("!n")
         utils.waitLoading()
@@ -621,15 +625,17 @@ class RH_OtaBookingEntry {
         }
         
         ; sort party members
-        ImageSearch(&partyX, &partyY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
-        MouseMove(partyX + 37, partyY + 77)
-        utils.waitLoading()
-        Click()
+        found := PmsImageFinder.find("opera-active-win.png", 5)
+        if (!found) {
+            MsgBox("界面定位失败，请重新打开预订界面。", POPUP_TITLE, "4096 T2")
+            this.end()
+        }
+
+        Click(found.outX + 37, found.outY + 77)
         utils.waitLoading()
 
         ; Fill guest names
         loop roomQty {
-
             guestName := A_Index > guestNames.Length ? guestNames[1] : guestNames[A_Index]
             
             if (A_Index == 1) {
