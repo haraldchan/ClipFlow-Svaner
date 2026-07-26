@@ -229,7 +229,7 @@ class RH_OtaBookingEntry {
             this.end()
         }
 
-        Click(found.outX + 93, found.outY + 259)
+        Click(found.outX + 93, found.outY + 259, 3)
         utils.waitLoading()
         Send(Format("{Text}{1}", roomQty))
         utils.waitLoading()
