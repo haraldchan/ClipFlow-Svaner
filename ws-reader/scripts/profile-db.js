@@ -1,44 +1,25 @@
-/**
- * @typedef {object} Profile
- * @property {string | ''} name 
- * @property {string | ''} lastName
- * @property {string | ''} firstName
- * @property {string | ''} roomNum
- * @property {string | ''} tel
- * @property {'内地旅客' | '港澳台旅客' | '国外旅客'} guestType
- * @property {string} region
- * @property {string} cardNo
- * @property {string} cardType
- * @property {'男' | '女'} gender
- * @property {string} birthday
- * @property {string} validDate
- * @property {object} data
- * @property {string} regTime
- * @property {object} [guardianInfo]
- */
-
 class ProfileDB {
     constructor() {
         /** @type {IDBDatabase | undefined} */
         this.db
 
         const objectStoreIndexes = [
-            'name',
-            'lastName',
-            'firstName',
-            'roomNum',
-            'tel',
-            'guestType',
-            'region',
-            'address',
-            'cardNo',
-            'cardType',
-            'gender',
-            'birthday',
-            'validDate',
-            'data',
-            'regTime',
-            'guardianInfo'
+            "curPhoto",
+            "ocrPhoto",
+            "name",
+            "nameLast",
+            "nameFirst",
+            "roomNum",
+            "tel",
+            "guestType",
+            "region",
+            "address",
+            "cardNo",
+            "cardType",
+            "gender",
+            "birthday",
+            "validDate",
+            "regTime"
         ]
 
         const DBOpenRequest = window.indexedDB.open("guestProfiles")
@@ -58,35 +39,14 @@ class ProfileDB {
     /**
      * @param {object} data 
      */
-    add(data) {
-        const newItem = {
-            name: data.name ?? '',
-            lastName: data.lastName ?? '',
-            firstName: data.firstName ?? '',
-            roomNum: data.roomNum ?? '',
-            tel: data.tel ?? '',
-            guestType: data.guestType,
-            region: data.region,
-            address: data.address ?? '',
-            cardNo: data.cardNo,
-            cardType: data.cardType,
-            gender: data.gender,
-            birthday: data.birthday,
-            validDate: data.validDate ?? '',
-            data: data,
-            regTime: data.regTime,
-        }
-        if (data.hasOwnProperty('guardianInfo')) {
-            newItem.guardianInfo = data.guardianInfo
-        }
-
+    add(newItem) {
         const transaction = this.db.transaction(['guestProfiles'], 'readwrite')
 
         transaction.onerror = () => console.log(`Transaction not opened due to error: ${transaction.error}`)
         transaction.oncomplete = () => console.log("Transaction completed: database modification finished.")
 
         const objectStore = transaction.objectStore('guestProfiles')
-        const getRequest = objectStore.get(data.cardNo)
+        const getRequest = objectStore.get(newItem.cardNo)
         getRequest.onsuccess = (e) => {
             const record = e.target.result
             if (!record) {
@@ -100,7 +60,6 @@ class ProfileDB {
     showAll() {
         const list = document.querySelector('history-card').shadowRoot.querySelector('.history-list')
         list.innerHTML = ''
-
 
         const objectStore = this.db.transaction('guestProfiles').objectStore('guestProfiles')
         objectStore.index('regTime').openCursor(null, 'prev').onsuccess = e => {

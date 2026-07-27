@@ -145,19 +145,28 @@ class ActionBar extends HTMLElement {
             const sendClip = {
                 identifier: identifier,
                 tsId: Date.now(),
+                curPhoto: currentData.curPhoto,
+                name: currentData.name ?? '',
+                nameLast: currentData.data.lastName ?? '',
+                nameFirst: currentData.data.firstName ?? '',
                 roomNum: currentData.roomNum ?? '',
                 tel: currentData.tel ?? '',
                 guestType: currentData.guestType,
-                idType: groupedCardTypes.get(currentData.guestType).get(currentData.cardType),
                 region: currentData.region,
+                address: currentData.data.address,
+                cardNo: currentData.data.cardNo,
+                cardType: groupedCardTypes.get(currentData.guestType).get(currentData.cardType),
                 gender: currentData.gender,
-                data: currentData,
+                birthday: currentData.birthday,
             }
 
             if (FormValidator.isUnder18.yes && currentData.guestType !== '国外旅客') {
                 sendClip.guardianInfo = currentData.guardianInfo
             }
-            
+
+            if (currentData.data.ocrPhoto) {
+                sendClip.ocrPhoto = currentData.data.ocrPhoto
+            }
 
             await navigator.clipboard.writeText(JSON.stringify(sendClip))
         })

@@ -422,7 +422,7 @@ class HistoryCard extends HTMLElement {
 
 		this.editBtn = shadow.getElementById('edit-btn')
 		this.editBtn.addEventListener('click', () => {
-			currentData = HistoryCard.selectedHistoryData.data
+			currentData = HistoryCard.selectedHistoryData
 
 			const form = document.querySelector('form-content').form
 			for (const field of form.elements) {
@@ -455,17 +455,27 @@ class HistoryCard extends HTMLElement {
 			const sendClip = {
 				identifier: identifier,
 				tsId: Date.now(),
+				curPhoto: HistoryCard.selectedHistoryData.curPhoto,
+				name: HistoryCard.selectedHistoryData.name ?? '',
+				nameLast: HistoryCard.selectedHistoryData.lastName ?? '',
+				nameFirst: HistoryCard.selectedHistoryData.firstName ?? '',
 				roomNum: HistoryCard.selectedHistoryData.roomNum ?? '',
 				tel: HistoryCard.selectedHistoryData.tel ?? '',
 				guestType: HistoryCard.selectedHistoryData.guestType,
-				idType: groupedCardTypes.get(HistoryCard.selectedHistoryData.guestType).get(HistoryCard.selectedHistoryData.cardType),
 				region: HistoryCard.selectedHistoryData.region,
+				address: HistoryCard.selectedHistoryData.address,
+				cardType: groupedCardTypes.get(HistoryCard.selectedHistoryData.guestType).get(HistoryCard.selectedHistoryData.cardType),
+				cardNo: HistoryCard.selectedHistoryData.cardNo,
 				gender: HistoryCard.selectedHistoryData.gender,
-				data: HistoryCard.selectedHistoryData.data,
+				birthday: HistoryCard.selectedHistoryData.birthday,
 			}
-			
-			if (FormValidator.getAge(new Date(sendClip.data.birthday)) < 18 && sendClip.guestType !== '国外旅客') {
+
+			if (FormValidator.getAge(new Date(sendClip.birthday)) < 18 && sendClip.guestType !== '国外旅客') {
 				sendClip.guardianInfo = HistoryCard.selectedHistoryData.guardianInfo
+			}
+
+			if (HistoryCard.selectedHistoryData.ocrPhoto) {
+				sendClip.ocrPhoto = HistoryCard.selectedHistoryData.ocrPhoto
 			}
 
 			await navigator.clipboard.writeText(JSON.stringify(sendClip))
@@ -481,7 +491,7 @@ class HistoryCard extends HTMLElement {
 			<div class="history-item">
 				<img 
 					class="history-photo" 
-					src="${data.data.curPhoto.startsWith('data:image/jpeg;base64,') ? data.data.curPhoto : 'data:image/jpeg;base64,' + data.data.curPhoto}" 
+					src="${data.curPhoto.startsWith('data:image/jpeg;base64,') ? data.curPhoto : 'data:image/jpeg;base64,' + data.curPhoto}" 
 					alt="head" 
 				/>
 				<div class="history-info">
@@ -568,7 +578,7 @@ class HistoryCard extends HTMLElement {
 
 				<div class="detail-row">
 					<label>证件号码</label>
-					<span>${data.data.cardNo}</span>
+					<span>${data.cardNo}</span>
 				</div>
 
 				<div class="detail-row">

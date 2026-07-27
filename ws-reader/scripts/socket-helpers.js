@@ -161,6 +161,22 @@ function handleMessageDisplay(data) {
 
 	const validateResult = FormValidator.handleFormValidate(form)
 	if (validateResult.isValid) {
-		PDB.add(currentData)
+		PDB.add({
+			curPhoto: currentData.curPhoto,
+			name: currentData.name ?? '',
+			lastName: currentData.lastName ?? '',
+			firstName: currentData.firstName ?? '',
+			roomNum: currentData.roomNum ?? '',
+			tel: currentData.tel ?? '',
+			guestType: currentData.guestType,
+			region: currentData.region,
+			address: currentData.address ?? '',
+			cardNo: currentData.cardNo,
+			cardType: groupedCardTypes.get(currentData.guestType).get(currentData.cardType),
+			gender: currentData.gender,
+			birthday: currentData.birthday,
+			validDate: currentData.validDate ?? '',
+			regTime: currentData.regTime
+		})
 	}
 }
