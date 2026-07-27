@@ -72,18 +72,17 @@ class WSMessageParser {
     static parseMainlandTraveler(incoming) {
         guestProfile := {
             idendifier: ProfileModifyNext.identifier,
-            addr: incoming.data.address,
-            birthday: incoming.data.birthday,
+            addr: incoming.address,
+            birthday: incoming.birthday,
             gender: incoming.gender,
             guestType: "内地旅客",
-            idNum: incoming.data.cardNo,
-            idType: incoming.idType,
+            idNum: incoming.cardNo,
+            idType: incoming.cardType,
             isMod: false,
-            name: incoming.data.name,
+            name: incoming.name,
             roomNum: incoming.roomNum,
             tel: incoming.tel,
             tsId: incoming.tsId,
-            ; wsData: incoming.data
         }
 
         if (incoming.HasOwnProp("guardianInfo")) {
@@ -97,20 +96,19 @@ class WSMessageParser {
         guestProfile := {
             idendifier: ProfileModifyNext.identifier,
             addr: " ",
-            birthday: incoming.data.birthday,
+            birthday: incoming.birthday,
             gender: incoming.gender,
             guestType: "港澳台旅客",
-            idNum: incoming.data.cardNo,
-            idType: incoming.idType,
+            idNum: incoming.cardNo,
+            idType: incoming.cardType,
             isMod: false,
-            name: incoming.data.name,
-            nameLast: incoming.data.lastName,
-            nameFirst: incoming.data.firstName,
+            name: incoming.name,
+            nameLast: incoming.lastName,
+            nameFirst: incoming.firstName,
             region: incoming.region,
             roomNum: incoming.roomNum,
             tel: incoming.tel,
             tsId: incoming.tsId,
-            ; wsData: incoming.data
         }
 
         if (incoming.HasOwnProp("guardianInfo")) {
@@ -125,19 +123,18 @@ class WSMessageParser {
             idendifier: ProfileModifyNext.identifier,
             addr: incoming.region,
             country: incoming.region,
-            birthday: incoming.data.birthday,
+            birthday: incoming.birthday,
             gender: incoming.gender,
             guestType: incoming.guestType,
-            idNum: incoming.data.cardNo,
-            idType: incoming.idType,
+            idNum: incoming.cardNo,
+            idType: incoming.cardType,
             isMod: false,
             name: Format("{1}, {2}", incoming.data.lastName, incoming.data.firstName),
-            nameFirst: incoming.data.firstName,
-            nameLast: incoming.data.lastName,
+            nameFirst: incoming.firstName,
+            nameLast: incoming.lastName,
             roomNum: incoming.roomNum,
             tel: incoming.tel,
             tsId: incoming.tsId,
-            ; wsData: incoming.data
         }
 
         return JSON.stringify(guestProfile)
