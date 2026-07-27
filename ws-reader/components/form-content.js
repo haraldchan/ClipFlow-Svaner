@@ -200,9 +200,11 @@ ${formContentStyle}
             <label>监护人关系</label>
             <input type="text" id="guardian-relation" name="guardianRelation" list="relation-list">
                 <datalist id="relation-list">
-                    <option value="父亲"></option>
-                    <option value="母亲"></option>
-                    <option value="其他"></option>
+					<option value="父母"></option>
+					<option value="祖父母"></option>
+					<option value="外祖父母"></option>
+					<option value="兄姐"></option>
+					<option value="其他"></option>
                 </datalist>
             </input>
         </div>
@@ -332,6 +334,11 @@ class FormContent extends HTMLElement {
                 case 'cardType':
                     this.curCardType.selected = field.value
                     currentData.cardType = field.value
+                    break
+
+                case 'birthday':
+                    currentData.birthday = field.value
+                    FormValidator.isUnder18.yes = validateBirthday(field) && currentData.guestType !== '国外旅客'
                     break
 
                 case 'guardianName':
