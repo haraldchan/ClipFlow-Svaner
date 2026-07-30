@@ -445,7 +445,7 @@ class HistoryCard extends HTMLElement {
 						break
 				}
 			}
-			
+
 			FormValidator.handleFormValidate(form)
 			document.querySelector('side-nav').readerBtn.click()
 		})
@@ -526,7 +526,7 @@ class HistoryCard extends HTMLElement {
 		historyDetailContainer.innerHTML = ''
 		const historyDetailContent = document.createElement('template')
 		historyDetailContent.innerHTML = html`
-				${data.guestType !== '国外旅客' 
+				${data.guestType !== '国外旅客'
 					? html`
 						<div class="detail-row">
 							<label>姓名</label>
@@ -536,7 +536,7 @@ class HistoryCard extends HTMLElement {
 					: ''
 				}
 
-				${data.guestType !== '内地旅客' 
+				${data.guestType !== '内地旅客'
 					? html`
 						<div class="detail-row">
 							<label>英文姓</label>
