@@ -41,7 +41,7 @@ class WSMessageParser {
             DirExist(this.uncPicFolder) ? this.uncPicFolder : this.localPicFolder,
             FormatTime(A_Now, "yyyy-MM-dd"),
             incoming.roomNum ? incoming.roomNum : " ",
-            incoming.data.name ? incoming.data.name : ""
+            incoming.name ? incoming.name : ""
         )
 
         if (!DirExist(saveFolder)) {
@@ -50,21 +50,21 @@ class WSMessageParser {
 
         ; save profile pic
         this.base64ToFile(
-            StrReplace(incoming.data.curPhoto, this.b64Prefix, ""),
-            Format("{1}\{2}-{3}.jpg", saveFolder, incoming.roomNum . incoming.data.name, "head")
+            StrReplace(incoming.curPhoto, this.b64Prefix, ""),
+            Format("{1}\{2}-{3}.jpg", saveFolder, incoming.roomNum . incoming.name, "head")
         )
 
         ; save scanned pic
-        passportImgKey := match(incoming.data, Map(
+        passportImgKey := match(incoming, Map(
             i => i.HasOwnProp("photo"), "photo",
             i => i.HasOwnProp("ocrPhoto"), "ocrPhoto",
         ), "")
 
         ; only save when passport is available(scan mode)
-        if (passportImgKey && incoming.data.%passportImgKey%) {
+        if (passportImgKey && incoming.%passportImgKey%) {
             this.base64ToFile(
-                StrReplace(incoming.data.%passportImgKey%, this.b64Prefix, ""),
-                Format("{1}\{2}-{3}.jpg", saveFolder, incoming.roomNum . incoming.data.name, "scan")
+                StrReplace(incoming.%passportImgKey%, this.b64Prefix, ""),
+                Format("{1}\{2}-{3}.jpg", saveFolder, incoming.roomNum . incoming.name, "scan")
             )
         }
     }
@@ -129,7 +129,7 @@ class WSMessageParser {
             idNum: incoming.cardNo,
             idType: incoming.cardType,
             isMod: false,
-            name: Format("{1}, {2}", incoming.data.lastName, incoming.data.firstName),
+            name: Format("{1}, {2}", incoming.lastName, incoming.firstName),
             nameFirst: incoming.firstName,
             nameLast: incoming.lastName,
             roomNum: incoming.roomNum,
