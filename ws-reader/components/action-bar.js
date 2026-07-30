@@ -147,14 +147,14 @@ class ActionBar extends HTMLElement {
                 tsId: Date.now(),
                 curPhoto: currentData.curPhoto,
                 name: currentData.name ?? '',
-                nameLast: currentData.data.lastName ?? '',
-                nameFirst: currentData.data.firstName ?? '',
+                nameLast: currentData.lastName ?? '',
+                nameFirst: currentData.firstName ?? '',
                 roomNum: currentData.roomNum ?? '',
                 tel: currentData.tel ?? '',
                 guestType: currentData.guestType,
                 region: currentData.region,
-                address: currentData.data.address,
-                cardNo: currentData.data.cardNo,
+                address: currentData.address,
+                cardNo: currentData.cardNo,
                 cardType: groupedCardTypes.get(currentData.guestType).get(currentData.cardType),
                 gender: currentData.gender,
                 birthday: currentData.birthday,
@@ -164,8 +164,8 @@ class ActionBar extends HTMLElement {
                 sendClip.guardianInfo = currentData.guardianInfo
             }
 
-            if (currentData.data.ocrPhoto) {
-                sendClip.ocrPhoto = currentData.data.ocrPhoto
+            if (currentData.ocrPhoto) {
+                sendClip.ocrPhoto = currentData.ocrPhoto
             }
 
             await navigator.clipboard.writeText(JSON.stringify(sendClip))
