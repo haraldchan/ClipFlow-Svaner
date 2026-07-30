@@ -15,6 +15,12 @@ ServerAgentPanel(App) {
     isListening := signal("离线")
 
     serverConfig := CONFIG.read("serverConfig")
+    if (!DirExist(serverConfig["host"])) {
+        return (
+            App.AddText("x30 y+10 h40 w580", "无法找到路径，请检查 Share 盘是否可用").SetFont("s13 q5 Bold")
+        )
+    }
+
     global agent := UnifiedAgent({
         pool: serverConfig["host"] . serverConfig["pmnPool"],
         qmPool: serverConfig["host"] . serverConfig["qmPool"],
