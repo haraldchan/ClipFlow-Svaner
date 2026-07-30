@@ -67,6 +67,9 @@ class ProfileModifyNext {
         PMN_App(App, this.title, this.getDB.Bind(this), this.identifier)
     }
 
+    /**
+     * @returns {useFileDB} 
+     */
     static getDB() {
         if (this.usingDB.value == "uncDB" && !DirExist(this.uncDB.main)) {
             this.usingDB.set("localDB")
