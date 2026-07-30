@@ -9,6 +9,12 @@ OfflineControls(App, queryFilter) {
     )
 
     handleDBSelect(ctrl, _) {
+        if (!DirExist(ProfileModifyNext.uncDB.main)) {
+            MsgBox("无法连接到 Share 盘", POPUP_TITLE, "4096 T2 iconx")
+            ctrl.Value := dbMap.values().findIndex(name => name == "本地硬盘")
+            return
+        }
+
         selectedDB := dbMap.getKey(ctrl.Text)
         App["send-to-unc"].Enabled := selectedDB == "localDB"
 
@@ -16,7 +22,7 @@ OfflineControls(App, queryFilter) {
     }
 
     handleSendToUNC(*) {
-        if (!DirExist(ProfileModifyNext.getDB().main)) {
+        if (!DirExist(ProfileModifyNext.uncDB.main)) {
             MsgBox("无法连接到 Share 盘", POPUP_TITLE, "4096 T2 iconx")
             return
         }
@@ -78,7 +84,7 @@ OfflineControls(App, queryFilter) {
     render() {
         App.AddButton("@align[y]:select-all-btn xs410 w80 h25", "WS Reader").onClick(handleLaunchWSReader)
         App.AddText("@align[y]:select-all-btn x+15 w70 h25 0x200", "当前数据库")
-        App.AddDDL(
+        App.AddDropDownList(
             "x+1 w80 Choose" . dbMap.keys().findIndex(k => k == ProfileModifyNext.usingDB.value), 
             dbMap.values()
         ).onChange(handleDBSelect)
