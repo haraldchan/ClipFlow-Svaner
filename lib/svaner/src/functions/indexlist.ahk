@@ -75,7 +75,7 @@ class IndexList {
                 if (ctrl is Gui.Control) {    
                     ctrl.Text := updatedText
                     if (ctrl.HasOwnProp("Value")) {
-                        ctrl.Vakye := updatedText
+                        ctrl.Value := updatedText
                     } 
                 }
 
