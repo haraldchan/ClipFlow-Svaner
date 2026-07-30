@@ -226,7 +226,7 @@ class FormContent extends HTMLElement {
 
         this.guestTypeState = { selected: '' }
         this.curGuestType = new Proxy(this.guestTypeState, {
-            set: (target, key, value, receiver) => {              
+            set: (target, key, value, receiver) => {
                 if (target[key] === value) {
                     return true
                 }
@@ -279,11 +279,11 @@ class FormContent extends HTMLElement {
 
         this.cardTypeState = { selected: '' }
         this.curCardType = new Proxy(this.cardTypeState, {
-            set: (target, key, value, receiver) => { 
+            set: (target, key, value, receiver) => {
                 if (target[key] === value) {
                     return true
                 }
-                
+
                 const ok = Reflect.set(target, key, value, receiver)
                 if (ok) {
                     // change guest type
@@ -338,7 +338,7 @@ class FormContent extends HTMLElement {
 
                 case 'birthday':
                     currentData.birthday = field.value
-                    FormValidator.isUnder18.yes = validateBirthday(field) && currentData.guestType !== '国外旅客'
+                    FormValidator.isUnder18.yes = FormValidator.validateBirthday(field) && currentData.guestType !== '国外旅客'
                     break
 
                 case 'guardianName':
