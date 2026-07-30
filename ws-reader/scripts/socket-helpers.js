@@ -172,7 +172,7 @@ function handleMessageDisplay(data) {
 			region: currentData.region,
 			address: currentData.address ?? '',
 			cardNo: currentData.cardNo,
-			cardType: groupedCardTypes.get(currentData.guestType).get(currentData.cardType),
+			cardType: currentData.cardType,
 			gender: currentData.gender,
 			birthday: currentData.birthday,
 			validDate: currentData.validDate ?? '',
