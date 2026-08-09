@@ -1,5 +1,5 @@
 {
-	"version": "1.11.5",
+	"version": "1.12.0",
 	"app": {
 		"moduleSelected": 1,
 		"tabPos": 1,
@@ -24,11 +24,7 @@
 				"name": "深圳捷旅",
 				"profileName": "Shenzhen jielv holiday",
 				"profileType": "Travel Agent",
-				"ratecode": [
-					"WHJL",
-					"WHJB1",
-					"WHJB2"
-				],
+				"ratecode": ["WHJL", "WHJB1", "WHJB2"],
 				"resType": "TRAVEL AGENT GTD",
 				"market": "WHL",
 				"source": "WHO"
@@ -38,11 +34,7 @@
 				"name": "广州奇利",
 				"profileName": "Guangzhou Kingsley Business Consultant",
 				"profileType": "Travel Agent",
-				"ratecode": [
-					"WHLRN",
-					"",
-					""
-				],
+				"ratecode": ["WHLRN", "", ""],
 				"resType": "TRAVEL AGENT GTD",
 				"market": "WHL",
 				"source": "WHO"
@@ -53,11 +45,7 @@
 				"profileNamePoa": "%Ctrip Ctrip Computer Techn",
 				"profileName": "%Ctrip Computer Technology",
 				"profileType": "Travel Agent",
-				"ratecode": [
-					"OTAR",
-					"",
-					""
-				],
+				"ratecode": ["OTAR", "", ""],
 				"resType": "OTA GTD",
 				"market": "DIS",
 				"source": "OTA"
@@ -68,11 +56,7 @@
 				"profileNamePoa": "%商旅现付",
 				"profileName": "%商旅月结",
 				"profileType": "Company",
-				"ratecode": [
-					"CORS",
-					"",
-					""
-				],
+				"ratecode": ["CORS", "", ""],
 				"resType": "COMPANY GTD",
 				"market": "RFP",
 				"source": "OTA"
@@ -82,11 +66,7 @@
 				"name": "携程商旅协议",
 				"profileName": "",
 				"profileType": "Company",
-				"ratecode": [
-					"CORS",
-					"",
-					""
-				],
+				"ratecode": ["CORS", "", ""],
 				"resType": "COMPANY GTD",
 				"market": "COR",
 				"source": "COS"
@@ -96,11 +76,7 @@
 				"name": "美团酒店",
 				"profileName": "MEI TUAN",
 				"profileType": "Travel Agent",
-				"ratecode": [
-					"OTAR",
-					"",
-					""
-				],
+				"ratecode": ["OTAR", "", ""],
 				"resType": "OTA GTD",
 				"market": "DIS",
 				"source": "OTA"
