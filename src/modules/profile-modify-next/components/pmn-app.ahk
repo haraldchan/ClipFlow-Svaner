@@ -51,7 +51,7 @@ PMN_App(App, moduleTitle, db, identifier) {
 
 
     ; settings
-    settings := signal({ fillOverwrite: false }, { asMap: true })
+    settings := signal({ fillOverwrite: false, isLimitedDate: true }, { asMap: true })
     fillBtnText := computed([isDelegate, settings], handleFillInBtnTextUpdate)
     handleFillInBtnTextUpdate(curDelegate, curSettings) {
         curOverwrite := curSettings["fillOverwrite"]
@@ -159,7 +159,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         }
     }
 
-    handleGuestInfoUpdateFromMod(updater) {        
+    handleGuestInfoUpdateFromMod(updater) {
         recentGuests := db().load(, , 60 * 24)
         matchedGuest := Map()
         items := updater.keys()
@@ -225,7 +225,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         listContent.set(handleSearchResultFilter(loadedItems))
         App["select-all-btn"].Value := false
     }
-    
+
     /**
      * Splits room number string with space and comma
      * @param roomNums 
@@ -274,7 +274,7 @@ PMN_App(App, moduleTitle, db, identifier) {
                     }
                     ; from abroad
                     else {
-                        if ( 
+                        if (
                             (item.Has("nameLast") || item.Has("nameFirst"))
                             && (InStr(item["nameLast"], searchInput) || InStr(item["nameFirst"], searchInput))
                         ) {
@@ -341,8 +341,6 @@ PMN_App(App, moduleTitle, db, identifier) {
 
             ; rooms := StrSplit(queryFilter.value["search"].trim(), " ")
             rooms := roomNumSplitPipe(queryFilter.value["search"].trim())
-            party := App["party-num"].Text
-            App["party-num"].Text := ""
 
             ; pick selected guests
             checkedRows := LV.getCheckedRowNumbers()
@@ -368,22 +366,29 @@ PMN_App(App, moduleTitle, db, identifier) {
                     isOnline := agent.delegate({
                         mode: "waterfall",
                         overwrite: settings.value["fillOverwrite"],
+                        limitDate: settings.value["isLimitedDate"] ? queryFilter.value["date"] : "",
                         rooms: rooms,
-                        party: party,
                         profiles: groupedSelectedGuests
                     }),
                     isDelegate.set(isOnline ? true : false),
                     App["delegate-check-box"].Value := isOnline ? true : false
                 ), -250)
             } else {
-                PMN_Waterfall.cascade(groupedSelectedGuests, settings.value["fillOverwrite"], party)
+                PMN_Waterfall.cascade(
+                    groupedSelectedGuests,
+                    settings.value["fillOverwrite"],
+                    settings.value["isLimitedDate"] ? queryFilter.value["date"] : "",
+                )
             }
+
+            ; reset date limiter
+            App["limit-date-btn"].Value := true
+            settings.update("isLimitedDate", true)
         } else {
             targetId := LV.GetText(LV.GetNext(), LV.svanerWrapper.titleKeys.findIndex(key => key == "idNum"))
             PMN_Fillin.fill(listContent.value.find(item => item["idNum"] == targetId), settings.value["fillOverwrite"])
         }
     }
-
 
     ; QM2 agent
     showQm2Panel(*) {
@@ -460,35 +465,35 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         ; agent mode
         App.AddCheckBox("vdelegate-check-box x+10 Disabled", "后台代行", { check: isDelegate })
-           .bind()
-           .onClick(handleDelegateActivate)
+            .bind()
+            .onClick(handleDelegateActivate)
         App.AddText("vconnection-status x+20 w80 Hidden", " {1}", serverConnection)
 
         ; datetime
         App.AddDateTime("vdate xs15 yp+25 w90 h25", "yyyy/MM/dd")
-           .onChange((ctrl, _) => (
+            .onChange((ctrl, _) => (
                 queryFilter.update("date", FormatTime(ctrl.Value, "yyyyMMdd"))
                 handleListContentUpdate()
-           ))
+            ))
         ; search conditions
         App.AddDDL("x+10 w80 Choose2", searchByMap.keys())
-           .onChange((ctrl, _) => searchBy.set(searchByMap[ctrl.Text]))
+            .onChange((ctrl, _) => searchBy.set(searchByMap[ctrl.Text]))
 
         ; search box
         App.AddEdit("vsearchBox x+5 w125 h25")
-           .onBlur((ctrl, _) => queryFilter.update("search", Trim(ctrl.Value)))
+            .onBlur((ctrl, _) => queryFilter.update("search", Trim(ctrl.Value)))
 
         ; range
         App.AddText("x+10 h25 0x200", "最近")
         App.AddEdit("vrange Number x+1 w30 h25", queryFilter.value["range"])
-           .onChange((ctrl, _) => queryFilter.update("range", !ctrl.Value ? 60 * 24 : ctrl.Value))
+            .onChange((ctrl, _) => queryFilter.update("range", !ctrl.Value ? 60 * 24 : ctrl.Value))
         App.AddText("x+1 h25 0x200", "分钟")
 
         ; refresh/fill
         App.AddButton("vrefresh x+10 w80 h25", "刷 新(&R)").onClick(handleRefresh)
         App.AddButton("vfillin x+5 w80 h25 Default", "{1}", fillBtnText)
-           .onClick(fillPmsProfile)
-           .onContextMenu((*) => settings.update("fillOverwrite", o => !o))
+            .onClick(fillPmsProfile)
+            .onContextMenu((*) => settings.update("fillOverwrite", o => !o))
 
         ; qm2 agent
         App.AddButton("vqm2-agent x+5 w80 h25 Disabled", "&QM2 Agent").onClick(showQm2Panel)
@@ -502,8 +507,8 @@ PMN_App(App, moduleTitle, db, identifier) {
         ; waterfall controls
         Show(() => [
             App.AddCheckBox("vselect-all-btn Hidden w80 h25 @align[x]:date y+5", "全选 (&A)"),
-            App.AddText("Hidden h25 x+15 0x200", "Party: "),
-            App.AddEdit("vparty-num Hidden x+1 w100 h25", "")
+            App.AddCheckBox("vlimit-date-btn Checked h25 x+15 0x200", "限定搜索日期")
+               .onClick((ctrl, _) => settings.update("isLimitedDate", ctrl.Value))
         ], searchBy, cur => cur == "waterfall")
 
         ; offline controls
