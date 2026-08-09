@@ -46,7 +46,7 @@ class BlankShare_Action {
 				continue
 			}
 
-			res := this.search(room)
+			res := this.search(room, form.hasOwnProp("limitDate") ? form["limitDate"] : "")
 			if (!res) {
 				continue
 			}
@@ -56,7 +56,7 @@ class BlankShare_Action {
 
 			if (existShares < shareQty[A_Index]) {
 				sharesToMake := shareQty[A_Index] - existShares
-				res := this.search(room)
+				res := this.search(room, form.hasOwnProp("limitDate") ? form["limitDate"] : "")
 				if (!res) {
 					continue
 				}
@@ -80,7 +80,7 @@ class BlankShare_Action {
 	 * @param {String} roomNum 
 	 * @returns {void | String} 
 	 */
-	static search(roomNum) {
+	static search(roomNum, limitDate := "") {
 		formattedRoom := StrLen(roomNum) == 3 ? "0" . roomNum : roomNum
 
 		Send("!r") ; room number field
@@ -93,6 +93,18 @@ class BlankShare_Action {
 		Send("{Text}" . formattedRoom)
 		utils.waitLoading()
 
+		if (limitDate) {
+			loop 12 {
+				Send("{Tab}")
+				Sleep(10)
+			}
+			Send("{Text}" . FormatTime(limitDate, "MMddyyyy"))
+			utils.waitLoading()
+			Send("{Tab}")
+			Sleep(10)
+			Send("{Text}" . FormatTime(limitDate, "MMddyyyy"))
+			utils.waitLoading()
+		}
 
 		Send("!h") ; alt+h => search
 		utils.waitLoading()

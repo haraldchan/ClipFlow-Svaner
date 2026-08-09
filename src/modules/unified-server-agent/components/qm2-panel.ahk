@@ -17,6 +17,7 @@ QM2_Panel(props) {
 
     p := useProps(props, {
         overwriteProfiles: false,
+        limitDate: "",
         selectedGuests: Map()
     })
 
@@ -39,11 +40,16 @@ QM2_Panel(props) {
         profiles := (App["send-pm-post"].Value == false || module != "BlankShare") ? Map() : p.selectedGuests
 
         form := App.Submit()
+        form.limitDate := p.limitDate
+
         agent.delegate({
             module: module,
             form: form,
             profiles: profiles,
-            additionals: { overwrite: p.overwriteProfiles }
+            additionals: {
+                overwrite: p.overwriteProfiles,
+                limitDate: p.limitDate,
+            }
         })
     }
 
@@ -82,8 +88,7 @@ QM2_Panel(props) {
     )
 
     render() {
-        StackBox(App, 
-        {
+        StackBox(App, {
             name: "op-radio-group",
             groupbox: { options: "vop-radio-group Section x10 y+10 w350 Hidden " . Format("h{1}", 30 * modules.keys().Length) }
         },
@@ -91,12 +96,12 @@ QM2_Panel(props) {
                 (entry, index) => App.AddRadio(index == 1 ? "xs1 h20 yp+1 Checked" : "xs1 h20 yp+30", entry[1]).onClick(handleModuleChange)
             )
         )
-        
+
         Dynamic(App, selectedModule, modules, { clickEvent: delegateQmActions })
-        
+
         ; initializing
         onMount()
     }
-    
+
     return render()
 }

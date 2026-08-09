@@ -274,7 +274,8 @@ class UnifiedAgent extends useServerAgent {
                 if (content["profiles"].Capacity > 0) {
                     message := this.delegate({
                         overwrite: content["additionals"]["overwrite"],
-                        profiles: content["profiles"]
+                        limitDate: content["additionals"].has("limitDate") ? content["additionals"]["limitDate"] : "",
+                        profiles: content["profiles"],
                     })
 
                     postCreatedPath := Format("{1}\{2}=={3}=={4}.json", this.pool, "PENDING", A_ComputerName, message.id)
@@ -295,7 +296,7 @@ class UnifiedAgent extends useServerAgent {
             }
             ; PMN post
             else {
-                res := PMN_Waterfall.cascade(content["profiles"], content["overwrite"], content["party"])
+                res := PMN_Waterfall.cascade(content["profiles"], content["overwrite"], content.has("limitDate") ? content["limitDate"] : "")
                 if (res is Error) {
                     switch res.Message {
                         case "Ended Unexpectedly":
@@ -323,16 +324,16 @@ class UnifiedAgent extends useServerAgent {
         c := useProps(content,
             content.HasOwnProp("form")
                 ? { ; QM post
-                    module: content.module, ; QM2 module name
-                    form: content.form,     ; form data from module component
-                    profiles: Map(),        ; profiles from QM2 Panel
-                    additionals: {}         ; additionals
+                    module: content.module,       ; QM2 module name
+                    form: content.form,           ; form data from module component
+                    profiles: Map(),              ; profiles from QM2 Panel
+                    additionals: {}               ; additionals
                 } : { ; PMN post
-                    mode: "waterfall",      ; single/waterfall/group
-                    overwrite: false,       ; isOverwrite value
-                    party: "",              ; optional party number for confinement
-                    profiles: Map(),        ; json object in single, array in waterfall/group
-                    additionals: {}         ; additionals
+                    mode: "waterfall",            ; single/waterfall/group
+                    overwrite: false,             ; isOverwrite value
+                    limitDate: content.limitDate, ; limit search date in opera
+                    profiles: Map(),              ; json object in single, array in waterfall/group
+                    additionals: {}               ; additionals
                 }
         )
 

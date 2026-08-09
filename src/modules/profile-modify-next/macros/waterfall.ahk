@@ -2,10 +2,9 @@ class PMN_Waterfall {
     /**
      * @param {Map<String, Array>} groupedSelectedGuests 
      * @param {true | false} isOverwrite 
-     * @param {String} party 
      * @returns {void | Error} 
      */
-    static cascade(groupedSelectedGuests, isOverwrite, party := "") {
+    static cascade(groupedSelectedGuests, isOverwrite, limitDate := "") {
         PMN_FillIn.start()
 
         for room, guests in groupedSelectedGuests {
@@ -20,11 +19,11 @@ class PMN_Waterfall {
             }
 
             for guest in sortedGuests {
-                res := this.search(guest["roomNum"], A_Index, party)
+                res := this.search(guest["roomNum"], A_Index, limitDate)
                 if (res == "not found") {
                     return Error("Room not found")
                 }
-                
+
                 if (!PMN_FillIn.isRunning) {
                     msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
                     return Error("Ended Unexpectedly")
@@ -77,7 +76,7 @@ class PMN_Waterfall {
         utils.waitLoading()
     }
 
-    static search(roomNum, index, party := 0) {
+    static search(roomNum, index, limitDate) {
         formattedRoom := StrLen(roomNum) = 3 ? "0" . roomNum : roomNum
 
         Send("!r")
@@ -90,12 +89,16 @@ class PMN_Waterfall {
         Send(formattedRoom)
         utils.waitLoading()
 
-        if (party) {
-            loop 16 {
+        if (limitDate) {
+            loop 12 {
                 Send("{Tab}")
                 Sleep(10)
             }
-            Send("{Text}" . party)
+            Send("{Text}" . FormatTime(limitDate, "MMddyyyy"))
+            utils.waitLoading()
+            Send("{Tab}")
+            Sleep(10)
+            Send("{Text}" . FormatTime(limitDate, "MMddyyyy"))
             utils.waitLoading()
         }
 

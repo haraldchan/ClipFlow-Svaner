@@ -26,7 +26,6 @@ PostDetails_Profile(post) {
             agent.delegate({
                 mode: post["content"]["mode"],
                 overwrite: post["content"]["overwrite"],
-                party: post["content"]["party"],
                 profiles: post["content"]["profiles"],
                 additionals: post["content"]["additionals"]
             }),
