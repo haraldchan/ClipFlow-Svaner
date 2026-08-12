@@ -46,7 +46,7 @@ class BlankShare_Action {
 				continue
 			}
 
-			res := this.search(room, form.hasOwnProp("limitDate") ? form["limitDate"] : "")
+			res := this.search(room, form.has("limitDate") ? form["limitDate"] : "")
 			if (!res) {
 				continue
 			}
@@ -56,7 +56,7 @@ class BlankShare_Action {
 
 			if (existShares < shareQty[A_Index]) {
 				sharesToMake := shareQty[A_Index] - existShares
-				res := this.search(room, form.hasOwnProp("limitDate") ? form["limitDate"] : "")
+				res := this.search(room, form.has("limitDate") ? form["limitDate"] : "")
 				if (!res) {
 					continue
 				}
@@ -224,6 +224,10 @@ class BlankShare_Action {
 			msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
 			return
 		}
+
+		; walkin checkin popup dismiss
+		Send("{Escape}")
+		utils.waitLoading()
 
 		; open resv
 		Send("!r")
