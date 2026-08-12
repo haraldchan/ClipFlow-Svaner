@@ -6,7 +6,7 @@ ClientPosts(App, enabled) {
     comp := Component(App, A_ThisFunc)
 
     postQueue := signal([{ status: "", time: "", id: "" }])
-    
+
     postStatus := Map(
         "PENDING", "已发送",
         "COLLECTED", "处理中",
@@ -17,7 +17,8 @@ ClientPosts(App, enabled) {
         "ABANDONED", "超时弃用",
         "NOTFOUND", "无效房号",
         "PING", "连接中",
-        "ONLINE", "在线"
+        "ONLINE", "在线",
+        "IGNORE", "已忽略"
     )
 
     connection := signal("未连接")
@@ -31,17 +32,17 @@ ClientPosts(App, enabled) {
     ping(ctrl, _) {
         connection.set("连接中...")
         ctrl.Enabled := false
-        
+
         res := agent.PING()
         connection.set(!res ? "无响应" : Format("在线 {1}", res.sender))
-        
+
         ctrl.Enabled := true
     }
 
     handlePostUpdate(*) {
         posts := []
         showMyOwnPosts := App["show-my-own-posts"].Value
-        
+
         ; check pmn posts
         loop files (agent.pool . "\*.json") {
             if (A_LoopFileName.includes("PING") || A_LoopFileName.includes("ONLINE")) {
@@ -70,7 +71,7 @@ ClientPosts(App, enabled) {
         loop files (agent.qmPool . "\*.json") {
             if (showMyOwnPosts && !A_LoopFileName.includes(A_ComputerName)) {
                 continue
-            }                
+            }
 
             status := StrSplit(A_LoopFileName, "==")[1]
             try {
@@ -87,7 +88,7 @@ ClientPosts(App, enabled) {
                 "TransactionEntry", "Auth"
             ))
             posts.InsertAt(1, post)
-        }     
+        }
 
         if (posts.Length) {
             postQueue.set(posts)
@@ -96,14 +97,14 @@ ClientPosts(App, enabled) {
             postQueue.reset()
         }
     }
-    
+
     showPostDetails(LV, row, *) {
         if (row == 0 || row > 10000 || LV.GetText(row, 1) == "连接中") {
             return
         }
 
         selectedPost := postQueue.value.find(post => post["id"] == LV.GetText(row, 4))
-        
+
         switch selectedPost["action"] {
             case "Profile":
                 PostDetails_Profile(selectedPost)
@@ -111,29 +112,28 @@ ClientPosts(App, enabled) {
                 form := selectedPost["content"]["form"]
                 PostDetails_QM2(selectedPost, "PaymentRelation", {
                     style: { xyPos: "xs10 y+10" },
-                    form : {
+                    form: {
                         pfRoom: form["pfRoom"],
                         pfName: form["pfName"],
-                        party:  form["party"],
+                        party: form["party"],
                         partyRoomQty: form["partyRoomQty"],
                         pbRoom: form["pbRoom"],
                         pbName: form["pbName"]
                     }
                 })
-            case "Share": 
+            case "Share":
                 form := selectedPost["content"]["form"]
                 PostDetails_QM2(selectedPost, "BlankShare", {
-                    styles: {
-                    },
-                    form : {
+                    styles: {},
+                    form: {
                         shareRoomNums: form["shareRoomNums"],
                         shareQty: form["shareQty"],
                         checkIn: form["checkIn"]
                     }
                 })
             case "Auth":
-                form := JSON.parse(JSON.stringify(selectedPost["content"]["form"]),, false)
-                PostDetails_QM2(selectedPost, "TransactionEntry",{
+                form := JSON.parse(JSON.stringify(selectedPost["content"]["form"]), , false)
+                PostDetails_QM2(selectedPost, "TransactionEntry", {
                     transactionInfo: form,
                     style: { xyPos: "xs10 y+10" },
                 })
@@ -142,10 +142,31 @@ ClientPosts(App, enabled) {
         }
     }
 
+    handleSetPostIgnore(LV, row, *) {
+        if (row == 0 || row > 10000 || LV.GetText(row, 1) == "连接中") {
+            return
+        }
+
+        selectedPost := postQueue.value.find(post => post["id"] == LV.GetText(row, 4))
+
+        searchPool := selectedPost["action"] == "Profile" ? agent.pool : agent.qmPool
+        loop files (searchPool . "\*.json") {
+            if (A_LoopFileName.includes(selectedPost["id"])) {
+                unpack(A_LoopFileName.split("="), [&status])
+                if (status != "PENDING" && status != "COLLECTED" && status != "RETRY") {
+                    return
+                }
+
+                agent.updatePostStatus(A_LoopFileFullPath, "IGNORE")
+            }
+        }
+
+        handlePostUpdate()
+    }
+
     comp.render := this => this.Add(
         StackBox(
-            App,
-            {
+            App, {
                 name: "client-posts-stackbox",
                 groupbox: {
                     options: "vsap-agent-gb Section x350 @align[y]:service-configs w350 h400"
@@ -156,35 +177,33 @@ ClientPosts(App, enabled) {
                     events: {
                         click: (ctrl, _) => CONFIG.write("clientEnabled", ctrl.Value)
                     }
-                }, 
+                },
             },
             () => [
                 ; test connection
                 App.AddButton("xs20 w60 h30 yp+30", "测试连接").onClick(ping),
                 App.AddText("x+5 h30 0x200", "服务状态: "),
                 App.AddText("vstatus-text w150 h30 x+1 0x200", "{1}", connection).SetFontStyles(statusTextStyle),
-
                 ; post status list
                 App.AddText("xs20 yp+50 h20 0x200", "已发送代行状态").SetFont("Bold"),
                 App.AddButton("x+5 h20 w20 +Center", "↻")
                    .onClick(handlePostUpdate)
                    .SetFont("bold"),
                 App.AddCheckBox("vshow-my-own-posts Checked x+140 h20", "本机发送"),
-                App.AddListView(
-                    { lvOptions: "vpost-list Grid -Multi LV0x4000 w320 h280 xs20 yp+25" }, 
-                    {
-                        keys: ["status", "action", "time", "id"],
-                        titles: ["当前状态", "代行类型", "发送时间", "POST ID"],
-                        widths: [60, 100, 150, 170]
-                    }, 
+                App.AddListView({ lvOptions: "vpost-list Grid -Multi LV0x4000 w320 h280 xs20 yp+25" }, {
+                    keys: ["status", "action", "time", "id"],
+                    titles: ["当前状态", "代行类型", "发送时间", "POST ID"],
+                    widths: [60, 100, 150, 170]
+                },
                     postQueue
                 ).onContextMenu(showPostDetails)
+                 .onDoubleClick(handleSetPostIgnore)
             ]
         )
     )
 
     return (
-        comp.render(), 
+        comp.render(),
         handlePostUpdate()
     )
 }

@@ -6,7 +6,7 @@
 SentPosts(App, isDelegate, listContent) {
     comp := Component(App, A_ThisFunc)
 
-    postQueue := signal([{ status: "", time: "", id: "" }])    
+    postQueue := signal([{ status: "", time: "", id: "" }])
     postStatus := Map(
         "PENDING", "已发送",
         "COLLECTED", "处理中",
@@ -17,7 +17,8 @@ SentPosts(App, isDelegate, listContent) {
         "ABANDONED", "超时弃用",
         "NOTFOUND", "无效房号",
         "PING", "连接中",
-        "ONLINE", "在线"
+        "ONLINE", "在线",
+        "IGNORE", "已忽略"
     )
 
     effect([isDelegate, listContent], handlePostListUpdate)
@@ -30,7 +31,7 @@ SentPosts(App, isDelegate, listContent) {
             return
         }
 
-        serverOnlineStatus := JSON.parse(FileRead(agent.onlineStatusIndicator, "utf-8"),, false)
+        serverOnlineStatus := JSON.parse(FileRead(agent.onlineStatusIndicator, "utf-8"), , false)
         if (!serverOnlineStatus.isOnline) {
             isDelegate.set(false)
             MsgBox("后台服务不在线。", POPUP_TITLE, "4096 T1 icon!")
@@ -39,7 +40,7 @@ SentPosts(App, isDelegate, listContent) {
 
         posts := []
         showMyOwnPosts := App["sent-posts-show-my-own-posts"].Value
-        
+
         ; check pmn posts
         loop files (agent.pool . "\*.json") {
             if (A_LoopFileName.includes("PING") || A_LoopFileName.includes("ONLINE")) {
@@ -69,7 +70,7 @@ SentPosts(App, isDelegate, listContent) {
         loop files (agent.qmPool . "\*.json") {
             if (showMyOwnPosts && !A_LoopFileName.includes(A_ComputerName)) {
                 continue
-            }                
+            }
 
             status := StrSplit(A_LoopFileName, "==")[1]
             try {
@@ -87,7 +88,7 @@ SentPosts(App, isDelegate, listContent) {
                 "TransactionEntry", "Auth"
             ))
             posts.InsertAt(1, post)
-        }     
+        }
 
         if (posts.Length) {
             postQueue.set(posts)
@@ -96,14 +97,14 @@ SentPosts(App, isDelegate, listContent) {
             postQueue.reset()
         }
     }
-    
+
     showPostDetails(LV, row, *) {
         if (row == 0 || row > 10000 || LV.GetText(row, 1) == "连接中") {
             return
         }
 
         selectedPost := postQueue.value.find(post => post["id"] == LV.GetText(row, 4))
-        
+
         switch selectedPost["action"] {
             case "Profile":
                 PostDetails_Profile(selectedPost)
@@ -114,13 +115,13 @@ SentPosts(App, isDelegate, listContent) {
                     form: {
                         pfRoom: form["pfRoom"],
                         pfName: form["pfName"],
-                        party:  form["party"],
+                        party: form["party"],
                         partyRoomQty: form["partyRoomQty"],
                         pbRoom: form["pbRoom"],
                         pbName: form["pbName"]
                     }
                 })
-            case "Share": 
+            case "Share":
                 form := selectedPost["content"]["form"]
                 PostDetails_QM2(selectedPost, "BlankShare", {
                     form: {
@@ -130,14 +131,37 @@ SentPosts(App, isDelegate, listContent) {
                     }
                 })
             case "Auth":
-                form := JSON.parse(JSON.stringify(selectedPost["content"]["form"]),, false)
-                PostDetails_QM2(selectedPost, "TransactionEntry",{
+                form := JSON.parse(JSON.stringify(selectedPost["content"]["form"]), , false)
+                PostDetails_QM2(selectedPost, "TransactionEntry", {
                     transactionInfo: form,
                     style: { xyPos: "xs10 y+10" },
                 })
             default:
                 return
         }
+    }
+
+    handleSetPostIgnore(LV, row, *) {
+        if (row == 0 || row > 10000 || LV.GetText(row, 1) == "连接中") {
+            return
+        }
+
+        selectedPost := postQueue.value.find(post => post["id"] == LV.GetText(row, 4))
+
+        searchPool := selectedPost["action"] == "Profile" ? agent.pool : agent.qmPool
+        loop files (searchPool . "\*.json") {
+            if (A_LoopFileName.includes(selectedPost["id"])) {
+                unpack(A_LoopFileName.split("="), [&status])
+                if (status != "PENDING" && status != "COLLECTED" && status != "RETRY") {
+                    return
+                }
+
+                agent.updatePostStatus(A_LoopFileFullPath, "IGNORE")
+                break
+            }
+        }
+
+        handlePostListUpdate(isDelegate.value, listContent.value)
     }
 
     comp.render := this => this.Add(
@@ -155,6 +179,7 @@ SentPosts(App, isDelegate, listContent) {
             }, 
             postQueue
         ).onContextMenu(showPostDetails)
+         .onDoubleClick(handleSetPostIgnore)
     )
 
     return comp.render()
