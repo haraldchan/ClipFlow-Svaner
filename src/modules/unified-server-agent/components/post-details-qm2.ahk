@@ -14,9 +14,9 @@ PostDetails_QM2(post, moduleName, props) {
     })
 
     qmModules := Map(
-        "BlankShare",      { desc: "Share 详情", module: BlankShare },
+        "BlankShare", { desc: "Share 详情", module: BlankShare },
         "PaymentRelation", { desc: "Payment 关系", module: PaymentRelation },
-        "TransactionEntry",    { desc: "授权押金", module: TransactionEntry }
+        "TransactionEntry", { desc: "授权押金", module: TransactionEntry }
     )
 
     handleRepost(*) {
@@ -28,7 +28,7 @@ PostDetails_QM2(post, moduleName, props) {
             form: form,
             profiles: profiles,
             additionals: post["content"]["additionals"]
-        }),
+        })
         renameResendPost(post["id"])
 
         return form
@@ -37,8 +37,7 @@ PostDetails_QM2(post, moduleName, props) {
     renameResendPost(id) {
         loop files (agent.qmPool . "\*.json") {
             if (InStr(A_LoopFileFullPath, id)) {
-                status := StrSplit(A_LoopFileName, "==")[1]
-                FileMove(A_LoopFileFullPath, StrReplace(A_LoopFileFullPath, status, "RESENT"))
+                agent.updatePostStatus(A_LoopFileFullPath, "RESENT")
                 break
             }
         }
@@ -71,6 +70,7 @@ PostDetails_QM2(post, moduleName, props) {
         App.AddGroupBox("Section w370 h300", "代行详情").SetFont("Bold")
         App.AddText("xs10 yp+20", "发送状态: " . post["status"])
         App.AddText("xs10 yp+20", "发送时间: " . post["time"])
+        App.AddText("xs10 yp+20", "限定日期: " . (post["content"]["additionals"]["limitDate"] ? FormatTime(post["content"]["additionals"]["limitDate"], "yyyy/MM/dd") : "无"))
         App.AddText("xs10 w200 h20 yp+30", qmModules[moduleName].desc).SetFont("bold s10")
         qmModules[moduleName].module.Call(App, props).render()
         onMount()
