@@ -69,12 +69,7 @@ class UnifiedAgent extends useServerAgent {
         this.resetPostsToPending()
 
         ; close all pms win
-        loop {
-            if (WinExist("OPERA Full Service Edition")) {
-                WinKill("OPERA Full Service Edition")
-            }
-            Sleep(200)
-        } until (!WinExist("OPERA Full Service Edition"))
+        utils.killApp("360se.exe")
     }
 
 
