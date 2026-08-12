@@ -27,7 +27,7 @@ class UnifiedAgent extends useServerAgent {
     /**
      * <Agent>
      * @param {String} postPath full post json file path
-     * @param {"PENDING"|"COLLECTED"|"MODIFIED"|"ABORTED"|"RETRY"|"RESENT"|"ABANDONED"|"NOTFOUND"|"ONLINE"} newStatus
+     * @param {"PENDING"|"COLLECTED"|"MODIFIED"|"ABORTED"|"RETRY"|"RESENT"|"ABANDONED"|"NOTFOUND"|"ONLINE"|"IGNORE"} newStatus
      */
     updatePostStatus(postPath, newStatus) => super.updatePostStatus(postPath, newStatus)
 
@@ -272,11 +272,13 @@ class UnifiedAgent extends useServerAgent {
 
                 ; create pmn post if profiles exists
                 if (content["profiles"].Capacity > 0) {
-                    message := this.delegate({
+                    delegateContent := {
                         overwrite: content["additionals"]["overwrite"],
                         limitDate: content["additionals"].has("limitDate") ? content["additionals"]["limitDate"] : "",
                         profiles: content["profiles"],
-                    })
+                    }
+
+                    message := this.delegate(delegateContent)
 
                     postCreatedPath := Format("{1}\{2}=={3}=={4}.json", this.pool, "PENDING", A_ComputerName, message.id)
                     loop {
@@ -296,7 +298,7 @@ class UnifiedAgent extends useServerAgent {
             }
             ; PMN post
             else {
-                res := PMN_Waterfall.cascade(content["profiles"], content["overwrite"], content.has("limitDate") ? content["limitDate"] : "")
+                res := PMN_Waterfall.cascade(content["profiles"], content["overwrite"], content.has("limitDate") ? content["limitDate"] : "", content["party"])
                 if (res is Error) {
                     switch res.Message {
                         case "Ended Unexpectedly":
@@ -324,16 +326,17 @@ class UnifiedAgent extends useServerAgent {
         c := useProps(content,
             content.HasOwnProp("form")
                 ? { ; QM post
-                    module: content.module,       ; QM2 module name
-                    form: content.form,           ; form data from module component
-                    profiles: Map(),              ; profiles from QM2 Panel
-                    additionals: {}               ; additionals
+                    module: content.module, ; QM2 module name
+                    form: content.form,     ; form data from module component
+                    profiles: Map(),        ; profiles from QM2 Panel
+                    additionals: {}         ; additionals
                 } : { ; PMN post
-                    mode: "waterfall",            ; single/waterfall/group
-                    overwrite: false,             ; isOverwrite value
-                    limitDate: content.limitDate, ; limit search date in opera
-                    profiles: Map(),              ; json object in single, array in waterfall/group
-                    additionals: {}               ; additionals
+                    mode: "waterfall",      ; single/waterfall/group
+                    overwrite: false,       ; isOverwrite value
+                    limitDate: "",          ; limit search date
+                    party: "",              ; optional party number for confinement
+                    profiles: Map(),        ; json object in single, array in waterfall/group
+                    additionals: {}         ; additionals
                 }
         )
 
