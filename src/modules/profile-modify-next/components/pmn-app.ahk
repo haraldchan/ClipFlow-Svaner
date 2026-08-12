@@ -51,7 +51,7 @@ PMN_App(App, moduleTitle, db, identifier) {
 
 
     ; settings
-    settings := signal({ fillOverwrite: false, isLimitedDate: true }, { asMap: true })
+    settings := signal({ fillOverwrite: false }, { asMap: true })
     fillBtnText := computed([isDelegate, settings], handleFillInBtnTextUpdate)
     handleFillInBtnTextUpdate(curDelegate, curSettings) {
         curOverwrite := curSettings["fillOverwrite"]
@@ -341,6 +341,9 @@ PMN_App(App, moduleTitle, db, identifier) {
 
             ; rooms := StrSplit(queryFilter.value["search"].trim(), " ")
             rooms := roomNumSplitPipe(queryFilter.value["search"].trim())
+            party := ""
+            ; party := App["party-num"].Text
+            ; App["party-num"].Text := ""
 
             ; pick selected guests
             checkedRows := LV.getCheckedRowNumbers()
@@ -362,14 +365,17 @@ PMN_App(App, moduleTitle, db, identifier) {
             }
 
             if (isDelegate.value) {
+                delegateContent := {
+                    mode: "waterfall",
+                    overwrite: settings.value["fillOverwrite"],
+                    limitDate: App["limit-date-btn"].Value ? queryFilter.value["date"] : "",
+                    rooms: rooms,
+                    party: party,
+                    profiles: groupedSelectedGuests
+                }
+
                 SetTimer(() => (
-                    isOnline := agent.delegate({
-                        mode: "waterfall",
-                        overwrite: settings.value["fillOverwrite"],
-                        limitDate: settings.value["isLimitedDate"] ? queryFilter.value["date"] : "",
-                        rooms: rooms,
-                        profiles: groupedSelectedGuests
-                    }),
+                    isOnline := agent.delegate(delegateContent),
                     isDelegate.set(isOnline ? true : false),
                     App["delegate-check-box"].Value := isOnline ? true : false
                 ), -250)
@@ -377,7 +383,8 @@ PMN_App(App, moduleTitle, db, identifier) {
                 PMN_Waterfall.cascade(
                     groupedSelectedGuests,
                     settings.value["fillOverwrite"],
-                    settings.value["isLimitedDate"] ? queryFilter.value["date"] : "",
+                    App["limit-date-btn"].Value ? queryFilter.value["date"] : "",
+                    party
                 )
             }
 
@@ -401,7 +408,10 @@ PMN_App(App, moduleTitle, db, identifier) {
         ; pick selected guests
         checkedRows := LV.getCheckedRowNumbers()
         if (!checkedRows.Length) {
-            QM2_Panel({ overwriteProfiles: settings.value["fillOverwrite"] })
+            QM2_Panel({
+                overwriteProfiles: settings.value["fillOverwrite"],
+                limitDate: App["limit-date-btn"].Value ? queryFilter.value["date"] : ""
+            })
             return
         }
 
@@ -416,7 +426,11 @@ PMN_App(App, moduleTitle, db, identifier) {
             }
         }
 
-        QM2_Panel({ overwriteProfiles: settings.value["fillOverwrite"], selectedGuests: groupedSelectedGuests })
+        QM2_Panel({
+            overwriteProfiles: settings.value["fillOverwrite"],
+            selectedGuests: groupedSelectedGuests,
+            limitDate: App["limit-date-btn"].Value ? queryFilter.value["date"] : ""
+        })
     }
 
 
@@ -508,7 +522,6 @@ PMN_App(App, moduleTitle, db, identifier) {
         Show(() => [
             App.AddCheckBox("vselect-all-btn Hidden w80 h25 @align[x]:date y+5", "全选 (&A)"),
             App.AddCheckBox("vlimit-date-btn Checked h25 x+15 0x200", "限定搜索日期")
-               .onClick((ctrl, _) => settings.update("isLimitedDate", ctrl.Value))
         ], searchBy, cur => cur == "waterfall")
 
         ; offline controls
