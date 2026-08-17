@@ -3,6 +3,8 @@
 ; includes
 #Include lib\index.ahk
 #Include src\App.ahk
+; sqlite
+#DllLoad lib\ahk-sqlite\sqlite3_x86.dll
 
 ; acquire admin
 if (!A_IsAdmin) {
@@ -12,9 +14,8 @@ if (!A_IsAdmin) {
 utils.clearExistInstances()
 
 ; global consts
-VERSION := "1.12.2"
+VERSION := "1.13.0"
 POPUP_TITLE := "ClipFlow " . VERSION
-UNC_PATH := "\\10.0.2.13\fd"
 WIN_GROUP := ["ahk_class SunAwtFrame"]
 IMAGES := useImages(A_ScriptDir . "\assets")
 APP_DATA_DIR := A_AppData . "\ClipFlow"

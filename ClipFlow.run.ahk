@@ -178,8 +178,12 @@ if (DirExist(UNC_PATH)) {
 }
 
 try {
-	Run("C:\ClipFlow\app\ClipFlow.ahk")
+	
+	Run(Format("C:\ClipFlow\app\ClipFlow_{}.ahk", A_PtrSize == 8 ? "x64" : "x86"))
 }
 catch {
-	Run("\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow-SvanerTest-main\ClipFlow.ahk")
+	Run(Format(
+		"\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow-SvanerTest-main\ClipFlow_{}.ahk",
+		A_PtrSize == 8 ? "x64" : "x86"
+	))
 }
