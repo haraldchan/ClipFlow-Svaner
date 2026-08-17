@@ -9,7 +9,7 @@ OfflineControls(App, queryFilter) {
     )
 
     handleDBSelect(ctrl, _) {
-        if (!DirExist(ProfileModifyNext.uncDB.main)) {
+        if (!FileExist(ProfileModifyNext.uncDB.dbPath)) {
             MsgBox("无法连接到 Share 盘", POPUP_TITLE, "4096 T2 iconx")
             ctrl.Value := dbMap.values().findIndex(name => name == "本地硬盘")
             return
