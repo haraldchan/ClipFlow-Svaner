@@ -1,7 +1,7 @@
 /**
  * @param {Svaner} App 
  * @param {String} moduleTitle 
- * @param {()=>useFileDB} db 
+ * @param {()=>Datebase} db 
  * @param {String} identifier 
  */
 PMN_App(App, moduleTitle, db, identifier) {
@@ -9,9 +9,6 @@ PMN_App(App, moduleTitle, db, identifier) {
     isDelegate := signal(false)
     effect(isDelegate, curIsDelegate => App["guest-profile-list"].Move(, , curIsDelegate ? 470 : 658))
 
-    /**
-     * @property {"" | "尝试连接中..." | "后台服务在线" | "超时无响应"} value 
-     */
     serverConnection := signal("")
     effect(serverConnection, handleConnStatus)
     handleConnStatus(curServerConnection) {
@@ -41,11 +38,11 @@ PMN_App(App, moduleTitle, db, identifier) {
         SetTimer(() => ((
             agent.PING()
                 ? serverConnection.set("后台服务在线")
-            : (
-                isDelegate.set(false),
-                ctrl.Value := false,
-                serverConnection.set("超时无响应")
-            )
+                : (
+                    isDelegate.set(false),
+                    ctrl.Value := false,
+                    serverConnection.set("超时无响应")
+                )
         ), ctrl.Enabled := true), -100)
     }
 
@@ -60,20 +57,19 @@ PMN_App(App, moduleTitle, db, identifier) {
 
 
     ; data states
-    listContent := signal(db().load(), { asMap: true })
-
-    queryFilter := signal({ date: FormatTime(A_Now, "yyyyMMdd"), search: "", range: 60 }, { asMap: true })
+    listContent := signal(db().load())
+    queryFilter := signal({ date: FormatTime(A_Now, "yyyyMMdd"), search: "", range: 60 })
 
     ; list UI states/effect
-    searchBy := signal("nameRoom")
+    searchBy := signal("roomNum")
     searchByMap := OrderedMap(
         "瀑流模式", "waterfall",
-        "姓名/房号", "nameRoom",
+        "房号", "roomNum",
+        "姓名", "name",
         "证件号码", "idNum",
         "地址", "addr",
         "电话", "tel",
         "生日", "birthday",
-        "时间戳 ID", "tsId",
     )
 
     effect(searchBy, handleSearchByChange)
@@ -89,7 +85,7 @@ PMN_App(App, moduleTitle, db, identifier) {
 
 
     ; incoming data handling
-    currentGuest := signal(Map("idNum", 0))
+    currentGuest := signal(Map("tsId", 0))
     clbListeners.addListener({
         description: "旅业证件信息捕获",
         isOn: true,
@@ -104,9 +100,9 @@ PMN_App(App, moduleTitle, db, identifier) {
         incomingGuest := JSON.parse(A_Clipboard)
 
         ; updating from add guest modal
-        if (currentGuest.value["idNum"] == incomingGuest["idNum"] && !incomingGuest["isMod"]) {
-            handleGuestInfoUpdateFromAdd(incomingGuest)
-            MsgBox(Format("已更新信息：{1}", incomingGuest["name"]), POPUP_TITLE, "T1.5")
+        if (currentGuest.value["tsId"] == incomingGuest["tsId"] && !incomingGuest["isMod"]) {
+            db().put(FormatTime(A_Now, "yyyyMMdd"), incomingGuest)
+            MsgBox(Format("已更新信息：{1}", incomingGuest["name"]), POPUP_TITLE, "T1.5 iconi")
         }
         ; updating from saved guest modal
         else if (incomingGuest["isMod"]) {
@@ -115,11 +111,10 @@ PMN_App(App, moduleTitle, db, identifier) {
                 return
             }
 
-            MsgBox(Format("已保存修改：{1}", updatedGuest["name"]), POPUP_TITLE, "T1.5")
+            MsgBox(Format("已保存修改：{1}", updatedGuest["name"]), POPUP_TITLE, "T1.5 iconi")
         }
         ; adding guest
         else {
-            incomingGuest["fileName"] := A_Now . "==" . Random(10000, 99999)
             incomingGuest["regTime"] := A_Now
 
             db().add(JSON.stringify(incomingGuest))
@@ -128,14 +123,14 @@ PMN_App(App, moduleTitle, db, identifier) {
             MsgBox(
                 Format("已保存信息：{1}{2}", incomingGuest["name"], isBirthday ? "`n`n此客人今天生日！" : ""),
                 POPUP_TITLE,
-                isBirthday ? "T3" : "T1.5"
+                isBirthday ? "T3 iconi" : "T1.5 iconi"
             )
         }
 
         currentGuest.set(JSON.parse(A_Clipboard))
 
         ; uodate date if not today
-        if (queryFilter.value["date"] != FormatTime(A_Now, "yyyyMMdd")) {
+        if (queryFilter.value.date != FormatTime(A_Now, "yyyyMMdd")) {
             queryFilter.update("date", FormatTime(A_Now, "yyyyMMdd"))
             App["date"].Value := FormatTime(A_Now, "yyyyMMdd")
         }
@@ -146,56 +141,47 @@ PMN_App(App, moduleTitle, db, identifier) {
         A_Clipboard := ""
     }
 
-    handleGuestInfoUpdateFromAdd(captured) {
-        recentGuests := db().load()
-        for guest in recentGuests {
-            if (guest["idNum"] == captured["idNum"]) {
-                captured["regTime"] := guest["regTime"]
-                captured["fileName"] := guest["fileName"]
-
-                db().updateOne(JSON.stringify(captured), queryFilter.value["date"], guest["fileName"])
-                return
-            }
-        }
-    }
-
     handleGuestInfoUpdateFromMod(updater) {
-        recentGuests := db().load(, , 60 * 24)
-        matchedGuest := Map()
-        items := updater.keys()
+        targetGuest := db().load(, "tsId", updater["tsId"], 1440)[1]
+        if (!targetGuest) {
+            MsgBox("无匹配目标。", POPUP_TITLE, "4096 T1.5 icon!")
+            return
+        }
 
-        for guest in recentGuests {
-            if (guest["tsId"] == updater["tsId"]) {
-                for item in items {
-                    if (InStr(updater[item], "*")) {
-                        continue
-                    }
-                    guest[item] := updater[item]
-                }
-                ; update full name
-                if (guest["guestType"] == "国外旅客") {
-                    guest["name"] := guest["nameLast"] . ", " . guest["nameFirst"]
-                }
-
-                matchedGuest := guest
-                break
+        for (key, val in updater) {
+            if (val.includes("*")) {
+                updater.Delete(key)
             }
         }
 
         try {
-            db().updateOne(JSON.stringify(matchedGuest), queryFilter.value["date"], matchedGuest["fileName"])
-        } catch {
-            MsgBox("无匹配目标...", POPUP_TITLE, "4096 T1.5")
-            return
+            db().put(, updater)
+            return db().load(, "tsId", updater["tsId"], 1440)[1]
         }
+        catch {
+            MsgBox("更新失败。", POPUP_TITLE, "4096 T1.5 iconx")
+        }
+    }
 
-        return matchedGuest
+
+    /**
+     * Splits room number string with space and comma
+     * @param roomNums 
+     * @returns {Array<String>} 
+     */
+    roomNumSplitPipe(roomNums) {
+        return pipe(
+            i => StrSplit(i, ","),
+            i => i.map(item => Trim(item)),
+            i => i.map(item => StrSplit(item, " ")),
+            i => i.flat()
+        )(roomNums)
     }
 
     handleRefresh(*) {
-        if (queryFilter.value["date"] != FormatTime(A_Now, "yyyyMMdd")) {
+        if (queryFilter.value.date != FormatTime(A_Now, "yyyyMMdd")) {
             res := MsgBox(
-                Format("搜索日期非今天，请确认是否准确`n`n是 - 继续搜索 {1}`n否 - 返回今天", FormatTime(queryFilter.value["date"], "yyyy年MM月dd日")),
+                Format("搜索日期非今天，请确认是否准确`n`n是 - 继续搜索 {1}`n否 - 返回今天", FormatTime(queryFilter.value.date, "yyyy年MM月dd日")),
                 POPUP_TITLE,
                 "4096 YesNo icon!"
             )
@@ -213,117 +199,72 @@ PMN_App(App, moduleTitle, db, identifier) {
         colTitles := App["guest-profile-list"].svanerWrapper.titleKeys
         useListPlaceholder(listContent, colTitles, "Loading...")
 
-        App["range"].Enabled := (queryFilter.value["date"] == FormatTime(A_Now, "yyyyMMdd"))
+        App["range"].Enabled := (queryFilter.value.date == FormatTime(A_Now, "yyyyMMdd"))
 
-        loadedItems := db().load(, queryFilter.value["date"], queryFilter.value["range"])
+        ; TODO: remove this if block after migration
+        if (!db().tableExists("guests_" . queryFilter.value.date)) {
+            dbConfig := CONFIG.read("dbConfig")
+            fdb := useFileDB({
+                name: "uncDB",
+                main: dbConfig["host"] . dbConfig["main"],
+                archive: dbConfig["host"] . dbConfig["archive"],
+                backup: dbConfig["host"] . dbConfig["backup"],
+            })
+
+            loadedItems := fdb.load(, queryFilter.value.date, 60 * 24 * 365)
+            filteredItems := []
+            if (!queryFilter.value.search) {
+                filteredItems := loadedItems
+            }
+            else {
+                for item in loadedItems {
+                    if (InStr(item[searchBy.value], queryFilter.value.search)) {
+                        filteredItems.InsertAt(1, item)
+                    }
+                }
+            }
+            if (!filteredItems.Length) {
+                useListPlaceholder(listContent, colTitles, "No Data")
+                return
+            }
+
+            listContent.set(filteredItems)
+            App["select-all-btn"].Value := false
+            return
+        }
+
+        loadedItems := []
+        switch searchBy.value {
+            case "waterfall":
+                if (!queryFilter.value.search) {
+                    loadedItems.Push(db().load(queryFilter.value.date, "roomNum", queryFilter.value.search, queryFilter.value.range)*)
+                }
+
+                roomNums := roomNumSplitPipe(queryFilter.value.search.trim())
+                ; filtering all entered room numbers
+                for roomNum in roomNums {
+                    loadedItems.Push(db().load(queryFilter.value.date, "roomNum", roomNum, queryFilter.value.range)*)
+                }
+            case "birthday":
+                bd := StrLen(queryFilter.value.search) == 8
+                    ? SubStr(queryFilter.value.search, 1, 4) . "-" . SubStr(queryFilter.value.search, 5, 2) . "-" . SubStr(queryFilter.value.search, 7, 2)
+                : queryFilter.value.search
+                loadedItems.Push(db().load(queryFilter.value.date, "birthday", bd, queryFilter.value.range)*)
+            default:
+                loadedItems.Push(db().load(queryFilter.value.date, searchBy.value, queryFilter.value.search, queryFilter.value.range)*)
+        }
 
         if (!loadedItems.Length) {
             useListPlaceholder(listContent, colTitles, "No Data")
             return
         }
 
-        listContent.set(handleSearchResultFilter(loadedItems))
+        listContent.set(loadedItems)
         App["select-all-btn"].Value := false
-    }
-
-    /**
-     * Splits room number string with space and comma
-     * @param roomNums 
-     * @returns {Array<String>} 
-     */
-    roomNumSplitPipe(roomNums) {
-        return pipe(
-            i => StrSplit(i, ","),
-            i => i.map(item => Trim(item)),
-            i => i.map(item => StrSplit(item, " ")),
-            i => i.flat()
-        )(roomNums)
-    }
-
-    handleSearchResultFilter(loadedItems) {
-        filteredItems := []
-        searchInput := queryFilter.value["search"]
-
-        if (!searchInput) {
-            return loadedItems
-        }
-
-        if (searchBy.value == "nameRoom") {
-            if (IsNumber(searchInput)) {
-                ; searching by room number
-                for item in loadedItems {
-                    if (InStr(item["roomNum"], searchInput)) {
-                        filteredItems.InsertAt(1, item)
-                    }
-                }
-            }
-            else {
-                ; searching by name fragment
-                for item in loadedItems {
-                    ; from mainland
-                    if (item["guestType"] == "内地旅客") {
-                        if (InStr(item["name"], searchInput)) {
-                            filteredItems.InsertAt(1, item)
-                        }
-                    }
-                    ; from HK/MO/TW
-                    else if (item["guestType"] == "港澳台旅客") {
-                        if (InStr(item["name"], searchInput) || InStr(item["nameLast"], searchInput) || InStr(item["nameFirst"], searchInput)) {
-                            filteredItems.InsertAt(1, item)
-                        }
-                    }
-                    ; from abroad
-                    else {
-                        if (
-                            (item.Has("nameLast") || item.Has("nameFirst"))
-                            && (InStr(item["nameLast"], searchInput) || InStr(item["nameFirst"], searchInput))
-                        ) {
-                            filteredItems.InsertAt(1, item)
-                        }
-                    }
-                }
-            }
-        }
-        else if (searchBy.value == "waterfall") {
-            ; roomNums := StrSplit(queryFilter.value["search"], " ")
-            roomNums := roomNumSplitPipe(queryFilter.value["search"].trim())
-            ; filtering all entered room numbers
-            for roomNum in roomNums {
-                for item in loadedItems {
-                    if (InStr(item["roomNum"], roomNum)) {
-                        filteredItems.InsertAt(1, item)
-                    }
-                }
-            }
-        }
-        else if (searchBy.value == "birthday") {
-            bd := StrLen(searchInput) == 8
-                ? SubStr(searchInput, 1, 4) . "-" . SubStr(searchInput, 5, 2) . "-" . SubStr(searchInput, 7, 2)
-                : searchInput
-            for item in loadedItems {
-                if (InStr(item[searchBy.value], bd)) {
-                    filteredItems.InsertAt(1, item)
-                }
-            }
-        }
-        else {
-            for item in loadedItems {
-                if (InStr(item[searchBy.value], searchInput)) {
-                    filteredItems.InsertAt(1, item)
-                }
-            }
-        }
-
-        return filteredItems
     }
 
     ; fill in profile by actions
     fillPmsProfile(*) {
-        if (!WinExist("ahk_class SunAwtFrame")) {
-            MsgBox("Opera 未启动！ ", "Profile Modify Next", "T1")
-            return
-        }
-
         App.Hide()
         Sleep(500)
 
@@ -333,14 +274,14 @@ PMN_App(App, moduleTitle, db, identifier) {
         }
 
         if (searchBy.value == "waterfall") {
-            if (!queryFilter.value["search"]) {
-                MsgBox("瀑流模式必须提供房号。", POPUP_TITLE, "T2")
+            if (!queryFilter.value.search) {
+                MsgBox("瀑流模式必须提供房号。", POPUP_TITLE, "T2 iconi")
                 App.Show()
                 return
             }
 
             ; rooms := StrSplit(queryFilter.value["search"].trim(), " ")
-            rooms := roomNumSplitPipe(queryFilter.value["search"].trim())
+            rooms := roomNumSplitPipe(queryFilter.value.search.trim())
             party := ""
             ; party := App["party-num"].Text
             ; App["party-num"].Text := ""
@@ -348,7 +289,7 @@ PMN_App(App, moduleTitle, db, identifier) {
             ; pick selected guests
             checkedRows := LV.getCheckedRowNumbers()
             if (!checkedRows.Length) {
-                MsgBox("未选中 Profile。", POPUP_TITLE, "T2")
+                MsgBox("未选中 Profile。", POPUP_TITLE, "T2 icon!")
                 App.Show()
                 return
             }
@@ -368,7 +309,7 @@ PMN_App(App, moduleTitle, db, identifier) {
                 delegateContent := {
                     mode: "waterfall",
                     overwrite: settings.value["fillOverwrite"],
-                    limitDate: App["limit-date-btn"].Value ? queryFilter.value["date"] : "",
+                    limitDate: App["limit-date-btn"].Value ? queryFilter.value.date : "",
                     rooms: rooms,
                     party: party,
                     profiles: groupedSelectedGuests
@@ -383,7 +324,7 @@ PMN_App(App, moduleTitle, db, identifier) {
                 PMN_Waterfall.cascade(
                     groupedSelectedGuests,
                     settings.value["fillOverwrite"],
-                    App["limit-date-btn"].Value ? queryFilter.value["date"] : "",
+                    App["limit-date-btn"].Value ? queryFilter.value.date : "",
                     party
                 )
             }
@@ -391,7 +332,13 @@ PMN_App(App, moduleTitle, db, identifier) {
             ; reset date limiter
             App["limit-date-btn"].Value := true
             settings.update("isLimitedDate", true)
-        } else {
+        } 
+        else {
+            if (!WinExist("ahk_class SunAwtFrame")) {
+                MsgBox("Opera 未启动！ ", "Profile Modify Next", "T1")
+                return
+            }
+
             targetId := LV.GetText(LV.GetNext(), LV.svanerWrapper.titleKeys.findIndex(key => key == "idNum"))
             PMN_Fillin.fill(listContent.value.find(item => item["idNum"] == targetId), settings.value["fillOverwrite"])
         }
@@ -410,7 +357,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         if (!checkedRows.Length) {
             QM2_Panel({
                 overwriteProfiles: settings.value["fillOverwrite"],
-                limitDate: App["limit-date-btn"].Value ? queryFilter.value["date"] : ""
+                limitDate: App["limit-date-btn"].Value ? queryFilter.value.date : ""
             })
             return
         }
@@ -429,7 +376,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         QM2_Panel({
             overwriteProfiles: settings.value["fillOverwrite"],
             selectedGuests: groupedSelectedGuests,
-            limitDate: App["limit-date-btn"].Value ? queryFilter.value["date"] : ""
+            limitDate: App["limit-date-btn"].Value ? queryFilter.value.date : ""
         })
     }
 
@@ -495,11 +442,11 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         ; search box
         App.AddEdit("vsearchBox x+5 w125 h25")
-            .onBlur((ctrl, _) => queryFilter.update("search", Trim(ctrl.Value)))
+            .onChange((ctrl, _) => queryFilter.update("search", Trim(ctrl.Value)))
 
         ; range
         App.AddText("x+10 h25 0x200", "最近")
-        App.AddEdit("vrange Number x+1 w30 h25", queryFilter.value["range"])
+        App.AddEdit("vrange Number x+1 w30 h25", queryFilter.value.range)
             .onChange((ctrl, _) => queryFilter.update("range", !ctrl.Value ? 60 * 24 : ctrl.Value))
         App.AddText("x+1 h25 0x200", "分钟")
 
