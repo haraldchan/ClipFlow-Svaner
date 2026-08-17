@@ -26,7 +26,7 @@ GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile) {
         }
 
         selectedItem := listContent.value.find(item => item["idNum"] == getSelectedCell(LV, row, "idNum"))
-        GuestProfileDetails(selectedItem, fillPmsProfile)
+        GuestProfileDetails(selectedItem, db, fillPmsProfile)
     }
 
     markAsPrimary(LV, row) {
