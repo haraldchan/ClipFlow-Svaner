@@ -58,7 +58,7 @@ GuestProfileDetails(selectedGuest, fillIn) {
             LV.Add(, field, val)
         }
 
-        if (selectedGuest.has("guardianInfo")) {
+        if (selectedGuest["guardianInfo"].Capacity > 0) {
             for key, field in guardianFieldIndex {
                 LV.Add(, field, selectedGuest["guardianInfo"][key])
             }
@@ -113,7 +113,7 @@ GuestProfileDetails(selectedGuest, fillIn) {
     }
 
     render() {
-        Profile.AddListView("vprofile Grid @lv:label-tip w230 " . (selectedGuest.has("guardianInfo") ? "r13" : "r10"), ["信息字段", "证件信息"]).onDoubleClick(copyListField)
+        Profile.AddListView("vprofile Grid @lv:label-tip w230 " . ((selectedGuest["guardianInfo"].Capacity > 0) ? "r13" : "r10"), ["信息字段", "证件信息"]).onDoubleClick(copyListField)
 
         Profile.AddButton("h30 w110", "关 闭 (&C)").onClick(handleClose)
         Profile.AddButton("x+10 h30 w110 Default", "{1}", fillMode)
