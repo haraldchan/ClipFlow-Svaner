@@ -2,7 +2,7 @@
 
 /**
  * @param {Svaner} App 
- * @param {()=>useFileDB} db 
+ * @param {()=>Datebase} db 
  * @param {signal} listContent 
  * @param {signal} queryFilter 
  * @param {signal} searchBy 
@@ -12,17 +12,12 @@ GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile) {
     getSelectedCell(LV, row, key) {
         return LV.GetText(row, App["guest-profile-list"].svanerWrapper.titleKeys.findIndex(item => item == key))
     }
-
-    copyIdNumber(LV, row) {
-        A_Clipboard := getSelectedCell(LV, row, "idNum")
-        MsgBox(Format("已复制证件号码: `n`n{1} : {2}", getSelectedCell(LV, row, "name"), A_Clipboard), POPUP_TITLE, "4096 T1")
-    }
  
     handleUpdateItem(LV, row) {
         selectedItem := listContent.value.find(item => item["idNum"] == getSelectedCell(LV, row, "idNum"))
         selectedItem["roomNum"] := getSelectedCell(LV, row, "roomNum")
     
-        SetTimer(() => db().updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], selectedItem["fileName"]), -1)
+        db().put(queryFilter.value.date, selectedItem)
     }
 
     showProfileDetails(LV, row, *) {
@@ -48,7 +43,7 @@ GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile) {
 
         LV.Modify(row,,, selectedItem["name"])
 
-        SetTimer(() => db().updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], selectedItem["fileName"]), -1)
+        db().put(queryFilter.value.date, selectedItem)
     }
 
     return App.AddListView(
