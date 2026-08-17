@@ -21,39 +21,41 @@ class ProfileModifyNext {
     static popupTitle := "ClipFlow - " . this.name
     static identifier := "04047fce826f48f751891b4721f7ac70" ; MD5 hash: ProfileModifyNext
     static usingDB := signal("uncDB")
+    /**
+     * @type {Datebase}
+     */
+    static db := ""
 
     static USE(App) {
-        dbConfig := CONFIG.read("dbConfig")
+        sqliteConfig := CONFIG.read("sqliteConfig")
 
         this.uncDB := {
             name: "uncDB",
-            main: dbConfig["host"] . dbConfig["main"],
-            archive: dbConfig["host"] . dbConfig["archive"],
-            backup: dbConfig["host"] . dbConfig["backup"],
+            dbPath: sqliteConfig["dbPath"],
+            retentionDays: sqliteConfig["retentionDays"]
         }
 
         this.localDB := {
             name: "localDB",
-            main: "c:\ClipFlow\db\GuestProfilesDB\GuestProfiles",
-            archive: "c:\ClipFlow\db\GuestProfilesDB\GuestProfilesArchive",
-            backup: "c:\ClipFlow\db\GuestProfilesBackup",
+            dbPath: "c:\ClipFlow\db\GuestProfilesDB\guests.sqlite",
+            retentionDays: sqliteConfig["retentionDays"]
         }
 
         ; initialize db
-        if (DirExist(this.uncDB.main)) {
-            this.db := useFileDB(this.uncDB)
+        if (FileExist(this.uncDB.dbPath)) {
+            this.db := Datebase(this.uncDB)
         }
         else {
-            this.db := useFileDB(this.localDB)
+            this.db := Datebase(this.localDB)
             this.usingDB.set("localDB")
         }
-        effect(this.usingDB, newUsingDB => this.db := useFileDB(this.%newUsingDB%))
+        effect(this.usingDB, newUsingDB => (
+            this.db.close(),
+            this.db := Datebase(this.%newUsingDB%)
+        ))
 
-        ; create archive on launch
-        yesterday := A_Now.yesterday().toFormat("yyyyMMdd")
-        if (!FileExist(this.db.archive . "\" . yesterday . " - archive.json")) {
-            this.db.createArchive(yesterday)
-        }
+        ; create backup
+        FileCopy(sqliteConfig["dbPath"], sqliteConfig["backupDir"] . "\guests_backup.sqlite", true)
 
         ; add ws message listener
         clbListeners.addListener({
@@ -64,14 +66,14 @@ class ProfileModifyNext {
         })
 
         ; mount module component
-        PMN_App(App, this.title, this.getDB.Bind(this), this.identifier)
+        PMN_App(App, this.title, this.switchDB.Bind(this), this.identifier)
     }
 
     /**
      * @returns {useFileDB} 
      */
-    static getDB() {
-        if (this.usingDB.value == "uncDB" && !DirExist(this.uncDB.main)) {
+    static switchDB() {
+        if (this.usingDB.value == "uncDB" && !FileExist(this.uncDB.dbPath)) {
             this.usingDB.set("localDB")
         }
 
