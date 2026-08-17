@@ -1,88 +1,40 @@
 /**
  * 
  * @param {Map} selectedGuest 
+ * @param {()=>Datebase} db
  * @param {Func} fillIn 
  */
-GuestProfileDetails(selectedGuest, fillIn) {
-    if (selectedGuest["idNum"] == 'No Data') {
+GuestProfileDetails(selectedGuest, db, fillIn) {
+    if (selectedGuest["idNum"] == "No Data") {
         return
     }
 
-    Profile := Svaner({
+    Win := Svaner({
         gui: {
             options: "+AlwaysOnTop",
             title: "Profile Details"
         },
         font: {
             name: "微软雅黑"
-        }
+        },
     })
+    Win.gui.BackColor := "0xF9F9F9"
 
     timeoutCount := 0
     TIMEOUT_MAX_SECOND := 60
 
-    fieldIndex := OrderedMap(
-        "roomNum", "房号",
-        "name", "全名",
-        "gender", "性别",
-        "birthday", "生日",
-        "guestType", "旅客类型",
-        "idType", "证件类型",
-        "idNum", "证件号码",
-        "addr", "地址",
-        "tel", "联系电话",
-        "regTime", "登记时间",
-    )
-
-    guardianFieldIndex := OrderedMap(
-        "guardianName", "监护人姓名",
-        "guardianTel", "监护人电话",
-        "guardianRelation", "监护人关系",
-    ) 
-
-    listInitialize(selectedGuest, fieldIndex) {
-        /**
-         * @type {Gui.ListView}
-         */
-        LV := Profile["profile"]
-        
-        LV.ModifyCol(1, 70)
-        LV.ModifyCol(2, 150)
-
-        for key, field in fieldIndex {
-            val := selectedGuest.has(key) ? selectedGuest[key] : ""
-            if (key == "regTime") {
-                val := FormatTime(val, "yyyy/MM/dd HH:mm")
-            }
-
-            LV.Add(, field, val)
-        }
-
-        if (selectedGuest["guardianInfo"].Capacity > 0) {
-            for key, field in guardianFieldIndex {
-                LV.Add(, field, selectedGuest["guardianInfo"][key])
-            }
-        }
-    }
-
-    copyListField(LV, row) {
-        A_Clipboard := LV.GetText(row, 2)
-        key := LV.GetText(row, 1)
-        MsgBox(Format("已复制信息: `n`n{1} : {2}", key, A_Clipboard), POPUP_TITLE, "4096 T1")
-    }
-
     detectWindowIsActive(*) {
-        timeoutCount := !WinActive(Profile.gui.Hwnd) ? timeoutCount + 1 : 0
+        timeoutCount := !WinActive(Win.gui.Hwnd) ? timeoutCount + 1 : 0
 
         if (timeoutCount >= TIMEOUT_MAX_SECOND) {
             SetTimer(, 0)
-            Profile.Destroy()
+            Win.Destroy()
         }
     }
 
     handleClose(*) {
         SetTimer(detectWindowIsActive, 0)
-        Profile.Destroy()
+        Win.Destroy()
     }
 
     fillMode := signal("填入Profile")
@@ -90,10 +42,9 @@ GuestProfileDetails(selectedGuest, fillIn) {
         fillMode.set(cur => cur == "填入Profile" ? "填入旅安" : "填入Profile")
     }
 
-
     fillInfo(*) {
         SetTimer(detectWindowIsActive, 0)
-        Profile.Hide()
+        Win.Hide()
 
         if (fillMode.value == "填入Profile") {
             fillIn()
@@ -102,21 +53,131 @@ GuestProfileDetails(selectedGuest, fillIn) {
             PMN_FillPSB.fill(selectedGuest)
         }
 
-        Profile.Destroy()
+        Win.Destroy()
+    }
+
+    handleUnlock(ctrl, _) {
+        ctrl.Text := "🔓"
+
+        for (control in Win.gui) {
+            if (control is Gui.Edit) {
+                control.Opt("-ReadOnly")
+            }
+            else {
+                control.Enabled := true
+            }
+        }
+    }
+
+    handleProfileUpdate(ctrl, _) {
+        newValue := ctrl is Gui.DateTime ? ctrl.Value : ctrl.Text
+
+        if (selectedGuest["guestType"] == "港澳台旅客" && ctrl.name == "addr") {
+            selectedGuest["region"] := ctrl.Text
+        }
+        else if (selectedGuest["guestType"] == "国外旅客" && ctrl.name == "addr") {
+            selectedGuest["country"] := ctrl.Text
+        }
+        else {
+            selectedGuest[ctrl.Name.toCase("camel")] := newValue
+        }
+
+        db().put(FormatTime(selectedGuest["regTime"], "yyyyMMdd"), selectedGuest)
     }
 
     onMount() {
-        listInitialize(selectedGuest, fieldIndex)
-        Profile.Show()
+        Win.Show()
 
         SetTimer(detectWindowIsActive, 1000)
     }
 
-    render() {
-        Profile.AddListView("vprofile Grid @lv:label-tip w230 " . ((selectedGuest["guardianInfo"].Capacity > 0) ? "r13" : "r10"), ["信息字段", "证件信息"]).onDoubleClick(copyListField)
+    Win.defineDirectives(
+        "@use:bold", ctrl => ctrl.SetFont("bold"),
+        "@use:pd-label", "xs10 yp+30 w55 h25 0x200 @use:bold",
+        "@use:pd-edit", "x+5 w150 h25 0x200 ReadOnly",
+    )
 
-        Profile.AddButton("h30 w110", "关 闭 (&C)").onClick(handleClose)
-        Profile.AddButton("x+10 h30 w110 Default", "{1}", fillMode)
+    idTypes := [
+        "身份证",
+        "国内护照",
+        "港澳通行证",
+        "港澳居民来往内地通行证",
+        "台湾居民来往大陆通行证",
+        "港澳台居民居住证",
+        "普通护照",
+        "外国人永久居留证",
+    ]
+
+    defineStackboxHeight() {
+        base := 290
+
+        if (selectedGuest["guestType"] != "内地旅客") {
+            base += 70
+        }
+
+        if (selectedGuest["guardianInfo"].Capacity > 0) {
+            base += 110
+        }
+
+        return "h" . String(base)
+    }
+
+    render() {
+        StackBox(Win, {
+            font: {
+                name: "Tahoma",
+                options: "s12 bold"
+            },
+            groupbox: {
+                title: "Profile 详情",
+                options: "Section x20 w230 " . defineStackboxHeight(),
+            }
+        },
+            () => [
+                ; edit btn
+                Win.AddText("vlock xs205 yp+0 w20 h25", "🔒").onClick(handleUnlock).SetFont("s12"),
+                ; room no.
+                Win.AddText("@use:pd-label yp+24", "房号"),
+                Win.AddEdit("vroomNum @use:pd-edit", selectedGuest["roomNum"]).onChange(handleProfileUpdate),
+                ; name
+                Win.AddText("@use:pd-label", "全名"),
+                Win.AddEdit("vname @use:pd-edit", selectedGuest["name"]).onChange(handleProfileUpdate),
+                selectedGuest["guestType"] != "内地旅客" && [
+                    Win.AddText("@use:pd-label", "英文姓"),
+                    Win.AddEdit("vname-last @use:pd-edit", selectedGuest["nameLast"]).onChange(handleProfileUpdate),
+                    Win.AddText("@use:pd-label", "英文名"),
+                    Win.AddEdit("vname-first @use:pd-edit", selectedGuest["nameFirst"]).onChange(handleProfileUpdate),
+                ],
+                ; gender
+                Win.AddText("@use:pd-label", "性别"),
+                Win.AddDDL("vgender x+5 w150 Disabled Choose" . (selectedGuest["gender"] == "男" ? 1 : 2), ["男", "女"]).onChange(handleProfileUpdate),
+                ; id type/num
+                Win.AddText("@use:pd-label", "证件信息"),
+                Win.AddDDL("vid-type x+5 w150 0x3 Disabled Choose" . (idTypes.findIndex(t => t == selectedGuest["idType"])), idTypes).onChange(handleProfileUpdate),
+                Win.AddEdit("vid-num @use:pd-edit xs10 yp+25 w205", selectedGuest["idNum"]).onChange(handleProfileUpdate),
+                ; addr
+                Win.AddText("@use:pd-label", "地址/地区"),
+                Win.AddEdit("vaddr @use:pd-edit", selectedGuest["addr"]).onChange(handleProfileUpdate),
+                ; tel
+                Win.AddText("@use:pd-label", "联系电话"),
+                Win.AddEdit("vtel @use:pd-edit", selectedGuest["tel"]).onChange(handleProfileUpdate),
+                ; guardian informations
+                selectedGuest["guardianInfo"].Capacity > 0 && [
+                    Win.AddText("@use:pd-label yp+10", "监护人姓名"),
+                    Win.AddEdit("vguardian-name @use:pd-edit", selectedGuest["guardianInfo"]["guardianName"]).onChange(handleProfileUpdate),
+                    Win.AddText("@use:pd-label", "监护人电话"),
+                    Win.AddEdit("vguardian-tel ", selectedGuest["guardianInfo"]["guardianTel"]).onChange(handleProfileUpdate),
+                    Win.AddText("@use:pd-label", "监护人关系"),
+                    Win.AddEdit("vguardian-relation @use:pd-edit", selectedGuest["guardianInfo"]["guardianRelation"]).onChange(handleProfileUpdate),
+                ],
+                ; registered time
+                Win.AddText("xs10 yp+40 w205 0x10 0x200", "divider"),
+                Win.AddText("@use:pd-label yp+10", "登记时间"),
+                Win.AddDateTime("vreg-time x+5 w150 h25 Disabled Choose" . selectedGuest["regTime"]).onChange(handleProfileUpdate),
+            ]
+        )
+        Win.AddButton("x20 h30 w110", "关 闭 (&C)").onClick(handleClose)
+        Win.AddButton("x+10 h30 w110 Default", "{1}", fillMode)
             .onClick(fillInfo)
             .onContextMenu(handleFillModeSwitch)
 
