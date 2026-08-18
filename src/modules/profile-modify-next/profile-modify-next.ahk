@@ -44,7 +44,7 @@ class ProfileModifyNext {
         }
 
         ; initialize db
-        if (FileExist(this.uncDB.dbPath)) {
+        if (FileExist(this.uncDB.dbPath.replace("\guests.sqlite"))) {
             this.db := Datebase(this.uncDB)
         }
         else {
@@ -57,7 +57,9 @@ class ProfileModifyNext {
         ))
 
         ; create backup
-        FileCopy(sqliteConfig["dbPath"], sqliteConfig["backupDir"] . "\guests_backup.sqlite", true)
+        if (FileExist(sqliteConfig["dbPath"])) {
+            FileCopy(sqliteConfig["dbPath"], sqliteConfig["backupDir"] . "\guests_backup.sqlite", true)
+        }
 
         ; add ws message listener
         clbListeners.addListener({
