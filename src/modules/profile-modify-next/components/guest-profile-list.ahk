@@ -6,9 +6,11 @@
  * @param {signal} listContent 
  * @param {signal} queryFilter 
  * @param {signal} searchBy 
- * @param {Func} fillPmsProfile 
+ * @param {Func} handleFillin 
+ * @param {Func} handleListUpdate 
+ * @param {SvanerListView}
  */
-GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile) {
+GuestProfileList(App, db, listContent, queryFilter, searchBy, handleFillin, handleListUpdate) {
     getSelectedCell(LV, row, key) {
         return LV.GetText(row, App["guest-profile-list"].svanerWrapper.titleKeys.findIndex(item => item == key))
     }
@@ -26,7 +28,7 @@ GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile) {
         }
 
         selectedItem := listContent.value.find(item => item["idNum"] == getSelectedCell(LV, row, "idNum"))
-        GuestProfileDetails(selectedItem, db, fillPmsProfile)
+        GuestProfileDetails(selectedItem, db, handleFillin, handleListUpdate)
     }
 
     markAsPrimary(LV, row) {
