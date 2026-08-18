@@ -109,4 +109,14 @@ class utils {
     static killApp(exe) {
         return RunWait(A_ComSpec ' /c taskkill /F /T /IM "' exe '"', , "Hide")
     }
+
+    static newGuid() {
+        guid := Buffer(16)
+        DllCall("ole32\CoCreateGuid", "Ptr", guid)
+
+        str := Buffer(78)
+        DllCall("ole32\StringFromGUID2", "Ptr", guid, "Ptr", str, "Int", 39)
+
+        return Trim(StrGet(str, "UTF-16"), "{}")
+    }
 }
