@@ -125,21 +125,24 @@ class PMG_Data {
             inhRooms.Push(curRoom)
         }
 
+        xmlDoc := ""
+        
         return inhRooms
     }
 
     /**
      * 
-     * @param {useFileDB} db db object
+     * @param {Datebase} db db object
      * @param {Array} inhRooms in house room numbers
      * @param {Integer} fetchPeriod fetch period hrs
      * @returns {Array} grouped guest profiles
      */
     static getGroupGuests(db, inhRooms, fetchPeriod) {
-        loadedGuests := db.load(, FormatTime(A_Now, "yyyyMMdd"), 60 * fetchPeriod)
-        filteredGuests := loadedGuests.filter(guest => inhRooms.includes(guest["roomNum"]))
-                                      .sort((a, b) => a["roomNum"] - b["roomNum"])
+        loadedGuests := []
+        for (room in inhRooms) {
+            loadedGuests.Push(db.load(, "roomNum", room, 60 * fetchPeriod))
+        }
 
-        return filteredGuests
+        return loadedGuests
     }
 }

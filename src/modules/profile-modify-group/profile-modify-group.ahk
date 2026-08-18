@@ -12,14 +12,19 @@ class ProfileModify_Group {
     static name := "ProfileModify Group"
     static title := "Flow Mode - " . this.name
     static popupTitle := "ClipFlow - " . this.name
+    /**
+     * @type {Datebase}
+     */
+    static db := ""
+
 
     static USE(App) {
-        dbConfig := CONFIG.read("dbConfig")
-        this.db := useFileDB({
-            main: dbConfig["host"] . dbConfig["main"],
-            archive: dbConfig["host"] . dbConfig["archive"],
-            backup: dbConfig["host"] . dbConfig["backup"],
-        })
+        sqliteConfig := CONFIG.read("sqliteConfig")
+        this.db := {
+            name: "pmgDB",
+            dbPath: sqliteConfig["dbPath"],
+            retentionDays: sqliteConfig["retentionDays"]
+        }
 
         PMG_App(App, this.title, this.db)
     }

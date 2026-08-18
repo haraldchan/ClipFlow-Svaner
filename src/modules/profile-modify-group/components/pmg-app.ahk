@@ -1,7 +1,7 @@
 /**
  * @param {Svaner} App 
  * @param {String} popupTitle 
- * @param {useFileDB} db 
+ * @param {Datebase} db 
  */
 PMG_App(App, popupTitle, db) {
     selectedGroup := signal(Map())
