@@ -201,38 +201,6 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         App["range"].Enabled := (queryFilter.value.date == FormatTime(A_Now, "yyyyMMdd"))
 
-        ; TODO: remove this if block after migration
-        if (!db().tableExists("guests_" . queryFilter.value.date)) {
-            dbConfig := CONFIG.read("dbConfig")
-            fdb := useFileDB({
-                name: "uncDB",
-                main: dbConfig["host"] . dbConfig["main"],
-                archive: dbConfig["host"] . dbConfig["archive"],
-                backup: dbConfig["host"] . dbConfig["backup"],
-            })
-
-            loadedItems := fdb.load(, queryFilter.value.date, 60 * 24 * 365)
-            filteredItems := []
-            if (!queryFilter.value.search) {
-                filteredItems := loadedItems
-            }
-            else {
-                for item in loadedItems {
-                    if (InStr(item[searchBy.value], queryFilter.value.search)) {
-                        filteredItems.InsertAt(1, item)
-                    }
-                }
-            }
-            if (!filteredItems.Length) {
-                useListPlaceholder(listContent, colTitles, "No Data")
-                return
-            }
-
-            listContent.set(filteredItems)
-            App["select-all-btn"].Value := false
-            return
-        }
-
         loadedItems := []
         switch searchBy.value {
             case "waterfall":
@@ -460,7 +428,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         App.AddButton("vqm2-agent x+5 w80 h25 Disabled", "&QM2 Agent").onClick(showQm2Panel)
 
         ; profile list
-        GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile)
+        GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile, handleListContentUpdate)
 
         ; sent posts
         Show(() => SentPosts(App, isDelegate, listContent), isDelegate, cur => cur == true)
