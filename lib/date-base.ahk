@@ -27,7 +27,7 @@ class Datebase extends SQLite {
                 "birthday", "TEXT",
                 "gender", "TEXT",
                 "guestType", "TEXT",
-                "idNum", "TEXT PRIMARY KEY",
+                "idNum", "TEXT",
                 "idType", "TEXT",
                 "name", "TEXT",
                 "nameLast", "TEXT NULL",
@@ -36,7 +36,7 @@ class Datebase extends SQLite {
                 "roomNum", "TEXT NULL",
                 "region", "TEXT NULL",
                 "country", "TEXT NULL",
-                "tsId", "INT64",
+                "tsId", "TEXT PRIMARY KEY",
                 "tel", "TEXT NULL",
                 "guardianInfo", "TEXT NULL"
             )
@@ -314,7 +314,7 @@ class Datebase extends SQLite {
             }
         }
 
-        updateKeys := updateDescriptor.keys().filter(key => key != "idNum")
+        updateKeys := updateDescriptor.keys().filter(key => key != "tsId")
 
         stmt := this.prepare(
             Format("
@@ -323,7 +323,7 @@ class Datebase extends SQLite {
                     ({2})
                 VALUES
                     ({3})
-                ON CONFLICT(idNum)
+                ON CONFLICT(tsId)
                 DO UPDATE SET
                     {4}
             )",
