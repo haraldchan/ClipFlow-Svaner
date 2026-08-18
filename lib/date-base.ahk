@@ -54,6 +54,8 @@ class Datebase extends SQLite {
             .join(", ")
 
         this.createTable(FormatTime(A_Now, "yyyyMMdd"))
+
+        this.cleanup()
     }
 
     createTable(date) {
@@ -117,23 +119,19 @@ class Datebase extends SQLite {
               AND name LIKE 'guests_%'
         )")
 
+        tablesToDrop := []
+
         while (true) {
             rc := this.step(stmt)
 
             if (rc == SQLite.ROW) {
                 tableName := this.columnText(stmt, 0)
-
-                ; Extract YYYYMMDD from guests_YYYYMMDD
                 date := SubStr(tableName, 8)
 
                 if (date < cutoffDate) {
-                    this.exec(
-                        Format(
-                            "DROP TABLE IF EXISTS {1}",
-                            tableName
-                        )
-                    )
+                    tablesToDrop.Push(tableName)
                 }
+
                 continue
             }
 
@@ -146,6 +144,13 @@ class Datebase extends SQLite {
         }
 
         this.finalize(stmt)
+
+        for tableName in tablesToDrop {
+            this.exec(Format(
+                "DROP TABLE IF EXISTS {1}",
+                tableName
+            ))
+        }
     }
 
     /**
