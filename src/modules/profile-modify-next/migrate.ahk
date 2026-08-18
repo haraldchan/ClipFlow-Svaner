@@ -15,11 +15,6 @@ MigrateHelper(db) {
     })
 
     handleWinClose(*) {
-        ; if (!Win["migrate-btn"].Enabled) {
-        ;     Msgbox("迁移中, 请勿关闭此窗口", POPUP_TITLE, "4096 T1 iconi")
-        ;     return true
-        ; }
-
         Win.Destroy()
     }
 
@@ -52,6 +47,7 @@ MigrateHelper(db) {
             for (dayArc in archivedProfiles) {
                 for (date, profiles in dayArc) {
                     for (profile in profiles) {
+                        profile["tsId"] := utils.newGuid()
                         db().add(JSON.stringify(profile), date)
                         Win["archive-progress"].Value++
                     }
@@ -61,6 +57,7 @@ MigrateHelper(db) {
         else {
             for (profile in onDayProfiles) {
                 profile["regTime"] := A_Now
+                profile["tsId"] := utils.newGuid()
                 db().add(JSON.stringify(profile))
                 Win["onday-progress"].Value++
             }
