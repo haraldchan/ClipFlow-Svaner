@@ -56,7 +56,6 @@ MigrateHelper(db) {
         }
         else {
             for (profile in onDayProfiles) {
-                profile["regTime"] := A_Now
                 profile["tsId"] := utils.newGuid()
                 db().add(JSON.stringify(profile))
                 Win["onday-progress"].Value++
