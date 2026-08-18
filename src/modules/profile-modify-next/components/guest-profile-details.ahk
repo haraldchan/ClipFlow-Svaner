@@ -2,9 +2,10 @@
  * 
  * @param {Map} selectedGuest 
  * @param {()=>Datebase} db
- * @param {Func} fillIn 
+ * @param {Func} handleFillin 
+ * @param {Func} handleListUpdate 
  */
-GuestProfileDetails(selectedGuest, db, fillIn) {
+GuestProfileDetails(selectedGuest, db, handleFillin, handleListUpdate) {
     if (selectedGuest["idNum"] == "No Data") {
         return
     }
@@ -33,6 +34,10 @@ GuestProfileDetails(selectedGuest, db, fillIn) {
     }
 
     handleClose(*) {
+        if (isUpdated) {
+            handleListUpdate()
+        }
+
         SetTimer(detectWindowIsActive, 0)
         Win.Destroy()
     }
@@ -47,7 +52,7 @@ GuestProfileDetails(selectedGuest, db, fillIn) {
         Win.Hide()
 
         if (fillMode.value == "填入Profile") {
-            fillIn()
+            handleFillin()
         }
         else {
             PMN_FillPSB.fill(selectedGuest)
@@ -56,10 +61,15 @@ GuestProfileDetails(selectedGuest, db, fillIn) {
         Win.Destroy()
     }
 
+    isUpdated := false
     handleUnlock(ctrl, _) {
         ctrl.Text := "🔓"
 
         for (control in Win.gui) {
+            if (control.Name == "reg-time") {
+                continue
+            }
+
             if (control is Gui.Edit) {
                 control.Opt("-ReadOnly")
             }
@@ -70,7 +80,12 @@ GuestProfileDetails(selectedGuest, db, fillIn) {
     }
 
     handleProfileUpdate(ctrl, _) {
+        isUpdated := true
+
         newValue := ctrl is Gui.DateTime ? ctrl.Value : ctrl.Text
+        if (ctrl.Name == "birthday") {
+            newValue := FormatTime(newValue, "yyyy-MM-dd")
+        }
 
         if (selectedGuest["guestType"] == "港澳台旅客" && ctrl.name == "addr") {
             selectedGuest["region"] := ctrl.Text
@@ -87,14 +102,13 @@ GuestProfileDetails(selectedGuest, db, fillIn) {
 
     onMount() {
         Win.Show()
-
         SetTimer(detectWindowIsActive, 1000)
     }
 
     Win.defineDirectives(
         "@use:bold", ctrl => ctrl.SetFont("bold"),
-        "@use:pd-label", "xs10 yp+30 w55 h25 0x200 @use:bold",
-        "@use:pd-edit", "x+5 w150 h25 0x200 ReadOnly",
+        "@use:pd-label", "xs10 yp+30 w55 h22 0x200 @use:bold",
+        "@use:pd-edit", "x+5 w150 h22 ReadOnly",
     )
 
     idTypes := [
@@ -109,7 +123,7 @@ GuestProfileDetails(selectedGuest, db, fillIn) {
     ]
 
     defineStackboxHeight() {
-        base := 290
+        base := 320
 
         if (selectedGuest["guestType"] != "内地旅客") {
             base += 70
@@ -154,7 +168,10 @@ GuestProfileDetails(selectedGuest, db, fillIn) {
                 ; id type/num
                 Win.AddText("@use:pd-label", "证件信息"),
                 Win.AddDDL("vid-type x+5 w150 0x3 Disabled Choose" . (idTypes.findIndex(t => t == selectedGuest["idType"])), idTypes).onChange(handleProfileUpdate),
-                Win.AddEdit("vid-num @use:pd-edit xs10 yp+25 w205", selectedGuest["idNum"]).onChange(handleProfileUpdate),
+                Win.AddEdit("vid-num @use:pd-edit xs10 yp+25 w210", selectedGuest["idNum"]).onChange(handleProfileUpdate),
+                ; birthday
+                Win.AddText("@use:pd-label", "生日"),
+                Win.AddDateTime("vbirthday x+5 w150 h25 Disabled Choose" . selectedGuest["birthday"].replace("-", "")).onChange(handleProfileUpdate),
                 ; addr
                 Win.AddText("@use:pd-label", "地址/地区"),
                 Win.AddEdit("vaddr @use:pd-edit", selectedGuest["addr"]).onChange(handleProfileUpdate),
@@ -163,10 +180,11 @@ GuestProfileDetails(selectedGuest, db, fillIn) {
                 Win.AddEdit("vtel @use:pd-edit", selectedGuest["tel"]).onChange(handleProfileUpdate),
                 ; guardian informations
                 selectedGuest["guardianInfo"].Capacity > 0 && [
+                    Win.AddText("xs10 yp+40 w205 0x10 0x200", "divider"),
                     Win.AddText("@use:pd-label yp+10", "监护人姓名"),
                     Win.AddEdit("vguardian-name @use:pd-edit", selectedGuest["guardianInfo"]["guardianName"]).onChange(handleProfileUpdate),
                     Win.AddText("@use:pd-label", "监护人电话"),
-                    Win.AddEdit("vguardian-tel ", selectedGuest["guardianInfo"]["guardianTel"]).onChange(handleProfileUpdate),
+                    Win.AddEdit("vguardian-tel @use:pd-edit", selectedGuest["guardianInfo"]["guardianTel"]).onChange(handleProfileUpdate),
                     Win.AddText("@use:pd-label", "监护人关系"),
                     Win.AddEdit("vguardian-relation @use:pd-edit", selectedGuest["guardianInfo"]["guardianRelation"]).onChange(handleProfileUpdate),
                 ],
