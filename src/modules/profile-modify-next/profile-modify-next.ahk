@@ -15,6 +15,8 @@
 #Include macros\fill-psb.ahk
 #Include macros\waterfall.ahk
 
+#Include migrate.ahk
+
 class ProfileModifyNext {
     static name := "ProfileModifyNext"
     static title := "Flow Mode - " . this.name
@@ -64,13 +66,15 @@ class ProfileModifyNext {
             type: "module",
             callback: (*) => WSMessageParser.capture(WSMessageParser.identifier)
         })
+        
+        MigrateHelper(this.switchDB.Bind(this))
 
         ; mount module component
         PMN_App(App, this.title, this.switchDB.Bind(this), this.identifier)
     }
 
     /**
-     * @returns {useFileDB} 
+     * @returns {Datebase} 
      */
     static switchDB() {
         if (this.usingDB.value == "uncDB" && !FileExist(this.uncDB.dbPath)) {
