@@ -50,6 +50,7 @@ MigrateHelper(db) {
                         profile["tsId"] := utils.newGuid()
                         db().add(JSON.stringify(profile), date)
                         Win["archive-progress"].Value++
+                        Win["archived-count"].Text := Format("{}/{}", Win["archive-progress"].Value, archivedProfileCount)
                     }
                 }
             }
@@ -59,6 +60,7 @@ MigrateHelper(db) {
                 profile["tsId"] := utils.newGuid()
                 db().add(JSON.stringify(profile))
                 Win["onday-progress"].Value++
+                Win["onday-count"].Text := Format("{}/{}", Win["onday-progress"].Value, onDayProfileCount)
             }
         }
     }
@@ -70,13 +72,14 @@ MigrateHelper(db) {
             font: { options: "bold" },
             groupbox: {
                 title: "迁移 Archive",
-                options: "Section x10 w280 h85"
+                options: "Section x10 w280 h100"
             }
         },
             () => [
-                Win.AddButton("vmigrate-archive-btn xs10 yp+25 w260 h30", Format("开始迁移已存档 Profile({})", archivedProfileCount))
+                Win.AddButton("vmigrate-archive-btn xs10 yp+25 w260 h30", "开始迁移已存档 Profile")
                    .onClick(handleMigration),
-                Win.gui.AddProgress("varchive-progress xs10 yp+40 w260 h10 c4592D8 BackgroundD6DEE8 " . Format("range1-{}", archivedProfileCount))
+                Win.gui.AddProgress("varchive-progress xs10 yp+40 w200 h20 c4592D8 BackgroundD6DEE8 " . Format("range1-{}", archivedProfileCount)),
+                Win.AddText("varchived-count x+5 w60 h20 0x200", Format("0/{}", archivedProfileCount)),
             ]
         )
         StackBox(Win, {
@@ -84,13 +87,14 @@ MigrateHelper(db) {
             font: { options: "bold" },
             groupbox: {
                 title: "迁移 On-Day",
-                options: "Section x10 w280 h85"
+                options: "Section x10 w280 h100"
             }
         },
             () => [
-                Win.AddButton("vmigrate-onday-btn xs10 yp+25 w260 h30", Format("开始迁移当天保存 Profile({})", onDayProfileCount))
+                Win.AddButton("vmigrate-onday-btn xs10 yp+25 w260 h30", "开始迁移当天保存 Profile")
                    .onClick(handleMigration),
-                Win.gui.AddProgress("vonday-progress xs10 yp+40 w260 h10 c4592D8 BackgroundD6DEE8 " . Format("range1-{}", onDayProfileCount))
+                Win.gui.AddProgress("vonday-progress xs10 yp+40 w200 h20 c4592D8 BackgroundD6DEE8 " . Format("range1-{}", onDayProfileCount)),
+                Win.AddText("vonday-count x+5 w60 h20 0x200", Format("0/{}", onDayProfileCount)),
             ]
         )
     }
