@@ -68,11 +68,11 @@ class ProfileModifyNext {
             type: "module",
             callback: (*) => WSMessageParser.capture(WSMessageParser.identifier)
         })
-        
-        MigrateHelper(this.switchDB.Bind(this))
 
         ; mount module component
         PMN_App(App, this.title, this.switchDB.Bind(this), this.identifier)
+
+        ; MigrateHelper(this.switchDB.Bind(this))
     }
 
     /**
