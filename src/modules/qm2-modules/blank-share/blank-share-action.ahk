@@ -102,6 +102,16 @@ class BlankShare_Action {
 			utils.waitLoading()
 			Send("{Tab}")
 			Sleep(10)
+
+            ; dismiss error message during night shift
+			foundError := PmsImageFinder.find("error.png", 2)
+			if (foundError) {
+				Send("{Enter}")
+				utils.waitLoading()
+				this.search(roomNum, limitDate.yesterday())
+				return
+			}
+
 			Send("{Text}" . FormatTime(limitDate, "MMddyyyy"))
 			utils.waitLoading()
 		}
