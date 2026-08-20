@@ -58,6 +58,19 @@ class Datebase extends SQLite {
         this.cleanup()
     }
 
+    /**
+     * @param {String} schemaName 
+     * @param {Map} schemaDescriptor 
+     */
+    defineSchema(schemaName, schemaDescriptor) {
+        this.schemas[schemaName] := schemaDescriptor
+    }
+
+
+    /**
+     * Creates table with name `guests_<yyyyMMdd>`
+     * @param {String} date date in format "yyyyMMdd"
+     */
     createTable(date) {
         this.exec(
             Format(
@@ -68,6 +81,12 @@ class Datebase extends SQLite {
         )
     }
 
+
+    /**
+     * Checks if a table exists.
+     * @param {String} tableName 
+     * @returns {true | false | Error} 
+     */
     tableExists(tableName) {
         stmt := this.prepare("
         (
@@ -93,15 +112,15 @@ class Datebase extends SQLite {
         }
 
         this.finalize(stmt)
-        throw Error(
-            "tableExists failed: " . rc
-        )
+        return Error("tableExists failed: " . rc, -1, rc)
     }
 
-    defineSchema(schemaName, schemaDescriptor) {
-        this.schemas[schemaName] := schemaDescriptor
-    }
 
+    /**
+     * Drops outdated tables.
+     * @param {Integer} retentionDays 
+     * @returns {Error | void} 
+     */
     cleanup(retentionDays := 180) {
         cutoff := DateAdd(
             A_Now,
@@ -140,7 +159,7 @@ class Datebase extends SQLite {
             }
 
             this.finalize(stmt)
-            throw Error("Cleanup failed: " . rc)
+            return Error("Cleanup failed: " . rc, -1, rc)
         }
 
         this.finalize(stmt)
@@ -153,9 +172,12 @@ class Datebase extends SQLite {
         }
     }
 
+
     /**
-     * @param jsonString 
+     * Add record to db
+     * @param {String} jsonString 
      * @param {String} date 
+     * @returns {"added" | "put" | Error} 
      */
     add(jsonString, date := FormatTime(A_Now, "yyyyMMdd")) {
         this.createTable(date)
@@ -208,24 +230,27 @@ class Datebase extends SQLite {
             }
 
             this.put(date, descriptor)
-            return
+            return "put"
         }
 
         if (stepRc != SQLite.DONE) {
-            throw Error("Insert failed: " . stepRc)
+            return Error("Insert failed: " . stepRc, -1, stepRc)
         }
 
         if (finalizeRc != SQLite.OK) {
-            throw Error("Finalize failed: " . finalizeRc)
+            return Error("Finalize failed: " . finalizeRc, -1, finalizeRc)
         }
+
+        return "added"
     }
 
     /**
+     * Loads data from db.
      * @param {String} date date in "yyyyMMdd" format
      * @param {String} key search key
      * @param {String} value search value
      * @param {Integer | Number} range 
-     * @returns {Array} 
+     * @returns {Array<Map> | Error} 
      */
     load(date := FormatTime(A_Now, "yyyyMMdd"), key := "roomNum", value := "", range := 60) {
         if (!this.schemas["captured"].Has(key)) {
@@ -277,9 +302,7 @@ class Datebase extends SQLite {
                         record[key] := this.columnInt64(stmt, index)
                     }
                     else {
-                        throw Error(
-                            "Unsupported column type: " . type
-                        )
+                        return Error("Unsupported column type: " . type, -1, type)
                     }
                 }
 
@@ -292,7 +315,7 @@ class Datebase extends SQLite {
             }
 
             this.finalize(stmt)
-            throw Error("Load failed: " . rc)
+            return Error("Load failed: " . rc, -1, rc)
         }
 
         this.finalize(stmt)
@@ -301,16 +324,17 @@ class Datebase extends SQLite {
     }
 
     /**
-     * 
+     * Updates data in db
      * @param {String} date date in "yyyyMMdd" format 
      * @param {Map} updateDescriptor 
+     * @returns {"put" | Error}
      */
     put(date, updateDescriptor) {
         this.createTable(date)
 
         for (key in updateDescriptor.keys()) {
             if (!this.schemas["captured"].Has(key)) {
-                throw Error("Unknown column: " . key)
+                return Error("Unknown column: " . key, -1, key)
             }
         }
 
@@ -352,7 +376,7 @@ class Datebase extends SQLite {
             }
             else {
                 this.finalize(stmt)
-                throw Error("Unsupported column type: " . type)
+                return Error("Unsupported column type: " . type, -1, type)
             }
         }
 
@@ -360,7 +384,7 @@ class Datebase extends SQLite {
         this.finalize(stmt)
 
         if (rc != SQLite.DONE) {
-            throw Error("Put failed: " . rc)
+            return Error("Put failed: " . rc, -1, type)
         }
     }
 }
