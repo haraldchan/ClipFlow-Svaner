@@ -163,10 +163,9 @@ class JSON {
 	}
 }
 
-
 VERSION := JSON.parse(FileRead(A_AppData . "\ClipFlow\clipflow.config.json"))["version"]
 UNC_PATH := "\\10.0.2.13\fd"
-uncScriptDir := UNC_PATH . "\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow-SvanerTest-main"
+uncScriptDir := UNC_PATH . "\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow-Svaner"
 if (DirExist(UNC_PATH)) {
 	; compare version
 	uncVersion := JSON.parse(FileRead(uncScriptDir . "\clipflow.config.json"))["version"]
@@ -178,12 +177,11 @@ if (DirExist(UNC_PATH)) {
 }
 
 try {
-	
 	Run(Format("C:\ClipFlow\app\ClipFlow_{}.ahk", A_PtrSize == 8 ? "x64" : "x86"))
 }
 catch {
 	Run(Format(
-		"\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow-SvanerTest-main\ClipFlow_{}.ahk",
+		"\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow-Svaner\ClipFlow_{}.ahk",
 		A_PtrSize == 8 ? "x64" : "x86"
 	))
 }
