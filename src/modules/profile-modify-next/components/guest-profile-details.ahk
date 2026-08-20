@@ -191,7 +191,7 @@ GuestProfileDetails(selectedGuest, db, handleFillin, handleListUpdate) {
                 ; registered time
                 Win.AddText("xs10 yp+40 w205 0x10 0x200", "divider"),
                 Win.AddText("@use:pd-label yp+10", "登记时间"),
-                Win.AddDateTime("vreg-time x+5 w150 h25 Disabled Choose" . selectedGuest["regTime"]).onChange(handleProfileUpdate),
+                Win.AddDateTime("vreg-time x+5 w150 h25 Disabled Choose" . selectedGuest["regTime"], "yyyy/MM/dd HH:mm").onChange(handleProfileUpdate),
             ]
         )
         Win.AddButton("x20 h30 w110", "关 闭 (&C)").onClick(handleClose)
