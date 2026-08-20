@@ -30,45 +30,26 @@ OfflineControls(App, queryFilter) {
         sentCount := 0
         updatedCount := 0
 
-        localDB := useFileDB(ProfileModifyNext.localDB)
-        uncDB := useFileDB(ProfileModifyNext.uncDB)
+        localDB := DateBase(ProfileModifyNext.localDB)
+        uncDB := DateBase(ProfileModifyNext.uncDB)
 
-        uncData := uncDB.load(, queryFilter.value["date"], queryFilter.value["range"])
-        uncValidateMap := Map()
-        uncValidateMap.Default := ""
-        for uncProfile in uncData {
-            uncValidateMap[uncProfile["idNum"]] := uncProfile
-        }
-
-        localData := localDB.load(, queryFilter.value["date"], queryFilter.value["range"])
-        if (!localData.Length) {
+        localProfiles := localDB.load(queryFilter.value.date, "roomNum", 1440)
+        if (!localProfiles.Length) {
             return
         }
-        
-        for localProfile in localData {
-            if (uncValidateMap[localProfile["idNum"]]) {
-                ; if matching idNum profile found, check each value
-                for key, val in localProfile {
-                    if (!uncValidateMap[localProfile["idNum"]].has(key)) {
-                        continue
-                    }
 
-                    if (uncValidateMap[localProfile["idNum"]][key] != val) {
-                        newProfile := JSON.stringify(localProfile)
-                        date := FormatTime(uncValidateMap[localProfile["idNum"]]["regTime"], "yyyyMMdd")
-                        fileName := uncValidateMap[localProfile["idNum"]]["fileName"]
+        for (profile in localProfiles) {
+            res := uncDB.add(JSON.stringify(profile), queryFilter.value.date)
+            if (res is Error) {
+                MsgBox("发送失败。`n`n错误信息：`n" . res.Message, POPUP_TITLE, "4096 T1.5 icon!")
+                return
+            }
 
-                        uncDB.updateOne(newProfile, date, fileName)
-                        updatedCount++
-                        break
-                    }
-                }
-            }
-            else {
-                uncDB.add(JSON.stringify(localProfile))
-                sentCount++
-            }
+            res == "added" ? sentCount++ : updatedCount++
         }
+
+        localDB.close()
+        uncDB.close()
 
         MsgBox(
             Format("已将本地数据同步至 Share 盘数据库。`n`n本次共发送 {1} 条，更新 {2} 条", sentCount, updatedCount),
