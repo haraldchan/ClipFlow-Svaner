@@ -117,7 +117,11 @@ PMN_App(App, moduleTitle, db, identifier) {
         else {
             incomingGuest["regTime"] := A_Now
 
-            db().add(JSON.stringify(incomingGuest))
+            res := db().add(JSON.stringify(incomingGuest))
+            if (res is Error) {
+                MsgBox("添加旅客失败。`n`n错误信息：`n" . res.Message, POPUP_TITLE, "icon!")
+                return
+            }
 
             isBirthday := incomingGuest["birthday"] == FormatTime(A_Now, "yyyy-MM-dd")
             MsgBox(
@@ -154,13 +158,13 @@ PMN_App(App, moduleTitle, db, identifier) {
             }
         }
 
-        try {
-            db().put(, updater)
-            return db().load(, "tsId", updater["tsId"], 1440)[1]
+        res := db().put(, updater)
+        if (res is Error) {
+            MsgBox("更新失败。", POPUP_TITLE, "4096 T1.5 icon!")
+            return
         }
-        catch {
-            MsgBox("更新失败。", POPUP_TITLE, "4096 T1.5 iconx")
-        }
+
+        return db().load(, "tsId", updater["tsId"], 1440)[1]
     }
 
 
@@ -248,7 +252,6 @@ PMN_App(App, moduleTitle, db, identifier) {
                 return
             }
 
-            ; rooms := StrSplit(queryFilter.value["search"].trim(), " ")
             rooms := roomNumSplitPipe(queryFilter.value.search.trim())
             party := ""
             ; party := App["party-num"].Text
