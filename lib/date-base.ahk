@@ -32,7 +32,7 @@ class Datebase extends SQLite {
                 "name", "TEXT",
                 "nameLast", "TEXT NULL",
                 "nameFirst", "TEXT NULL",
-                "regTime", "INT64 NULL",
+                "regTime", "TEXT NULL",
                 "roomNum", "TEXT NULL",
                 "region", "TEXT NULL",
                 "country", "TEXT NULL",
