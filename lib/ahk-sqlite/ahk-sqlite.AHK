@@ -36,11 +36,15 @@ class SQLite {
 
         buf := Buffer(A_PtrSize, 0)
 
+        ; Create UTF-8 null-terminated string
+        pathBuf := Buffer(StrPut(this.dbPath, "UTF-8"))
+        StrPut(this.dbPath, pathBuf, "UTF-8")
+
         rc := DllCall(
             this.DLL . "\sqlite3_open",
-            "AStr", this.dbPath,
+            "Ptr", pathBuf.Ptr,
             "Ptr", buf.Ptr,
-            "Int"
+            "CDecl Int"
         )
 
         this.db := NumGet(buf, 0, "Ptr")
@@ -90,7 +94,7 @@ class SQLite {
             "Ptr", 0,
             "Ptr", 0,
             "Ptr*", &errorMessage,
-            "Int"
+            "CDecl Int"
         )
 
         if (rc != 0) {
@@ -121,7 +125,7 @@ class SQLite {
             "Int", -1,
             "Ptr", buf.Ptr,
             "Ptr", 0,
-            "Int"
+            "CDecl Int"
         )
 
         stmt := NumGet(buf, 0, "Ptr")
@@ -145,7 +149,7 @@ class SQLite {
         rc := DllCall(
             this.DLL . "\sqlite3_finalize",
             "Ptr", stmt,
-            "Int"
+            "CDecl Int"
         )
 
         return rc
@@ -156,7 +160,7 @@ class SQLite {
         rc := DllCall(
             this.DLL . "\sqlite3_step",
             "Ptr", stmt,
-            "Int"
+            "CDecl Int"
         )
 
         return rc
@@ -174,7 +178,7 @@ class SQLite {
             "Ptr", buf.Ptr,
             "Int", -1,
             "Ptr", -1,
-            "Int"
+            "CDecl Int"
         )
 
         if (rc != SQLite.OK) {
@@ -188,7 +192,7 @@ class SQLite {
             "Ptr", stmt,
             "Int", index,
             "Int", value,
-            "Int"
+            "CDecl Int"
         )
 
         if (rc != 0) {
@@ -202,7 +206,7 @@ class SQLite {
             "Ptr", stmt,
             "Int", index,
             "Int64", value,
-            "Int"
+            "CDecl Int"
         )
 
         if (rc != 0) {
@@ -215,7 +219,7 @@ class SQLite {
             this.DLL . "\sqlite3_bind_null",
             "Ptr", stmt,
             "Int", index,
-            "Int"
+            "CDecl Int"
         )
 
         if (rc != 0) {
@@ -227,7 +231,7 @@ class SQLite {
         rc := DllCall(
             this.DLL . "\sqlite3_reset",
             "Ptr", stmt,
-            "Int"
+            "CDecl Int"
         )
 
         if (rc != 0) {
@@ -240,7 +244,7 @@ class SQLite {
             this.DLL . "\sqlite3_column_type",
             "Ptr", stmt,
             "Int", index,
-            "Int"
+            "CDecl Int"
         )
     }
 
@@ -249,7 +253,7 @@ class SQLite {
             this.DLL . "\sqlite3_column_text",
             "Ptr", stmt,
             "Int", index,
-            "Ptr"
+            "CDecl Ptr"
         )
 
         if (!ptr) {
@@ -264,7 +268,7 @@ class SQLite {
             this.DLL . "\sqlite3_column_int",
             "Ptr", stmt,
             "Int", index,
-            "Int"
+            "CDecl Int"
         )
     }
 
@@ -273,7 +277,7 @@ class SQLite {
             this.DLL . "\sqlite3_column_int64",
             "Ptr", stmt,
             "Int", index,
-            "Int64"
+            "CDecl Int64"
         )
     }
 }
