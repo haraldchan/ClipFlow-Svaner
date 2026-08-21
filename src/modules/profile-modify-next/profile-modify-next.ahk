@@ -48,6 +48,8 @@ class ProfileModifyNext {
             this.db := Datebase(this.uncDB)
         }
         else {
+            DirCreate("c:\ClipFlow\db\GuestProfilesDB")
+
             this.db := Datebase(this.localDB)
             this.usingDB.set("localDB")
         }
@@ -80,6 +82,7 @@ class ProfileModifyNext {
      */
     static switchDB() {
         if (this.usingDB.value == "uncDB" && !FileExist(this.uncDB.dbPath)) {
+            DirCreate("c:\ClipFlow\db\GuestProfilesDB")
             this.usingDB.set("localDB")
         }
 
