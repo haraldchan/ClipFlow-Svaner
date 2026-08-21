@@ -14,13 +14,13 @@ class useServerAgent {
 
         /** @type {Integer} collect interval in ms */
         this.interval := s.interval
-        
+
         /** @type {Integer} post deletion period in min */
         this.expiration := s.expiration
-        
+
         /** @type {Integer} collect post range in min */
         this.collectRange := s.collectRange
-        
+
         /** @type {true | false} whether ping before sending a post */
         this.safePost := s.safePost
 
@@ -74,7 +74,7 @@ class useServerAgent {
                 sender: curHeader[2],
                 id: curHeader[3]
             }
-        } 
+        }
         catch Error as err {
             ; if (USE_ERROR_LOG) {
             ;     logError(err)
@@ -82,7 +82,7 @@ class useServerAgent {
         }
 
         return {
-            header: updatedPostHeader, 
+            header: updatedPostHeader,
             err: err
         }
     }
@@ -95,7 +95,9 @@ class useServerAgent {
     setOnlineStatus(isOn, isRestarting := false) {
         this.onlineStatus.isOnline := isOn
         this.onlineStatus.isRestart := isRestarting
-        this.onlineStatus.activeServer := isOn ? A_ComputerName : ""
+        if (isOn) {
+            this.onlineStatus.activeServer := A_ComputerName
+        }
 
         f := FileOpen(this.onlineStatusIndicator, "w", "utf-8")
         f.Write(JSON.stringify(this.onlineStatus))
@@ -123,10 +125,10 @@ class useServerAgent {
                 #Requires AutoHotkey v2.0
                 #SingleInstance Force
                 #Include {1}
-
+                
                 responder := useServerAgent({ pool: "{2}" })
                 SetTimer(ObjBindMethod(responder, "RESPONSE"), 3000)
-            )", 
+            )",
             selfIncludePath,
             this.pool
         )
@@ -143,7 +145,7 @@ class useServerAgent {
         filename := Format("{1}\{2}=={3}=={4}.json", this.pool, message.method, message.sender, message.id)
         resMatcher := this.pool . "\*" . message.id . "*.json"
         FileAppend(JSON.stringify(message), filename, "UTF-8")
-        
+
         ; wait for response
         loop {
             loop files, this.pool . "\*.json" {
@@ -155,12 +157,12 @@ class useServerAgent {
                         sender: responsedHeader[2],
                         id: responsedHeader[3]
                     }
-                } 
+                }
             }
 
             Sleep(1000)
             ; response timeout
-            if(A_Index > (this.interval / 1000 * 3 * 3)) {
+            if (A_Index > (this.interval / 1000 * 3 * 3)) {
                 try {
                     FileDelete(filename)
                 }
@@ -180,7 +182,7 @@ class useServerAgent {
                 responseHeader := Format("{}=={}=={}", "ONLINE", A_ComputerName, header[3])
                 try {
                     FileMove(
-                        A_LoopFileFullPath, 
+                        A_LoopFileFullPath,
                         StrReplace(A_LoopFileFullPath, A_LoopFileName, responseHeader),
                         true
                     )
@@ -200,15 +202,15 @@ class useServerAgent {
             /**
              * @type {OnlineStatus}
              */
-            serverOnlineStatus := JSON.parse(FileRead(this.onlineStatusIndicator, "utf-8"),, false)
-            
+            serverOnlineStatus := JSON.parse(FileRead(this.onlineStatusIndicator, "utf-8"), , false)
+
             if (serverOnlineStatus is Error) {
-                MsgBox("Service status error.",, "4096 T2 icon!")
+                MsgBox("Service status error.", , "4096 T2 icon!")
                 return false
             }
 
             if (!serverOnlineStatus.isOnline) {
-                MsgBox("Service offline.",, "4096 T2 iconx")
+                MsgBox("Service offline.", , "4096 T2 iconx")
                 return false
             }
         }
