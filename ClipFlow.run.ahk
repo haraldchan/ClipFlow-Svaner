@@ -170,7 +170,8 @@ if (DirExist(UNC_PATH)) {
 	; compare version
 	uncVersion := JSON.parse(FileRead(uncScriptDir . "\clipflow.config.json"))["version"]
 	if (VERSION != uncVersion || !DirExist("C:\ClipFlow\app")) {
-		DirCopy(uncScriptDir, "C:\ClipFlow\app", true)
+		DirDelete("C:\ClipFlow\app")
+		DirCopy(uncScriptDir, "C:\ClipFlow\app")
 		FileCopy(uncScriptDir . "\clipflow.config.json", A_AppData . "\ClipFlow\clipflow.config.json", true)
 		Reload()
 	}
