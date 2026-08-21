@@ -22,8 +22,8 @@ OfflineControls(App, queryFilter) {
     }
 
     handleSendToUNC(*) {
-        if (!DirExist(ProfileModifyNext.uncDB.main)) {
-            MsgBox("无法连接到 Share 盘", POPUP_TITLE, "4096 T2 iconx")
+        if (!FileExist(ProfileModifyNext.uncDB.dbPath)) {
+            MsgBox("无法连接到 Share 盘或数据库不存在", POPUP_TITLE, "4096 T2 iconx")
             return
         }
 
@@ -33,7 +33,7 @@ OfflineControls(App, queryFilter) {
         localDB := DateBase(ProfileModifyNext.localDB)
         uncDB := DateBase(ProfileModifyNext.uncDB)
 
-        localProfiles := localDB.load(queryFilter.value.date, "roomNum", 1440)
+        localProfiles := localDB.load(queryFilter.value.date, "roomNum", , 1440)
         if (!localProfiles.Length) {
             return
         }
@@ -66,7 +66,7 @@ OfflineControls(App, queryFilter) {
         App.AddButton("@align[y]:select-all-btn xs410 w80 h25", "WS Reader").onClick(handleLaunchWSReader)
         App.AddText("@align[y]:select-all-btn x+15 w70 h25 0x200", "当前数据库")
         App.AddDropDownList(
-            "x+1 w80 Choose" . dbMap.keys().findIndex(k => k == ProfileModifyNext.usingDB.value), 
+            "x+1 w80 Choose" . dbMap.keys().findIndex(k => k == ProfileModifyNext.usingDB.value),
             dbMap.values()
         ).onChange(handleDBSelect)
         App.AddButton("vsend-to-unc x+1 w25 h25 Disabled", "📤").onClick(handleSendToUNC)
