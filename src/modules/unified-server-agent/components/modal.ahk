@@ -1,7 +1,7 @@
 UnifiedAgentModal(clickEvent) {
 	MM := Gui("+AlwaysOnTop", "Unified Agent")
 	MM.SetFont("s10", "微软雅黑")
-	MM.BackColor := "White"
+	MM.BackColor := "0xF9F9F9"
 
 	msg := "Profile Modify 代行服务运行中...`n`n1.按下 Ctrl+Alt+Del 解锁键鼠`n2.点击确定停止服务"
 
