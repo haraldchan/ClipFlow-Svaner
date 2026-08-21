@@ -34,8 +34,14 @@ SentPosts(App, isDelegate, listContent) {
         serverOnlineStatus := JSON.parse(FileRead(agent.onlineStatusIndicator, "utf-8"), , false)
         if (!serverOnlineStatus.isOnline) {
             isDelegate.set(false)
-            MsgBox("后台服务不在线。", POPUP_TITLE, "4096 T1 icon!")
-            return
+            
+            changeSafePost  := MsgBox("后台服务不在线。`n`n是否仍然启用后台代行？`n（发送的代行任务将在后台恢复后执行）", POPUP_TITLE, "4096 T1 icon! OKCancel")
+            if (changeSafePost == "OK") {
+                agent.safePost := false
+            }
+            else {
+                return
+            }
         }
 
         posts := []

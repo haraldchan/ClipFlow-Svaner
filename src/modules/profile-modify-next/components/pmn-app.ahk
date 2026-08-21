@@ -39,8 +39,8 @@ PMN_App(App, moduleTitle, db, identifier) {
             agent.PING()
                 ? serverConnection.set("后台服务在线")
                 : (
-                    isDelegate.set(false),
-                    ctrl.Value := false,
+                    agent.safePost && isDelegate.set(false),
+                    agent.safePost && ctrl.Value := false,
                     serverConnection.set("超时无响应")
                 )
         ), ctrl.Enabled := true), -100)
