@@ -14,7 +14,7 @@ if (!A_IsAdmin) {
 utils.clearExistInstances()
 
 ; global consts
-VERSION := "1.13.4"
+VERSION := "1.13.6"
 POPUP_TITLE := "ClipFlow " . VERSION
 WIN_GROUP := ["ahk_class SunAwtFrame"]
 IMAGES := useImages(A_ScriptDir . "\assets")
