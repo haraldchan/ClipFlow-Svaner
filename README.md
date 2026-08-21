@@ -23,11 +23,16 @@ ClipFlow/
  |             |      |      |──── pmn-app.ahk
  |             |      |      |──── guest-profile-details.ahk
  |             |      |      |──── guest-profile-list.ahk
+ |             |      |      |──── offline-controls.ahk
+ |             |      |      |──── sent-posts.ahk
  |             |      |      └──── settings.ahk
- |             |      |      └──── db-selector.ahk
- |             |      |──── schema/
- |             |      |      |──── guest-profile.ahk
+ |             |      |──── parsers/
+ |             |      |      |──── psb-sheet-exporter.ahk
  |             |      |      └──── ws-message-formatter.ahk
+ |             |      |──── schema/
+ |             |      |      └──── guest-profile.ahk
+ |             |      |──── templates/
+ |             |      |      └──── psb-upload-template.xlsx
  |             |      └──── macros/
  |             |             |──── fill-in.ahk
  |             |             |──── fill-psb.ahk
@@ -37,10 +42,11 @@ ClipFlow/
  |             |      |──── components/
  |             |      |      |──── pmg-app.ahk
  |             |      |      |──── on-day-groups.ahk
+ |             |      |      |──── group-guest-list.ahk
  |             |      |      └──── settings.ahk
  |             |      └──── macros/
- |             |             |──── data-handler.ahk
- |             |             └──── modify-group.ahk
+ |             |             |──── pmg-data.ahk
+ |             |             └──── pmg-execute.ahk
  |             |──── reservation-handler/
  |             |      |──── reservation-handler.ahk
  |             |      |──── components/
@@ -83,18 +89,7 @@ ClipFlow/
  |──── assets/
  |──── lib/
  |      |──── index.ahk
- |      |──── svaner/
- |      |──── system-icon/
- |      |──── use-dict/
- |      |──── use-json-config.ahk
- |      |──── use-server-agent.ahk
- |      └──── utils.ahk
+ |      └──── dependencies...
  |──── ws-reader
- |      |──── assets/
- |      |──── dicts/ (dictionaries)
- |      |──── js/    (components & helpers)
- |      |──── ws-reader.css
- |      |──── ws-reader.html
- |      └──── ws-reader.js
  └──── clipflow.config.json
 ```
