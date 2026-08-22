@@ -140,7 +140,7 @@ class PMG_Data {
     static getGroupGuests(db, inhRooms, fetchPeriod) {
         loadedGuests := []
         for (room in inhRooms) {
-            loadedGuests.Push(db.load(, "roomNum", room, 60 * fetchPeriod))
+            loadedGuests.Push(db.load(, "roomNum", room, 60 * fetchPeriod)*)
         }
 
         return loadedGuests
