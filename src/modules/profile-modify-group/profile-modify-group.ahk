@@ -20,11 +20,11 @@ class ProfileModify_Group {
 
     static USE(App) {
         sqliteConfig := CONFIG.read("sqliteConfig")
-        this.db := {
+        this.db := DateBase({
             name: "pmgDB",
             dbPath: sqliteConfig["dbPath"],
             retentionDays: sqliteConfig["retentionDays"]
-        }
+        })
 
         PMG_App(App, this.title, this.db)
     }
