@@ -14,12 +14,12 @@ if (!A_IsAdmin) {
 utils.clearExistInstances()
 
 ; global consts
-VERSION := "1.13.6"
+APP_DATA_DIR := A_AppData . "\ClipFlow"
+CONFIG := useJsonConfig("./clipflow.config.json", "clipflow.config.json", APP_DATA_DIR)
+VERSION := CONFIG.read("version")
 POPUP_TITLE := "ClipFlow " . VERSION
 WIN_GROUP := ["ahk_class SunAwtFrame"]
 IMAGES := useImages(A_ScriptDir . "\assets")
-APP_DATA_DIR := A_AppData . "\ClipFlow"
-CONFIG := useJsonConfig("./clipflow.config.json", "clipflow.config.json", APP_DATA_DIR)
 USE_ERROR_LOG := CONFIG.read(["app", "errorLogging"])
 FORCE_SUSPEND_MESSAGE := 0x2042
 SUSPEND_CONTROLLER := SuspendController(FORCE_SUSPEND_MESSAGE)
