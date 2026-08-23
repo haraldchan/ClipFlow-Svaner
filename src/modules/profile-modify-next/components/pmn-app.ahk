@@ -101,8 +101,13 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         ; updating from add guest modal
         if (currentGuest.value["tsId"] == incomingGuest["tsId"] && !incomingGuest["isMod"]) {
-            db().put(FormatTime(A_Now, "yyyyMMdd"), incomingGuest)
-            MsgBox(Format("已更新信息：{1}", incomingGuest["name"]), POPUP_TITLE, "T1.5 iconi")
+            res := db().put(FormatTime(A_Now, "yyyyMMdd"), incomingGuest)
+            if (res is Error) {
+                MsgBox("修改旅客失败。`n`n错误信息：`n" . res.Message, POPUP_TITLE, "4096 T1.5 icon!")
+                return
+            }
+
+            MsgBox(Format("已更新信息：{1}", incomingGuest["name"]), POPUP_TITLE, "4096 T1.5 iconi")
         }
         ; updating from saved guest modal
         else if (incomingGuest["isMod"]) {
@@ -111,7 +116,7 @@ PMN_App(App, moduleTitle, db, identifier) {
                 return
             }
 
-            MsgBox(Format("已保存修改：{1}", updatedGuest["name"]), POPUP_TITLE, "T1.5 iconi")
+            MsgBox(Format("已保存修改：{1}", updatedGuest["name"]), POPUP_TITLE, "4096 T1.5 iconi")
         }
         ; adding guest
         else {
@@ -119,7 +124,7 @@ PMN_App(App, moduleTitle, db, identifier) {
 
             res := db().add(JSON.stringify(incomingGuest))
             if (res is Error) {
-                MsgBox("添加旅客失败。`n`n错误信息：`n" . res.Message, POPUP_TITLE, "icon!")
+                MsgBox("添加旅客失败。`n`n错误信息：`n" . res.Message, POPUP_TITLE, "4096 T1.5 icon!")
                 return
             }
 
@@ -160,7 +165,7 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         res := db().put(, updater)
         if (res is Error) {
-            MsgBox("更新失败。", POPUP_TITLE, "4096 T1.5 icon!")
+            MsgBox("添加旅客失败。`n`n错误信息：`n" . res.Message, POPUP_TITLE, "4096 T1.5 icon!")
             return
         }
 
