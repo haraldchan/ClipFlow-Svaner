@@ -5,6 +5,7 @@ class SQLite {
     static ROW := 100
     static DONE := 101
     static CONSTRAINT := 19
+    static BUSY := 5
 
     ; Special destructor argument
     static TRANSIENT := -1
