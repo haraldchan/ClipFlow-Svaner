@@ -184,41 +184,54 @@ class Datebase extends SQLite {
 
         data := JSON.parse(jsonString)
 
-        stmt := this.prepare(
-            Format(
-                "INSERT INTO guests_{1} ({2}) VALUES ({3})",
-                date,
-                this.keys.join(", "),
-                this.keys.map(key => "?").join(", ")
+        loop {
+            stmt := this.prepare(
+                Format(
+                    "INSERT INTO guests_{1} ({2}) VALUES ({3})",
+                    date,
+                    this.keys.join(", "),
+                    this.keys.map(key => "?").join(", ")
+                )
             )
-        )
 
-        for (key, type in this.schemas["captured"]) {
-            index := this.keyIndexes[key]
-            value := data.Has(key) ? data[key] : ""
+            for (key, type in this.schemas["captured"]) {
+                index := this.keyIndexes[key]
+                value := data.Has(key) ? data[key] : ""
 
-            if (key == "region") {
-                data["guestType"] == "内地旅客" ? this.bindText(stmt, index, "中国") : this.bindText(stmt, index, value)
-                continue
-            }
-
-            if (!data.Has(key) || data[key] == "") {
-                this.bindNull(stmt, index)
-            }
-            else if (type.includes("INT64")) {
-                this.bindInt64(stmt, index, Number(value))
-            }
-            else if (type.includes("TEXT")) {
-                if (key == "guardianInfo") {
-                    value := JSON.stringify(value)
+                if (key == "region") {
+                    data["guestType"] == "内地旅客" ? this.bindText(stmt, index, "中国") : this.bindText(stmt, index, value)
+                    continue
                 }
 
-                this.bindText(stmt, index, value)
-            }
-        }
+                if (!data.Has(key) || data[key] == "") {
+                    this.bindNull(stmt, index)
+                }
+                else if (type.includes("INT64")) {
+                    this.bindInt64(stmt, index, Number(value))
+                }
+                else if (type.includes("TEXT")) {
+                    if (key == "guardianInfo") {
+                        value := JSON.stringify(value)
+                    }
 
-        stepRc := this.step(stmt)
-        finalizeRc := this.finalize(stmt)
+                    this.bindText(stmt, index, value)
+                }
+            }
+
+            stepRc := this.step(stmt)
+            finalizeRc := this.finalize(stmt)
+
+            if (stepRc == SQLite.BUSY) {
+                if (A_Index < 6) {
+                    Sleep(100)
+                    continue
+                }
+
+                return Error("Database remained busy after retry", -1, stepRc)
+            }
+
+            break
+        }
 
         if (stepRc == SQLite.CONSTRAINT) {
             descriptor := OrderedMap()
@@ -229,8 +242,7 @@ class Datebase extends SQLite {
                 descriptor[key] := value
             }
 
-            this.put(date, descriptor)
-            return "put"
+            return this.put(date, descriptor)
         }
 
         if (stepRc != SQLite.DONE) {
@@ -386,5 +398,7 @@ class Datebase extends SQLite {
         if (rc != SQLite.DONE) {
             return Error("Put failed: " . rc, -1, type)
         }
+
+        return "put"
     }
 }
