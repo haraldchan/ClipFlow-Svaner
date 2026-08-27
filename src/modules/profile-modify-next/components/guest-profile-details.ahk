@@ -107,7 +107,7 @@ GuestProfileDetails(selectedGuest, db, handleFillin, handleListUpdate) {
 
     Win.defineDirectives(
         "@use:bold", ctrl => ctrl.SetFont("bold"),
-        "@use:pd-label", "xs10 yp+30 w55 h22 0x200 @use:bold",
+        "@use:pd-label", "xs10 yp+30 w65 h22 0x200 @use:bold",
         "@use:pd-edit", "x+5 w150 h22 ReadOnly",
     )
 
@@ -144,7 +144,7 @@ GuestProfileDetails(selectedGuest, db, handleFillin, handleListUpdate) {
             },
             groupbox: {
                 title: "Profile 详情",
-                options: "Section x20 w230 " . defineStackboxHeight(),
+                options: "Section x20 w240 " . defineStackboxHeight(),
             }
         },
             () => [
