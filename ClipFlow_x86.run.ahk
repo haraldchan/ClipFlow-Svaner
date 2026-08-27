@@ -169,10 +169,27 @@ uncScriptDir := UNC_PATH . "\19-个人文件夹\HC\Software - 软件及脚本\AH
 if (DirExist(UNC_PATH)) {
 	; compare version
 	uncVersion := JSON.parse(FileRead(uncScriptDir . "\clipflow.config.json"))["version"]
-	if (VERSION != uncVersion || !DirExist("C:\ClipFlow\app")) {
-		DirDelete("C:\ClipFlow\app")
+	if (VERSION != uncVersion) {
+		; DetectHiddenWindows(true)
+		SetTitleMatchMode(2)
+		loop {
+			if (id := WinExist("ClipFlow_")) {
+				pid := WinGetPID("ahk_id " . id)
+			}
+			ProcessClose(pid)
+		}
+
+		; update app dir
+		if (DirExist("C:\ClipFlow\app")) {
+			DirDelete("C:\ClipFlow\app")
+		}
 		DirCopy(uncScriptDir, "C:\ClipFlow\app")
+
+		; copy config
 		FileCopy(uncScriptDir . "\clipflow.config.json", A_AppData . "\ClipFlow\clipflow.config.json", true)
+
+		; copy sqlite
+		DirCopy(uncScriptDir . "\lib\ahk-sqlite\sqlite", A_AppData . "\ClipFlow\sqlite")
 		Reload()
 	}
 }
