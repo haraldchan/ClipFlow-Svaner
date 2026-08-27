@@ -101,6 +101,7 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         ; updating from add guest modal
         if (currentGuest.value["tsId"] == incomingGuest["tsId"] && !incomingGuest["isMod"]) {
+            incomingGuest["regTime"] := A_Now
             res := db().put(FormatTime(A_Now, "yyyyMMdd"), incomingGuest)
             if (res is Error) {
                 MsgBox("修改旅客失败。`n`n错误信息：`n" . res.Message, POPUP_TITLE, "4096 T1.5 icon!")
@@ -121,7 +122,6 @@ PMN_App(App, moduleTitle, db, identifier) {
         ; adding guest
         else {
             incomingGuest["regTime"] := A_Now
-
             res := db().add(JSON.stringify(incomingGuest))
             if (res is Error) {
                 MsgBox("添加旅客失败。`n`n错误信息：`n" . res.Message, POPUP_TITLE, "4096 T1.5 icon!")
@@ -308,7 +308,7 @@ PMN_App(App, moduleTitle, db, identifier) {
             ; reset date limiter
             App["limit-date-btn"].Value := true
             settings.update("isLimitedDate", true)
-        } 
+        }
         else {
             if (!WinExist("ahk_class SunAwtFrame")) {
                 MsgBox("Opera 未启动！ ", "Profile Modify Next", "T1")
