@@ -1,5 +1,5 @@
 {
-	"version": "1.13.7",
+	"version": "1.13.8-1",
 	"app": {
 		"moduleSelected": 1,
 		"tabPos": 1,
@@ -16,7 +16,7 @@
 		"onDayGroupFolder": "\\\\10.0.2.13\\fd\\9-ON DAY GROUP DETAILS",
 		"matchRangeHour": 8
 	},
-	"sqliteConfig":{
+	"sqliteConfig": {
 		"dbPath": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本\\GuestProfilesDB\\guests.sqlite",
 		"backupDir": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本\\GuestProfilesBackup",
 		"retentionDays": 180
