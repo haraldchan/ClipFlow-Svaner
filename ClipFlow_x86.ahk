@@ -4,7 +4,7 @@
 #Include lib\index.ahk
 #Include src\App.ahk
 ; sqlite
-#DllLoad lib\ahk-sqlite\sqlite3_x86.dll
+#DllLoad %A_AppData%\ClipFlow\sqlite\sqlite3_x86.dll
 
 ; acquire admin
 if (!A_IsAdmin) {

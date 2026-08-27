@@ -12,8 +12,8 @@ class Datebase extends SQLite {
         this.name := config.HasOwnProp("name") ? config.name : ""
         super.__New({
             dll: A_PtrSize == 8
-                ? A_ScriptDir . "\lib\ahk-sqlite\sqlite3_x64.dll"
-                : A_ScriptDir . "\lib\ahk-sqlite\sqlite3_x86.dll",
+                ? A_AppData . "\ClipFlow\sqlite\sqlite3_x64.dll"
+                : A_AppData . "\ClipFlow\sqlite\sqlite3_x86.dll",
             dbPath: config.HasOwnProp("dbPath") ? config.dbPath : ":memory:",
             retentionDays: config.HasOwnProp("retentionDays") ? config.retentionDays : 180
         })
