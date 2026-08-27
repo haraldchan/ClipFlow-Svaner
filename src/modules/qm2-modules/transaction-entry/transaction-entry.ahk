@@ -7,7 +7,7 @@
  */
 TransactionEntry(App, props := {}) {
     transactionInfo := props.transactionInfo
-    ( !props.hasOwnProp("style") && props.style := {} )
+    (!props.hasOwnProp("style") && props.style := {})
     s := useProps(props.style, {
         xyPos: ""
     })
@@ -26,10 +26,13 @@ TransactionEntry(App, props := {}) {
     }
 
     sendQmPost(transactionInfo) {
-        agent.delegate({
+        delegateContent := {
             module: "TransactionEntry",
-            form: transactionInfo
-        })
+            form: transactionInfo,
+            additionals: { limitDate: "" }
+        }
+
+        agent.delegate(delegateContent)
     }
 
     completeInfo(*) {
