@@ -339,14 +339,20 @@ class Datebase extends SQLite {
      * Updates data in db
      * @param {String} date date in "yyyyMMdd" format 
      * @param {Map} updateDescriptor 
+     * @param {true | false} ignoreUnknownColumn ignores unknown column instead of returning error
      * @returns {"put" | Error}
      */
-    put(date, updateDescriptor) {
+    put(date, updateDescriptor, ignoreUnknownColumn := false) {
         this.createTable(date)
 
         for (key in updateDescriptor.keys()) {
             if (!this.schemas["captured"].Has(key)) {
-                return Error("Unknown column: " . key, -1, key)
+                if (!ignoreUnknownColumn) {
+                    return Error("Unknown column: " . key, -1, key)
+                }
+                else {
+                    updateDescriptor.Delete(key)
+                }
             }
         }
 
