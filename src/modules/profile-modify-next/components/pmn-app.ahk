@@ -102,7 +102,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         ; updating from add guest modal
         if (currentGuest.value["tsId"] == incomingGuest["tsId"] && !incomingGuest["isMod"]) {
             incomingGuest["regTime"] := A_Now
-            res := db().put(FormatTime(A_Now, "yyyyMMdd"), incomingGuest)
+            res := db().put(FormatTime(A_Now, "yyyyMMdd"), incomingGuest, true)
             if (res is Error) {
                 MsgBox("修改旅客失败。`n`n错误信息：`n" . res.Message, POPUP_TITLE, "4096 T1.5 icon!")
                 return
@@ -163,7 +163,7 @@ PMN_App(App, moduleTitle, db, identifier) {
             }
         }
 
-        res := db().put(, updater)
+        res := db().put(, updater, true)
         if (res is Error) {
             MsgBox("添加旅客失败。`n`n错误信息：`n" . res.Message, POPUP_TITLE, "4096 T1.5 icon!")
             return
@@ -407,7 +407,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         App.AddText("vconnection-status x+20 w80 Hidden", " {1}", serverConnection)
 
         ; datetime
-        App.AddDateTime("vdate xs15 yp+25 w90 h25", "yyyy/MM/dd")
+        App.AddDateTime("vdate xs15 yp+25 w90 h25 " . Format("Range-{}", A_Now.toFormat("yyyyMMdd")), "yyyy/MM/dd")
             .onChange((ctrl, _) => (
                 queryFilter.update("date", FormatTime(ctrl.Value, "yyyyMMdd"))
                 handleListContentUpdate()
