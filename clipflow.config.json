@@ -1,5 +1,6 @@
 {
-	"version": "1.13.8-1",
+	"auto-update": true,
+	"version": "1.13.9",
 	"app": {
 		"moduleSelected": 1,
 		"tabPos": 1,
