@@ -39,7 +39,10 @@ ServerAgentPanel(App) {
         serverOnlineStatus := JSON.parse(FileRead(agent.onlineStatusIndicator, "utf-8"), , false)
         ; recover opera pms if is set to auto restart
         if (agent.isAutoRestart && serverOnlineStatus.isRestart && serverOnlineStatus.activeServer == A_ComputerName) {
-            agent.recoverPMS()
+            res := agent.recoverPMS()
+            if (res is Error) {
+                return
+            }
             isListening.set("在线")
         }
     }
