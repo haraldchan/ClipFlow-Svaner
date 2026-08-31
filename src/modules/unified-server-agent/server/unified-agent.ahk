@@ -163,6 +163,12 @@ class UnifiedAgent extends useServerAgent {
         Sleep(200)
 
         ; log into opera
+        found := PmsImageFinder.find("login-btn.png")
+        if (found is Error) {
+            return found
+        }
+        Click(found.outX, found.outY - 110)
+        Sleep(100)
         Send("{TEXT}" . PMS_USERNAME)
         Sleep(100)
         Send("{Tab}")
@@ -195,6 +201,8 @@ class UnifiedAgent extends useServerAgent {
         utils.waitLoading()
         WinMaximize("ahk_class SunAwtFrame")
         Sleep(100)
+
+        return true
     }
 
 
