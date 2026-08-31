@@ -166,7 +166,17 @@ class JSON {
 localConfig := JSON.parse(FileRead(A_AppData . "\ClipFlow\clipflow.config.json"))
 isAutoUpdate := localConfig["auto-update"]
 if (!isAutoUpdate) {
-	ExitApp()
+	updateNow := MsgBox("检测到新版本，是否更新？",, "4096 iconi OKCancel")
+
+	if (updateNow == "Cancel") {
+		try {
+			Run("C:\ClipFlow\app\ClipFlow_x86.ahk")
+		}
+		catch {
+			Run("\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow-Svaner\ClipFlow_x86.ahk")
+		}
+		ExitApp()
+	}
 }
 
 VERSION := localConfig["version"]
@@ -179,14 +189,14 @@ if (DirExist(UNC_PATH)) {
 	if (VERSION != uncVersion) {
 		DetectHiddenWindows(true)
 		loop {
-			if (id := WinExist("Svaner\ClipFlow_")) {
+			if (id := WinExist("app\ClipFlow_")) {
 				pid := WinGetPID("ahk_id " . id)
 				if (!pid) {
 					break
 				}
 				ProcessClose(pid)
 			}
-		} until (!WinExist("Svaner\ClipFlow_"))
+		} until (!WinExist("app\ClipFlow_"))
 
 		; update app dir
 		if (DirExist("C:\ClipFlow\app")) {
