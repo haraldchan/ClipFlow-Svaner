@@ -2,10 +2,9 @@ class PMN_Waterfall {
     /**
      * @param {Map<String, Array>} groupedSelectedGuests 
      * @param {true | false} isOverwrite 
-     * @param {String} party 
      * @returns {void | Error} 
      */
-    static cascade(groupedSelectedGuests, isOverwrite, limitDate := "", party := "") {
+    static cascade(groupedSelectedGuests, isOverwrite, limitDate := "") {
         PMN_FillIn.start()
 
         for room, guests in groupedSelectedGuests {
@@ -20,7 +19,7 @@ class PMN_Waterfall {
             }
 
             for guest in sortedGuests {
-                res := this.search(guest["roomNum"], A_Index, limitDate, party)
+                res := this.search(guest["roomNum"], A_Index, limitDate)
                 if (res == "not found") {
                     return Error("Room not found")
                 }
@@ -77,7 +76,7 @@ class PMN_Waterfall {
         utils.waitLoading()
     }
 
-    static search(roomNum, index, limitDate, party := 0) {
+    static search(roomNum, index, limitDate) {
         formattedRoom := StrLen(roomNum) = 3 ? "0" . roomNum : roomNum
 
         Send("!r")
