@@ -1,6 +1,6 @@
 {
 	"auto-update": true,
-	"version": "1.13.10",
+	"version": "1.13.11",
 	"app": {
 		"moduleSelected": 1,
 		"tabPos": 1,
@@ -102,9 +102,6 @@
 		"clientEnabled": true,
 		"serverConfig": {
 			"host": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本\\ClipFlow-server-posts",
-			"pmnPool": "\\pmn-pool",
-			"qmPool": "\\qm-pool",
-			"testPool": "\\test-pool",
 			"isAutoRestart": true
 		}
 	}
