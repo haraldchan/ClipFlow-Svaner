@@ -377,6 +377,12 @@ class UnifiedAgent extends useServerAgent {
 
         c := useProps(content, defaultProps)
 
-        return this.POST(c.toObject(), content.HasOwnProp("form") ? this.qmPool : this.pool)
+        postPool := match(content.postType, Map(
+            "pmn", this.pool,
+            "qm", this.qmPool,
+            "landow", this.landowPool
+        ))
+
+        return this.POST(c.toObject(), postPool)
     }
 }
