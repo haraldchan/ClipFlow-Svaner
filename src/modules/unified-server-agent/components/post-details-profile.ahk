@@ -23,10 +23,10 @@ PostDetails_Profile(post) {
 
     handleRepost(*) {
         delegateContent := {
+            postType: "pmn",
             mode: post["content"]["mode"],
             overwrite: post["content"]["overwrite"],
             limitDate: post["content"]["limitDate"],
-            party: post["content"]["party"],
             profiles: post["content"]["profiles"],
             additionals: post["content"]["additionals"]
         }
