@@ -23,12 +23,16 @@ PostDetails_QM2(post, moduleName, props) {
         profiles := (App["send-pm-post"].Value == false || moduleName != "BlankShare") ? Map() : post["content"]["profiles"]
 
         form := App.Submit()
-        agent.delegate({
+        
+        delegateContent := {
+            postType: "qm",
             module: moduleName,
             form: form,
             profiles: profiles,
             additionals: post["content"]["additionals"]
-        })
+        }
+
+        agent.delegate(delegateContent)
         renameResendPost(post["id"])
 
         return form
@@ -64,6 +68,8 @@ PostDetails_QM2(post, moduleName, props) {
             App[moduleName.toCase("kebab") . "-action"].OnEvent("Click", handleModuleEventDelegate, -1)
             App[moduleName.toCase("kebab") . "-action"].Opt("+Default")
         }
+
+        App.Show()
     }
 
     render() {
@@ -72,10 +78,11 @@ PostDetails_QM2(post, moduleName, props) {
         App.AddText("xs10 yp+20", "发送时间: " . post["time"])
         App.AddText("xs10 yp+20", "限定日期: " . (post["content"]["additionals"]["limitDate"] ? FormatTime(post["content"]["additionals"]["limitDate"], "yyyy/MM/dd") : "无"))
         App.AddText("xs10 w200 h20 yp+30", qmModules[moduleName].desc).SetFont("bold s10")
-        qmModules[moduleName].module.Call(App, props).render()
-        onMount()
-        App.Show()
+        qmModules[moduleName].module.Call(App, props).render()        
     }
 
-    return render()
+    return (
+        render(),
+        onMount()
+    )
 }

@@ -27,6 +27,7 @@ TransactionEntry(App, props := {}) {
 
     sendQmPost(transactionInfo) {
         delegateContent := {
+            postType: "qm",
             module: "TransactionEntry",
             form: transactionInfo,
             additionals: { limitDate: "" }

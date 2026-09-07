@@ -2,6 +2,11 @@ class UnifiedAgent extends useServerAgent {
     __New(serverSettings) {
         super.__New(serverSettings)
         this.qmPool := serverSettings.HasOwnProp("qmPool") ? serverSettings.qmPool : ""
+        DirCreate(this.qmPool)
+
+        this.landowPool := serverSettings.HasOwnProp("landowPool") ? serverSettings.landowPool : ""
+        DirCreate(this.landowPool)
+        
         this.isAutoRestart := serverSettings.HasOwnProp("isAutoRestart") ? serverSettings.isAutoRestart : true
         this.popupTitle := "Unified Agent"
 
@@ -21,6 +26,7 @@ class UnifiedAgent extends useServerAgent {
         ; delete expired posts
         this.cleanup()
         this.cleanup(this.qmPool)
+        this.cleanup(this.landowPool)
     }
 
 
@@ -37,6 +43,10 @@ class UnifiedAgent extends useServerAgent {
      * @param {String} pool 
      */
     cleanup(pool := this.pool) {
+        if (!DirExist(pool)) {
+            return
+        }
+
         exp := this.expiration
         loop files (pool . "\*.json") {
             if (A_LoopFileName == "online-status.json") {
@@ -270,52 +280,61 @@ class UnifiedAgent extends useServerAgent {
             }
 
             content := unboxedPost["content"]
-            ; QM2 post
-            if (content.Has("module")) {
-                res := ObjBindMethod(this.qmModules[content["module"]], "USE", content["form"]).Call()
-                if (res is Error) {
-                    this.updatePostStatus(post.path, "NOTFOUND")
-                    continue
-                }
 
-                ; create pmn post if profiles exists
-                if (content["profiles"].Capacity > 0) {
-                    delegateContent := {
-                        overwrite: content["additionals"]["overwrite"],
-                        limitDate: content["additionals"].has("limitDate") ? content["additionals"]["limitDate"] : "",
-                        profiles: content["profiles"],
-                    }
-
-                    message := this.delegate(delegateContent)
-
-                    postCreatedPath := Format("{1}\{2}=={3}=={4}.json", this.pool, "PENDING", A_ComputerName, message.id)
-                    loop {
-                        if (FileExist(postCreatedPath)) {
-                            break
+            switch content["postType"] {
+                case "pmn":
+                    res := PMN_Waterfall.cascade(content["profiles"], content["overwrite"], content.has("limitDate") ? content["limitDate"] : "")
+                    if (res is Error) {
+                        switch res.Message {
+                            case "Ended Unexpectedly":
+                                this.updatePostStatus(post.path, "RETRY")
+                            case "Room not found":
+                                this.updatePostStatus(post.path, "NOTFOUND")
                         }
-                        Sleep(500)
-                    } until (A_Index > 10)
-                    if (!FileExist(postCreatedPath)) {
-                        this.updatePostStatus(post.path, "MODIFIED")
-                        return ; todo: need handling if pmn delegation fails, sending message to client
+                        continue
                     }
 
-                    ; rename post file so that it can be picked up by original sender
-                    FileMove(postCreatedPath, postCreatedPath.replace(A_ComputerName, unboxedPost["sender"]), true)
-                }
-            }
-            ; PMN post
-            else {
-                res := PMN_Waterfall.cascade(content["profiles"], content["overwrite"], content.has("limitDate") ? content["limitDate"] : "", content["party"])
-                if (res is Error) {
-                    switch res.Message {
-                        case "Ended Unexpectedly":
-                            this.updatePostStatus(post.path, "RETRY")
-                        case "Room not found":
-                            this.updatePostStatus(post.path, "NOTFOUND")
+                case "qm":
+                    res := ObjBindMethod(this.qmModules[content["module"]], "USE", content["form"]).Call()
+                    if (res is Error) {
+                        this.updatePostStatus(post.path, "NOTFOUND")
+                        continue
                     }
-                    continue
-                }
+
+                    ; create pmn post if profiles exists
+                    if (content["profiles"].Capacity > 0) {
+                        delegateContent := {
+                            postType: "pmn",
+                            overwrite: content["additionals"]["overwrite"],
+                            limitDate: content["additionals"].has("limitDate") ? content["additionals"]["limitDate"] : "",
+                            profiles: content["profiles"],
+                        }
+
+                        message := this.delegate(delegateContent)
+
+                        postCreatedPath := Format("{1}\{2}=={3}=={4}.json", this.pool, "PENDING", A_ComputerName, message.id)
+                        loop {
+                            if (FileExist(postCreatedPath)) {
+                                break
+                            }
+                            Sleep(500)
+                        } until (A_Index > 10)
+                        if (!FileExist(postCreatedPath)) {
+                            this.updatePostStatus(post.path, "MODIFIED")
+                            return ; todo: need handling if pmn delegation fails, sending message to client
+                        }
+
+                        ; rename post file so that it can be picked up by original sender
+                        FileMove(postCreatedPath, postCreatedPath.replace(A_ComputerName, unboxedPost["sender"]), true)
+                    }
+
+                case "landow":
+                    res := Landow.createOrder(content["roomNum"], content["orderType"], content["qty"], content["remarks"])
+                    if (res is Error) {
+                        Landow.close()
+                        this.updatePostStatus(post.path, "ABORTED")
+                        continue
+                    }
             }
 
             this.updatePostStatus(post.path, "MODIFIED")
@@ -331,22 +350,32 @@ class UnifiedAgent extends useServerAgent {
      * @param content post content to send
      */
     delegate(content) {
-        c := useProps(content,
-            content.HasOwnProp("form")
-                ? { ; QM post
-                    module: content.module, ; QM2 module name
-                    form: content.form,     ; form data from module component
-                    profiles: Map(),        ; profiles from QM2 Panel
-                    additionals: {}         ; additionals
-                } : { ; PMN post
-                    mode: "waterfall",      ; single/waterfall/group
-                    overwrite: false,       ; isOverwrite value
-                    limitDate: "",          ; limit search date
-                    party: "",              ; optional party number for confinement
-                    profiles: Map(),        ; json object in single, array in waterfall/group
-                    additionals: {}         ; additionals
-                }
-        )
+        defaultProps := match(content.postType, Map(
+            "qm", { ; QM post
+                postType: "qm",
+                module: content.module, ; QM2 module name
+                form: content.form,     ; form data from module component
+                profiles: Map(),        ; profiles from QM2 Panel
+                additionals: {}         ; additionals
+            },
+            "pmn", { ; PMN post
+                postType: "pmn",
+                mode: "waterfall",      ; single/waterfall/group
+                overwrite: false,       ; isOverwrite value
+                limitDate: "",          ; limit search date
+                profiles: Map(),        ; json object in single, array in waterfall/group
+                additionals: {}         ; additionals
+            },
+            "landow", {
+                postType: "landow",
+                roomNum: "",
+                orderType: "",
+                qty: 1,
+                remarks: "",
+            }
+        ))
+
+        c := useProps(content, defaultProps)
 
         return this.POST(c.toObject(), content.HasOwnProp("form") ? this.qmPool : this.pool)
     }
