@@ -17,8 +17,9 @@ QM2_Panel(props) {
 
     p := useProps(props, {
         overwriteProfiles: false,
+        selectedGuests: Map(),
+        guestWithNeedsHandler: "",
         limitDate: "",
-        selectedGuests: Map()
     })
 
     modules := OrderedMap(
@@ -42,7 +43,8 @@ QM2_Panel(props) {
         form := App.Submit()
         form.limitDate := p.limitDate
 
-        agent.delegate({
+        delegateContent := {
+            postType: "qm",
             module: module,
             form: form,
             profiles: profiles,
@@ -50,8 +52,11 @@ QM2_Panel(props) {
                 overwrite: p.overwriteProfiles,
                 limitDate: p.limitDate,
             }
-        })
+        }
+
+        agent.delegate(delegateContent)
     }
+
 
     timeoutCount := 0
     TIMEOUT_MAX_SECOND := 60
@@ -71,17 +76,6 @@ QM2_Panel(props) {
         }
     }
 
-    onMount() {
-        App["share-room-nums"].Value := p.selectedGuests.keys().join(" ")
-        App["share-qty"].Value := p.selectedGuests.values().map(g => g.Length <= 1 ? 0 : g.Length - 1).join(" ")
-
-        App["blank-share-action"].Opt("+Default")
-
-        SetTimer(detectWindowIsActive, 1000)
-
-        App.Show()
-    }
-
     App.defineDirectives(
         "@use:form-text", "xs10 yp+30 w100 h25 0x200",
         "@use:form-edit", "x+10 w200 h25 0x200"
@@ -97,11 +91,21 @@ QM2_Panel(props) {
             )
         )
 
-        Dynamic(App, selectedModule, modules, { clickEvent: delegateQmActions })
-
-        ; initializing
-        onMount()
+        Dynamic(App, selectedModule, modules, { clickEvent: delegateQmActions, selectedGuests: p.selectedGuests, guestWithNeedsHandler: p.guestWithNeedsHandler })
     }
 
-    return render()
-}
+    onMount() {
+        App["share-room-nums"].Value := p.selectedGuests.keys().join(" ")
+        App["share-qty"].Value := p.selectedGuests.values().map(g => g.Length <= 1 ? 0 : g.Length - 1).join(" ")
+        App["blank-share-action"].Opt("+Default")
+
+        SetTimer(detectWindowIsActive, 1000)
+
+        App.Show()
+    }
+
+    return (
+        render(),
+        onMount()
+    )
+} 
