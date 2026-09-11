@@ -60,14 +60,15 @@ PMN_Settings(settingSignal, profiles) {
                 font: { options: "bold" },
                 groupbox: {
                     title: "使用说明",
-                    options: "Section x10 w280 h110"
+                    options: "Section x10 w280 h130"
                 }
             },
             () => [
-                Win.AddText("xs10 yp+25 w260 h20", "点击房号 | F2`t- 修改房号"),
+                Win.AddText("xs10 yp+25 w260 h20", "F11`t`t- 重启 ClipFlow"),
+                Win.AddText("xs10 yp+20 w260 h20", "点击房号 | F2`t- 修改房号"),
                 Win.AddText("xs10 yp+20 w260 h20", "鼠标右键`t- 显示详细信息"),
-                Win.AddText("xs10 yp+20 w260 h20", "双击信息`t- (主界面中) 复制身份证号"),
-                Win.AddText("xs10 yp+20 w260 h20", "`t`t- (详情信息) 复制单条信息"),
+                Win.AddText("xs10 yp+20 w260 h20", "双击信息`t- (普通模式) 复制证件号码"),
+                Win.AddText("xs10 yp+20 w260 h20", "`t`t- (瀑流模式) 标记为主 Profile"),
             ]
         )
         StackBox(Win, 
