@@ -13,7 +13,7 @@ GuestProfileDetails(selectedGuest, db, handleFillin, handleListUpdate) {
     Win := Svaner({
         gui: {
             options: "+AlwaysOnTop",
-            title: "Profile Details"
+            title: "信息详情"
         },
         font: {
             name: "微软雅黑"
@@ -66,7 +66,7 @@ GuestProfileDetails(selectedGuest, db, handleFillin, handleListUpdate) {
         ctrl.Text := "🔓"
 
         for (control in Win.gui) {
-            if (control.Name == "reg-time") {
+            if (control.Name == "reg-time" || (selectedGuest["guestType"] == "国外旅客" && control.Name == "name")) {
                 continue
             }
 
@@ -95,6 +95,17 @@ GuestProfileDetails(selectedGuest, db, handleFillin, handleListUpdate) {
         }
         else {
             selectedGuest[ctrl.Name.toCase("camel")] := newValue
+        }
+
+        db().put(FormatTime(selectedGuest["regTime"], "yyyyMMdd"), selectedGuest)
+    }
+
+    handleProfileNameUpdate(ctrl, _) {
+        isUpdated := true
+
+        selectedGuest[ctrl.Name.toCase("camel")] := ctrl.Text
+        if (selectedGuest["guestType"] == "国外旅客") {
+            Win["name"].Value := selectedGuest["name"] := selectedGuest["nameLast"] . ", " . selectedGuest["nameFirst"]
         }
 
         db().put(FormatTime(selectedGuest["regTime"], "yyyyMMdd"), selectedGuest)
@@ -158,9 +169,9 @@ GuestProfileDetails(selectedGuest, db, handleFillin, handleListUpdate) {
                 Win.AddEdit("vname @use:pd-edit", selectedGuest["name"]).onChange(handleProfileUpdate),
                 selectedGuest["guestType"] != "内地旅客" && [
                     Win.AddText("@use:pd-label", "英文姓"),
-                    Win.AddEdit("vname-last @use:pd-edit", selectedGuest["nameLast"]).onChange(handleProfileUpdate),
+                    Win.AddEdit("vname-last @use:pd-edit", selectedGuest["nameLast"]).onChange(handleProfileNameUpdate),
                     Win.AddText("@use:pd-label", "英文名"),
-                    Win.AddEdit("vname-first @use:pd-edit", selectedGuest["nameFirst"]).onChange(handleProfileUpdate),
+                    Win.AddEdit("vname-first @use:pd-edit", selectedGuest["nameFirst"]).onChange(handleProfileNameUpdate),
                 ],
                 ; gender
                 Win.AddText("@use:pd-label", "性别"),
