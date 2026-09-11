@@ -48,6 +48,26 @@ GuestProfileList(App, db, listContent, queryFilter, searchBy, handleFillin, hand
         db().put(queryFilter.value.date, selectedItem)
     }
 
+    copyIdNumber(LV, row) {
+        if (row == 0 || row > 10000) {
+            return
+        }
+        
+        selectedItem := listContent.value.find(item => item["idNum"] == getSelectedCell(LV, row, "idNum"))
+        A_Clipboard := selectedItem["idNum"]
+        
+        MsgBox(Format("已复制客人 {} 证件号码：{}", selectedItem["name"], selectedItem["idNum"]),, "4096 T2 iconi")
+    }
+
+    handleDoubleClick(LV, row) {
+        if (searchBy.value == "waterfall") {
+            markAsPrimary(LV, row)
+        }
+        else {
+            copyIdNumber(LV, row)
+        }
+    }
+
     return App.AddListView(
             {
                 lvOptions: "vguest-profile-list Grid -ReadOnly -Multi @lv:label-tip @align[x]:date y+10 w658 h320",
@@ -61,7 +81,7 @@ GuestProfileList(App, db, listContent, queryFilter, searchBy, handleFillin, hand
             listContent
         ).SetFont("s10")
          .onContextMenu(showProfileDetails)
-         .onDoubleClick(markAsPrimary)
+         .onDoubleClick(handleDoubleClick)
          .onItemEdit(handleUpdateItem)
          .focusOnUpdate()
 }
