@@ -169,12 +169,13 @@ class UnifiedAgent extends useServerAgent {
 
         Run(BROWSER . " " . PMS_URL)
         WinWait("OPERA Login")
+        WinMaximize("OPERA Login")
         WinActivate("OPERA Login")
         Sleep(200)
 
         ; log into opera
-        found := PmsImageFinder.find("login-btn.png")
-        if (found is Error) {
+        found := PmsImageFinder.find("login-btn.png", 2)
+        if (!found) {
             return found
         }
         Click(found.outX, found.outY - 110)
