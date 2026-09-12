@@ -107,7 +107,15 @@ class utils {
     }
 
     static killApp(exe) {
-        return RunWait(A_ComSpec ' /c taskkill /F /T /IM "' exe '"', , "Hide")
+        loop {
+            if (id := WinExist("ahk_exe" . exe)) {
+                pid := WinGetPID("ahk_id " . id)
+                if (!pid) {
+                    break
+                }
+                ProcessClose(pid)
+            }
+        } until (!WinExist(exe))
     }
 
     static newGuid() {
