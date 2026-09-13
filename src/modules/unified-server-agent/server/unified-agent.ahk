@@ -352,14 +352,14 @@ class UnifiedAgent extends useServerAgent {
      */
     delegate(content) {
         defaultProps := match(content.postType, Map(
-            "qm", { ; QM post
+            "qm", () => { ; QM post
                 postType: "qm",
                 module: content.module, ; QM2 module name
                 form: content.form,     ; form data from module component
                 profiles: Map(),        ; profiles from QM2 Panel
                 additionals: {}         ; additionals
             },
-            "pmn", { ; PMN post
+            "pmn", () => { ; PMN post
                 postType: "pmn",
                 mode: "waterfall",      ; single/waterfall/group
                 overwrite: false,       ; isOverwrite value
@@ -367,7 +367,7 @@ class UnifiedAgent extends useServerAgent {
                 profiles: Map(),        ; json object in single, array in waterfall/group
                 additionals: {}         ; additionals
             },
-            "landow", {
+            "landow", () => {
                 postType: "landow",
                 roomNum: "",
                 orderType: "",
