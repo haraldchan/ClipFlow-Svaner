@@ -1,19 +1,25 @@
 #Include landow-image-finder.ahk
 
 class Landow {
-    static appPath := "" ; TODO: check path
-    static ahkExe := "ahk_exe CmsManager.exe"
+    static appPath := "C:\Program Files (x86)\Landow\CmsManager\CmsManager.exe"
+    static loginTitle := "登录"
+    static winTitle := "住客服务管家"
+    static exe := "ahk_exe CmsManager.exe"
 
     static runAndLogin() {
         Run(this.appPath)
         loop {
-            if (WinExist(this.ahkExe)) {
+            if (WinExist(this.exe)) {
                 break
             }
             Sleep(100)
+
+            if (A_Index > 100) {
+                break
+            }
         }
 
-        WinActivate(this.ahkExe)
+        WinActivate(this.loginTitle)
         Send("{Tab}")
         Sleep(100)
         Send("{Space}")
@@ -21,23 +27,31 @@ class Landow {
         Send("{Enter}")
         Sleep(100)
 
-        res := LandowImageFinder.find("landow-contact.png", 30)
+        WinWait(, this.winTitle, 3)
+        res := LandowImageFinder.find("landow-contact.png", 1000)
         if (!res) {
             return
         }
+
+        WinActivate(this.winTitle)
+        Sleep(100)
+
+        CoordMode("Mouse", "Client")
+        Click(65, 225)
+        CoordMode("Mouse", "Screen")
     }
 
     static close() {
         DetectHiddenWindows(true)
         loop {
-            if (id := WinExist(this.ahkExe)) {
+            if (id := WinExist(this.winTitle)) {
                 pid := WinGetPID("ahk_id " . id)
                 if (!pid) {
                     break
                 }
                 ProcessClose(pid)
             }
-        } until (!WinExist(this.ahkExe))
+        } until (!WinExist(this.winTitle))
     }
 
     ; 对客服务
@@ -62,10 +76,10 @@ class Landow {
     }
 
     static createOrder(roomNum, orderType, qty := 1, remarks := 0) {
-        if (!WinExist(this.ahkExe)) {
+        if (!WinExist(this.winTitle)) {
             this.runAndLogin()
         }
-        WinActivate(this.ahkExe)
+        WinActivate(this.winTitle)
 
         this.clickGuestService()
         Sleep(100)
@@ -74,44 +88,46 @@ class Landow {
         this.clickItemAndService()
         Sleep(100)
 
-        found := LandowImageFinder.find("landow-no-guest.png", 30)
+        found := LandowImageFinder.find("landow-no-guest.png", 50)
         if (!found) {
             throw Error("Landow CmsManager failed.")
         }
 
         ; send room num and wait for guest to load
+        Sleep(200)
         Send("{Text}" . roomNum)
         Sleep(100)
         Send("{Enter}")
         Sleep(100)
 
-        found := LandowImageFinder.find("landow-loaded.png", 30)
+        found := LandowImageFinder.find("landow-loaded.png", 50)
         if (!found) {
             this.close()
             throw Error("Landow CmsManager failed.")
         }
 
         ; send order type
+        WinActivate(this.winTitle)
+        Click()
+        Sleep(2000)
         Send("{Tab}")
         Sleep(100)
         Send("{Text}" . orderType)
         Sleep(100)
         Send("{Enter}")
-        Sleep(100)
+        Sleep(1000)
 
-        ; send qty  
+        ; send qty
         Send("{Tab}")
         Sleep(100)
         Send("{Text}" . qty)
         Sleep(100)
-        Send("{Enter}")
+        Send("{Tab}")
         Sleep(100)
 
         ; move to remarks
-        loop 2 {
-            Send("{Tab}")
-            Sleep(100)
-        }
+        Send("{Tab}")
+        Sleep(100)
         Send("{Text}" . remarks)
 
         ; confirm send
