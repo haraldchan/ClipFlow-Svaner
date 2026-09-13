@@ -22,9 +22,9 @@ ServerAgentPanel(App) {
     }
 
     global agent := UnifiedAgent({
-        pool: serverConfig["host"] . "\pmnPool",
-        qmPool: serverConfig["host"] . "\qmPool",
-        landowPool: serverConfig["host"] . "\landowPool",
+        pool: serverConfig["host"] . "\pmn-pool",
+        qmPool: serverConfig["host"] . "\qm-pool",
+        landowPool: serverConfig["host"] . "\landow-pool",
         interval: 3000,
         expiration: 480,
         collectRange: 15,
