@@ -174,11 +174,11 @@ class UnifiedAgent extends useServerAgent {
         Sleep(200)
 
         ; log into opera
-        found := PmsImageFinder.find("login-btn.png", 2)
+        found := PmsImageFinder.find("opera-login-anchor.png", 10)
         if (!found) {
             return found
         }
-        Click(found.outX, found.outY - 110)
+        Click(found.outX + 29, found.outY - 168)
         Sleep(100)
         Send("{TEXT}" . PMS_USERNAME)
         Sleep(100)
@@ -359,7 +359,7 @@ class UnifiedAgent extends useServerAgent {
                 profiles: Map(),        ; profiles from QM2 Panel
                 additionals: {}         ; additionals
             },
-            "pmn", () => { ; PMN post
+            "pmn", () =>  { ; PMN post
                 postType: "pmn",
                 mode: "waterfall",      ; single/waterfall/group
                 overwrite: false,       ; isOverwrite value
@@ -367,7 +367,7 @@ class UnifiedAgent extends useServerAgent {
                 profiles: Map(),        ; json object in single, array in waterfall/group
                 additionals: {}         ; additionals
             },
-            "landow", () => {
+            "landow", () =>  {
                 postType: "landow",
                 roomNum: "",
                 orderType: "",
