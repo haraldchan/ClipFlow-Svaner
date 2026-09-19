@@ -3,7 +3,7 @@
  * @param {signal} isDelegate
  * @param {signal} listContent
  */
-SentPosts(App, isDelegate, listContent) {
+SentPosts(App, isDelegate, listContent, handleGuestsWithNeeds) {
     comp := Component(App, A_ThisFunc)
 
     postQueue := signal([{ status: "", time: "", id: "" }])
@@ -34,8 +34,8 @@ SentPosts(App, isDelegate, listContent) {
         serverOnlineStatus := JSON.parse(FileRead(agent.onlineStatusIndicator, "utf-8"), , false)
         if (!serverOnlineStatus.isOnline) {
             isDelegate.set(false)
-            
-            changeSafePost  := MsgBox("后台服务不在线。`n`n是否仍然启用后台代行？`n（发送的代行任务将在后台恢复后执行）", POPUP_TITLE, "4096 T1 icon! OKCancel")
+
+            changeSafePost := MsgBox("后台服务不在线。`n`n是否仍然启用后台代行？`n（发送的代行任务将在后台恢复后执行）", POPUP_TITLE, "4096 T1 icon! OKCancel")
             if (changeSafePost == "OK") {
                 agent.safePost := false
             }
@@ -125,7 +125,7 @@ SentPosts(App, isDelegate, listContent) {
                         partyRoomQty: form["partyRoomQty"],
                         pbRoom: form["pbRoom"],
                         pbName: form["pbName"]
-                    }
+                    },
                 })
             case "Share":
                 form := selectedPost["content"]["form"]
@@ -134,7 +134,9 @@ SentPosts(App, isDelegate, listContent) {
                         shareRoomNums: form["shareRoomNums"],
                         shareQty: form["shareQty"],
                         checkIn: form["checkIn"]
-                    }
+                    },
+                    selectedGuests: selectedPost["content"]["profiles"],
+                    guestWithNeedsHandler: handleGuestsWithNeeds,
                 })
             case "Auth":
                 form := JSON.parse(JSON.stringify(selectedPost["content"]["form"]), , false)

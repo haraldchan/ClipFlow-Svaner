@@ -38,11 +38,11 @@ PMN_App(App, moduleTitle, db, identifier) {
         SetTimer(() => ((
             agent.PING()
                 ? serverConnection.set("后台服务在线")
-                : (
-                    agent.safePost && isDelegate.set(false),
-                    agent.safePost && ctrl.Value := false,
-                    serverConnection.set("超时无响应")
-                )
+            : (
+                agent.safePost && isDelegate.set(false),
+                agent.safePost && ctrl.Value := false,
+                serverConnection.set("超时无响应")
+            )
         ), ctrl.Enabled := true), -100)
     }
 
@@ -240,7 +240,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         App["select-all-btn"].Value := false
     }
 
-    ; detect age for specific service 
+    ; detect age for specific service
     ELDERLY_AGE := 60
     CHILDREN_AGE := 16
     /**
@@ -253,7 +253,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         children := guestProfiles.filter(guest => A_Year - guest["birthday"].split("-")[1] < CHILDREN_AGE)
 
         if (!elderly.Length && !children.Length) {
-            return 
+            return
         }
 
         if (resultOnly) {
@@ -276,15 +276,15 @@ PMN_App(App, moduleTitle, db, identifier) {
         }
 
         sendOrder := MsgBox(
-            Format("此批客人中包含高龄或小童：`n`n{}`n`n是否发送相应蓝豆工单？", 
+            Format("此批客人中包含高龄或小童：`n`n{}`n`n是否发送相应蓝豆工单？",
                 Format(
-                "{}{}",
-                (elderly.Length && !notifyOnly && sendElderlyOrder) ? "高龄：`n" . elderlyToShow . "`n`n" : "",
-                (children.Length && !notifyOnly && sendChildren) ? "小童：`n" . childrenToShow : ""
-            )), 
-            POPUP_TITLE, 
+                    "{}{}",
+                    (elderly.Length && !notifyOnly && sendElderlyOrder) ? "高龄：`n" . elderlyToShow . "`n`n" : "",
+                    (children.Length && !notifyOnly && sendChildren) ? "小童：`n" . childrenToShow : ""
+                )),
+            POPUP_TITLE,
             "4096 OKCancel icon?"
-            )
+        )
 
         if (sendOrder == "OK") {
             if (sendElderlyOrder) {
@@ -296,12 +296,12 @@ PMN_App(App, moduleTitle, db, identifier) {
                         orderType: "其他物品",
                         remarks: "高龄客人入住，请作防滑处理"
                     }
-                        
+
                     ; agent.delegate(delegateContent)
                     MsgBox(JSON.stringify(delegateContent))
                 }
             }
-            
+
             if (sendChildren) {
                 childrenRoomNums := children.map(elderly => elderly["roomNum"]).unique()
                 for (room in childrenRoomNums) {
@@ -382,7 +382,7 @@ PMN_App(App, moduleTitle, db, identifier) {
                 )
             }
 
-            handleGuestsWithNeeds(selectedGuests,,true)
+            handleGuestsWithNeeds(selectedGuests, , true)
 
             ; reset date limiter
             App["limit-date-btn"].Value := true
@@ -528,7 +528,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile, handleListContentUpdate)
 
         ; sent posts
-        Show(() => SentPosts(App, isDelegate, listContent), isDelegate, cur => cur == true)
+        Show(() => SentPosts(App, isDelegate, listContent, handleGuestsWithNeeds), isDelegate, cur => cur == true)
 
         ; waterfall controls
         Show(() => [
