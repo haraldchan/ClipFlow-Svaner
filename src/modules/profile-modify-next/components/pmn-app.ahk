@@ -528,7 +528,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile, handleListContentUpdate)
 
         ; sent posts
-        Show(() => SentPosts(App, isDelegate, listContent, handleGuestsWithNeeds), isDelegate, cur => cur == true)
+        Show(() => SentPosts(App, isDelegate, listContent), isDelegate, cur => cur == true)
 
         ; waterfall controls
         Show(() => [
