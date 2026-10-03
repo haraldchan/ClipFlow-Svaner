@@ -15,8 +15,6 @@
 #Include macros\fill-psb.ahk
 #Include macros\waterfall.ahk
 
-#Include migrate.ahk
-
 class ProfileModifyNext {
     static name := "ProfileModifyNext"
     static title := "Flow Mode - " . this.name
