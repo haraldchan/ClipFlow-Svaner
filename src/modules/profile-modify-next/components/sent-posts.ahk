@@ -3,7 +3,7 @@
  * @param {signal} isDelegate
  * @param {signal} listContent
  */
-SentPosts(App, isDelegate, listContent, handleGuestsWithNeeds) {
+SentPosts(App, isDelegate, listContent) {
     comp := Component(App, A_ThisFunc)
 
     postQueue := signal([{ status: "", time: "", id: "" }])
@@ -125,7 +125,7 @@ SentPosts(App, isDelegate, listContent, handleGuestsWithNeeds) {
                         partyRoomQty: form["partyRoomQty"],
                         pbRoom: form["pbRoom"],
                         pbName: form["pbName"]
-                    },
+                    }
                 })
             case "Share":
                 form := selectedPost["content"]["form"]
@@ -134,9 +134,7 @@ SentPosts(App, isDelegate, listContent, handleGuestsWithNeeds) {
                         shareRoomNums: form["shareRoomNums"],
                         shareQty: form["shareQty"],
                         checkIn: form["checkIn"]
-                    },
-                    selectedGuests: selectedPost["content"]["profiles"],
-                    guestWithNeedsHandler: handleGuestsWithNeeds,
+                    }
                 })
             case "Auth":
                 form := JSON.parse(JSON.stringify(selectedPost["content"]["form"]), , false)
@@ -173,8 +171,7 @@ SentPosts(App, isDelegate, listContent, handleGuestsWithNeeds) {
     }
 
     comp.render := this => this.Add(
-        App.AddText("vsent-posts-title x530 @align[y]:guest-profile-list h20 0x200", "已发送代行")
-           .SetFont("bold"),
+        App.AddText("vsent-posts-title x530 @align[y]:guest-profile-list h20 0x200", "已发送代行").SetFont("bold"),
         App.AddCheckBox("vsent-posts-show-my-own-posts Checked xp+120 h20 w60", "本机"),
         App.AddListView(
             {
@@ -184,7 +181,7 @@ SentPosts(App, isDelegate, listContent, handleGuestsWithNeeds) {
                 keys: ["status", "action", "time", "id"],
                 titles: ["当前状态", "代行类型", "发送时间", "POST ID"],
                 widths: [60, 100, 150, 170]
-            }, 
+            },
             postQueue
         ).onContextMenu(showPostDetails)
          .onDoubleClick(handleSetPostIgnore)
