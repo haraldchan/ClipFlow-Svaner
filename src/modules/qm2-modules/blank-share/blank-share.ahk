@@ -15,11 +15,11 @@ BlankShare(App, props := {}) {
         checkIn: true,
     })
 
-    selectedGuests := [props.selectedGuests.values().flat()*]
-    handler := props.guestWithNeedsHandler
+    selectedGuests := props.HasOwnProp("selectedGuests") ? props.selectedGuests.values().flat() : []
+    handler := props.HasOwnProp("guestWithNeedsHandler") ? props.guestWithNeedsHandler : ""
 
     LANDOW_ORDER_NOTIFY_ONLY := true
-    if (LANDOW_ORDER_NOTIFY_ONLY) {
+    if (LANDOW_ORDER_NOTIFY_ONLY && handler != "") {
         handler(selectedGuests, false, true)
     }
 
@@ -30,16 +30,16 @@ BlankShare(App, props := {}) {
 
         if (!LANDOW_ORDER_NOTIFY_ONLY) {
             sendElderlyOrder := App["delegate-landow-elderly"].Value,
-            sendChildrenOrder := App["delegate-landow-children"].Value
-            if (sendElderlyOrder || sendChildrenOrder) {
+                sendChildrenOrder := App["delegate-landow-children"].Value
+            if (sendElderlyOrder || sendChildrenOrder && handler != "") {
                 handler(
-                    selectedGuests, 
-                    resultOnly := false, 
+                    selectedGuests,
+                    resultOnly := false,
                     notifyOnly := false, ; TODO: switch to true only after landow macro passes test.
                     sendElderlyOrder,
                     sendChildrenOrder
                 )
-            } 
+            }
         }
 
         clickEvent := props.clickEvent
@@ -53,10 +53,10 @@ BlankShare(App, props := {}) {
     hasChildren := false
 
     handleShowLandowOrderCheckBox() {
-        if (!props.guestWithNeedsHandler) {
+        if (!props.HasOwnProp("guestWithNeedsHandler")) {
             return
         }
-        
+
         handler := props.guestWithNeedsHandler
         guestWithNeeds := handler(selectedGuests, true)
         if (!guestWithNeeds) {
@@ -81,13 +81,13 @@ BlankShare(App, props := {}) {
         if (hasChildren) {
             stackboxHeight += 35
         }
-        
+
         return "h" . stackboxHeight
     }
 
     comp.render := (this) => this.Add(
         StackBox(
-            App,
+            App, 
             {
                 name: "blank-share-stack-box",
                 font: { options: "bold" },
