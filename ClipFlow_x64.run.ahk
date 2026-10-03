@@ -217,10 +217,9 @@ appInit() {
 			FileCopy(uncScriptDir . "\clipflow.config.json", A_AppData . "\ClipFlow\clipflow.config.json", true)
 
 			; copy sqlite
-			if (DirExist(A_AppData . "\ClipFlow\sqlite")) {
-				DirDelete(A_AppData . "\ClipFlow\sqlite", true)
+			if (!DirExist(A_AppData . "\ClipFlow\sqlite")) {
+				DirCopy(uncScriptDir . "\lib\ahk-sqlite\sqlite", A_AppData . "\ClipFlow\sqlite", true)
 			}
-			DirCopy(uncScriptDir . "\lib\ahk-sqlite\sqlite", A_AppData . "\ClipFlow\sqlite", true)
 			Reload()
 		}
 	}
