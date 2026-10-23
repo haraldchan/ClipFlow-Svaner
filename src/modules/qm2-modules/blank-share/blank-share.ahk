@@ -29,8 +29,9 @@ BlankShare(App, props := {}) {
         }
 
         if (!LANDOW_ORDER_NOTIFY_ONLY) {
-            sendElderlyOrder := App["delegate-landow-elderly"].Value,
-                sendChildrenOrder := App["delegate-landow-children"].Value
+            sendElderlyOrder := App["delegate-landow-elderly"].Value
+            sendChildrenOrder := App["delegate-landow-children"].Value
+            
             if (sendElderlyOrder || sendChildrenOrder && handler != "") {
                 handler(
                     selectedGuests,
@@ -57,7 +58,11 @@ BlankShare(App, props := {}) {
             return
         }
 
-        handler := props.guestWithNeedsHandler
+        handler := props.HasOwnProp("guestWithNeedsHandler") ? props.guestWithNeedsHandler : ""
+        if (!handler) {
+            return
+        }
+
         guestWithNeeds := handler(selectedGuests, true)
         if (!guestWithNeeds) {
             return
