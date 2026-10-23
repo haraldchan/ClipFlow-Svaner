@@ -38,11 +38,11 @@ PMN_App(App, moduleTitle, db, identifier) {
         SetTimer(() => ((
             agent.PING()
                 ? serverConnection.set("后台服务在线")
-            : (
-                agent.safePost && isDelegate.set(false),
-                agent.safePost && ctrl.Value := false,
-                serverConnection.set("超时无响应")
-            )
+                : (
+                    agent.safePost && isDelegate.set(false),
+                    agent.safePost && ctrl.Value := false,
+                    serverConnection.set("超时无响应")
+                )
         ), ctrl.Enabled := true), -100)
     }
 
@@ -151,21 +151,25 @@ PMN_App(App, moduleTitle, db, identifier) {
     }
 
     handleGuestInfoUpdateFromMod(updater) {
-        targetGuest := db().load(, "tsId", updater["tsId"], 1440)[1]
-        if (!targetGuest) {
+        res := db().load(, "tsId", updater["tsId"], 1440)
+        if (!res.Length) {
             MsgBox("无匹配目标。", POPUP_TITLE, "4096 T1.5 icon!")
             return
         }
 
         for (key, val in updater) {
-            if (val.includes("*")) {
+            if (key == "guardianInfo") {
+                continue
+            }
+
+            if (String(val).includes("*")) {
                 updater.Delete(key)
             }
         }
 
-        res := db().put(, updater, true)
+        res := db().put(FormatTime(A_Now, "yyyyMMdd"), updater, true)
         if (res is Error) {
-            MsgBox("添加旅客失败。`n`n错误信息：`n" . res.Message, POPUP_TITLE, "4096 T1.5 icon!")
+            MsgBox("修改旅客信息失败。`n`n错误信息：`n" . res.Message, POPUP_TITLE, "4096 T1.5 icon!")
             return
         }
 
@@ -225,7 +229,7 @@ PMN_App(App, moduleTitle, db, identifier) {
             case "birthday":
                 bd := StrLen(queryFilter.value.search) == 8
                     ? SubStr(queryFilter.value.search, 1, 4) . "-" . SubStr(queryFilter.value.search, 5, 2) . "-" . SubStr(queryFilter.value.search, 7, 2)
-                : queryFilter.value.search
+                    : queryFilter.value.search
                 loadedItems.Push(db().load(queryFilter.value.date, "birthday", bd, queryFilter.value.range)*)
             default:
                 loadedItems.Push(db().load(queryFilter.value.date, searchBy.value, queryFilter.value.search, queryFilter.value.range)*)
@@ -240,7 +244,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         App["select-all-btn"].Value := false
     }
 
-    ; detect age for specific service
+    ; detect age for specific service 
     ELDERLY_AGE := 60
     CHILDREN_AGE := 16
     /**
@@ -253,7 +257,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         children := guestProfiles.filter(guest => A_Year - guest["birthday"].split("-")[1] < CHILDREN_AGE)
 
         if (!elderly.Length && !children.Length) {
-            return
+            return 
         }
 
         if (resultOnly) {
@@ -276,13 +280,13 @@ PMN_App(App, moduleTitle, db, identifier) {
         }
 
         sendOrder := MsgBox(
-            Format("此批客人中包含高龄或小童：`n`n{}`n`n是否发送相应蓝豆工单？",
+            Format("此批客人中包含高龄或小童：`n`n{}`n`n是否发送相应蓝豆工单？", 
                 Format(
-                    "{}{}",
-                    (elderly.Length && !notifyOnly && sendElderlyOrder) ? "高龄：`n" . elderlyToShow . "`n`n" : "",
-                    (children.Length && !notifyOnly && sendChildren) ? "小童：`n" . childrenToShow : ""
-                )),
-            POPUP_TITLE,
+                "{}{}",
+                (elderly.Length && !notifyOnly && sendElderlyOrder) ? "高龄：`n" . elderlyToShow . "`n`n" : "",
+                (children.Length && !notifyOnly && sendChildren) ? "小童：`n" . childrenToShow : ""
+            )), 
+            POPUP_TITLE, 
             "4096 OKCancel icon?"
         )
 
@@ -296,12 +300,12 @@ PMN_App(App, moduleTitle, db, identifier) {
                         orderType: "其他物品",
                         remarks: "高龄客人入住，请作防滑处理"
                     }
-
+                        
                     ; agent.delegate(delegateContent)
                     MsgBox(JSON.stringify(delegateContent))
                 }
             }
-
+            
             if (sendChildren) {
                 childrenRoomNums := children.map(elderly => elderly["roomNum"]).unique()
                 for (room in childrenRoomNums) {
@@ -382,7 +386,7 @@ PMN_App(App, moduleTitle, db, identifier) {
                 )
             }
 
-            handleGuestsWithNeeds(selectedGuests, , true)
+            handleGuestsWithNeeds(selectedGuests,,true)
 
             ; reset date limiter
             App["limit-date-btn"].Value := true
@@ -466,6 +470,7 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         toggleRange(direction) {
             range := App["range"]
+
             if (!range.value) {
                 range.value := 0
             }
@@ -491,35 +496,35 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         ; agent mode
         App.AddCheckBox("vdelegate-check-box x+10 Disabled", "后台代行", { check: isDelegate })
-            .bind()
-            .onClick(handleDelegateActivate)
+           .bind()
+           .onClick(handleDelegateActivate)
         App.AddText("vconnection-status x+20 w80 Hidden", " {1}", serverConnection)
 
         ; datetime
-        App.AddDateTime("vdate xs15 yp+25 w90 h25 " . Format("Range-{}", A_Now.toFormat("yyyyMMdd")), "yyyy/MM/dd")
-            .onChange((ctrl, _) => (
+        App.AddDateTime("vdate xs15 yp+25 w90 h25 ", "yyyy/MM/dd")
+           .onChange((ctrl, _) => (
                 queryFilter.update("date", FormatTime(ctrl.Value, "yyyyMMdd"))
                 handleListContentUpdate()
-            ))
+           ))
         ; search conditions
         App.AddDDL("x+10 w80 Choose2", searchByMap.keys())
-            .onChange((ctrl, _) => searchBy.set(searchByMap[ctrl.Text]))
+           .onChange((ctrl, _) => searchBy.set(searchByMap[ctrl.Text]))
 
         ; search box
         App.AddEdit("vsearchBox x+5 w125 h25")
-            .onChange((ctrl, _) => queryFilter.update("search", Trim(ctrl.Value)))
+           .onChange((ctrl, _) => queryFilter.update("search", Trim(ctrl.Value)))
 
         ; range
         App.AddText("x+10 h25 0x200", "最近")
         App.AddEdit("vrange Number x+1 w30 h25", queryFilter.value.range)
-            .onChange((ctrl, _) => queryFilter.update("range", !ctrl.Value ? 60 * 24 : ctrl.Value))
+           .onChange((ctrl, _) => queryFilter.update("range", !ctrl.Value ? 60 * 24 : ctrl.Value))
         App.AddText("x+1 h25 0x200", "分钟")
 
         ; refresh/fill
         App.AddButton("vrefresh x+10 w80 h25", "刷 新(&R)").onClick(handleRefresh)
         App.AddButton("vfillin x+5 w80 h25 Default", "{1}", fillBtnText)
-            .onClick(fillPmsProfile)
-            .onContextMenu((*) => settings.update("fillOverwrite", o => !o))
+           .onClick(fillPmsProfile)
+           .onContextMenu((*) => settings.update("fillOverwrite", o => !o))
 
         ; qm2 agent
         App.AddButton("vqm2-agent x+5 w80 h25 Disabled", "&QM2 Agent").onClick(showQm2Panel)
