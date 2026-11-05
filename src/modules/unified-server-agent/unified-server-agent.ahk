@@ -34,12 +34,8 @@ ServerAgentPanel(App) {
     })
 
     onMount() {
-        /**
-         * @type {OnlineStatus}
-         */
-        serverOnlineStatus := JSON.parse(FileRead(agent.onlineStatusIndicator, "utf-8"), , false)
         ; recover opera pms if is set to auto restart
-        if (agent.isAutoRestart && serverOnlineStatus.isRestart && serverOnlineStatus.activeServer == A_ComputerName) {
+        if (agent.isAutoRestart && CONFIG.read(["serverAgent", "isRecovering"]) == true) {
             res := agent.recoverPMS()
             if (res is Error) {
                 return

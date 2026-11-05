@@ -33,17 +33,26 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         App["qm2-agent"].Enabled := ctrl.Value
         ctrl.Enabled := false
+        isDelegate.set(true)
         serverConnection.set("尝试连接中...")
+        
+        SetTimer(ping, -1)
+        ping(*) {
+            isAlive := agent.pingBO()
 
-        SetTimer(() => ((
-            agent.PING()
-                ? serverConnection.set("后台服务在线")
-                : (
-                    agent.safePost && isDelegate.set(false),
-                    agent.safePost && ctrl.Value := false,
-                    serverConnection.set("超时无响应")
-                )
-        ), ctrl.Enabled := true), -100)
+            if (isAlive) {
+                serverConnection.set("后台服务在线")
+            }
+            else {
+                if (agent.safePost) {
+                    isDelegate.set(false)
+                    ctrl.Value := false
+                }
+                serverConnection.set("超时无响应")    
+            }
+
+            ctrl.Enabled := true
+        }
     }
 
 
@@ -495,8 +504,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         App.AddText("xp15", moduleTitle . " ⓘ ").onClick((*) => PMN_Settings(settings, listContent))
 
         ; agent mode
-        App.AddCheckBox("vdelegate-check-box x+10 Disabled", "后台代行", { check: isDelegate })
-           .bind()
+        App.AddCheckBox("vdelegate-check-box x+10 Disabled", "后台代行")
            .onClick(handleDelegateActivate)
         App.AddText("vconnection-status x+20 w80 Hidden", " {1}", serverConnection)
 

@@ -36,11 +36,12 @@ ServiceConfigs(App, enabled, isListening) {
         }
     }
 
-    effect(isListening, cur => (
-        App["service-activator"].Value := cur == "在线",
-        App["service-activator"].Enabled := cur == "离线",
-        App["online-text"].SetFont(cur == "在线" ? "cgreen bold" : "cred bold")
-    ))
+    effect(isListening, handleOnlineSwitching)
+    handleOnlineSwitching(curOnlineStatus) {
+        App["service-activator"].Value := curOnlineStatus == "在线"
+        App["service-activator"].Enabled := curOnlineStatus == "离线"
+        App["online-text"].SetFont(curOnlineStatus == "在线" ? "cgreen bold" : "cred bold")
+    }
 
     handleServiceStart(ctrl, _) {
         if (ctrl.Value == true && MsgBox("服务将启动，请确保 Opera 处于 InHouse 界面", "Server Agent", "4096 OKCancel") == "Cancel") {

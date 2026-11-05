@@ -33,10 +33,26 @@ ClientPosts(App, enabled) {
         connection.set("连接中...")
         ctrl.Enabled := false
 
-        res := agent.PING()
-        connection.set(!res ? "无响应" : Format("在线 {1}", res.sender))
+        ; res := agent.PING()
+        isAlive := agent.pingBO()
+        if (isAlive) {
+            connection.set("在线 " agent.liveBO.value.name)
+        }
+        else {
+            connection.set("无响应")
+        }
 
         ctrl.Enabled := true
+    }
+
+    effect(agent.liveBO, handleBoStatusUpdate)
+    handleBoStatusUpdate(bo) {
+        if (!bo) {
+            connection.set("无响应")
+        }
+        else {
+            connection.set("在线 " bo.name)
+        }
     }
 
     handlePostUpdate(*) {
@@ -53,7 +69,7 @@ ClientPosts(App, enabled) {
                 continue
             }
 
-            status := StrSplit(A_LoopFileName, "==")[1]
+            status := StrSplit(A_LoopFileName, "==")[1].split("$$")[1]
             try {
                 post := JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8"))
             }
@@ -236,7 +252,7 @@ ClientPosts(App, enabled) {
         searchPool := selectedPost["action"] == "Profile" ? agent.pool : agent.qmPool
         loop files (searchPool . "\*.json") {
             if (A_LoopFileName.includes(selectedPost["id"])) {
-                unpack(A_LoopFileName.split("="), [&status])
+                status := StrSplit(A_LoopFileName, "==")[1].split("$$")[1]
                 if (status != "PENDING" && status != "COLLECTED" && status != "RETRY") {
                     return
                 }

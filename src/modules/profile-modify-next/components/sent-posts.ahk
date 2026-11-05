@@ -31,11 +31,10 @@ SentPosts(App, isDelegate, listContent) {
             return
         }
 
-        serverOnlineStatus := JSON.parse(FileRead(agent.onlineStatusIndicator, "utf-8"), , false)
-        if (!serverOnlineStatus.isOnline) {
+        if (!agent.pingBO()) {
             isDelegate.set(false)
 
-            changeSafePost := MsgBox("后台服务不在线。`n`n是否仍然启用后台代行？`n（发送的代行任务将在后台恢复后执行）", POPUP_TITLE, "4096 T1 icon! OKCancel")
+            changeSafePost := MsgBox("后台服务不在线。`n`n是否仍然启用后台代行？`n（发送的代行任务将在后台恢复后执行）", POPUP_TITLE, "4096 icon! OKCancel")
             if (changeSafePost == "OK") {
                 agent.safePost := false
             }
@@ -57,7 +56,8 @@ SentPosts(App, isDelegate, listContent) {
                 continue
             }
 
-            status := StrSplit(A_LoopFileName, "==")[1]
+            status := StrSplit(A_LoopFileName, "==")[1].split("$$")[1]
+            postHandler := StrSplit(A_LoopFileName, "==")[1].split("$$")[2]
             try {
                 post := JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8"))
             }
@@ -157,7 +157,7 @@ SentPosts(App, isDelegate, listContent) {
         searchPool := selectedPost["action"] == "Profile" ? agent.pool : agent.qmPool
         loop files (searchPool . "\*.json") {
             if (A_LoopFileName.includes(selectedPost["id"])) {
-                unpack(A_LoopFileName.split("="), [&status])
+                status := StrSplit(A_LoopFileName, "==")[1].split("$$")[1]
                 if (status != "PENDING" && status != "COLLECTED" && status != "RETRY") {
                     return
                 }
