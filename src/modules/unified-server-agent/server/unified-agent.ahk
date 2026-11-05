@@ -66,13 +66,9 @@ class UnifiedAgent extends useServerAgent {
      * <Agent>
      */
     abort() {
-        serverOnlineStatus := JSON.parse(FileRead(this.onlineStatusIndicator, "utf-8"), , false)
-        if (serverOnlineStatus.activeServer != A_ComputerName) {
-            return
-        }
-
         ; prep for restart
-        this.setOnlineStatus(false, true)
+        this.stopBO()
+        CONFIG.write(["serverAgent", "isRecovering"], true)
 
         ; change posts status
         this.updatePostStatus(this.currentHandlingPost, this.isAutoRestart ? "RETRY" : "ABORTED")
@@ -122,9 +118,7 @@ class UnifiedAgent extends useServerAgent {
      */
     listen(status) {
         if (status == "在线") {
-
-            this.setOnlineStatus(true, false)
-            this.spawnResponder(A_ScriptDir . "\lib\index.ahk", "ua-responder")
+            this.startBO()
             loop {
                 ; block input
                 this.blockInput()
@@ -135,7 +129,8 @@ class UnifiedAgent extends useServerAgent {
             } until (this.isListening.value == "离线")
         }
         else {
-            this.setOnlineStatus(false)
+            this.stopBO()
+            this.startFD()
         }
     }
 
@@ -146,15 +141,16 @@ class UnifiedAgent extends useServerAgent {
     resetPostsToPending() {
         postsToReset := []
 
-        postsToReset.Push(this.COLLECT("COLLECTED", this.qmPool)*)
+        postsToReset.Push(this.COLLECT("COLLECTED$$" A_ComputerName, this.qmPool)*)
         postsToReset.Push(this.COLLECT("RETRY", this.qmPool)*)
-        postsToReset.Push(this.COLLECT("COLLECTED")*)
+        postsToReset.Push(this.COLLECT("COLLECTED$$" A_ComputerName)*)
         postsToReset.Push(this.COLLECT("RETRY")*)
 
         for post in postsToReset {
             this.updatePostStatus(post.path, "PENDING")
         }
     }
+
 
     /**
      * <Agent>
@@ -228,7 +224,6 @@ class UnifiedAgent extends useServerAgent {
         }
 
         this.keepAlive()
-        ; this.resetPostsToPending()
 
         qmPosts := this.COLLECT("PENDING", this.qmPool)
         pmnPosts := this.COLLECT("PENDING", this.pool)
@@ -320,6 +315,7 @@ class UnifiedAgent extends useServerAgent {
                             }
                             Sleep(500)
                         } until (A_Index > 10)
+                        
                         if (!FileExist(postCreatedPath)) {
                             this.updatePostStatus(post.path, "MODIFIED")
                             return ; todo: need handling if pmn delegation fails, sending message to client
@@ -338,7 +334,7 @@ class UnifiedAgent extends useServerAgent {
                     }
             }
 
-            this.updatePostStatus(post.path, "MODIFIED")
+            try this.updatePostStatus(post.path, "MODIFIED")
         }
 
         this.currentHandlingPost := ""
