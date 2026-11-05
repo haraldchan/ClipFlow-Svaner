@@ -1,6 +1,6 @@
 {
 	"auto-update": true,
-	"version": "1.13.15",
+	"version": "1.14.0",
 	"app": {
 		"moduleSelected": 1,
 		"tabPos": 1,
@@ -103,6 +103,7 @@
 		"serverConfig": {
 			"host": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本\\ClipFlow-server-posts",
 			"isAutoRestart": true
-		}
+		},
+		"isRecovering": false
 	}
 }
