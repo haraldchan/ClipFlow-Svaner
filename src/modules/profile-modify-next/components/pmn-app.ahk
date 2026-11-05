@@ -85,10 +85,14 @@ PMN_App(App, moduleTitle, db, identifier) {
     handleSearchByChange(cur) {
         App["guest-profile-list"].Opt(cur == "waterfall" ? "+Checked +Multi" : "-Checked -Multi")
         App["delegate-check-box"].Enabled := cur == "waterfall"
+        
         if (cur != "waterfall") {
             App["delegate-check-box"].Value := false
             App["qm2-agent"].Enabled := false
             isDelegate.set(false)
+        }
+        else {
+            ControlClick(App["delegate-check-box"])
         }
     }
 
