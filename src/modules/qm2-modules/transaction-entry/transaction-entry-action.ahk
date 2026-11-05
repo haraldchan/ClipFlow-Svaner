@@ -53,7 +53,7 @@ class TransactionEntry_Action {
     static startCopy(&prevX, &prevY, &prevW, &prevH) {
         BlockInput(true)
         WinGetPos(&prevX, &prevY, &prevW, &prevH, this.SPAY)
-        WinMove(0, 0, 1300, 800, this.SPAY)
+        WinMove(0, 0, 1305, 800, this.SPAY)
         WinSetAlwaysOnTop(false, this.SPAY)
         CoordMode("Mouse", "Window")
 
