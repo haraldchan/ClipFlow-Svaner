@@ -31,33 +31,16 @@ SentPosts(App, isDelegate, listContent) {
             return
         }
 
-        if (!agent.pingBO()) {
-            isDelegate.set(false)
-
-            changeSafePost := MsgBox("后台服务不在线。`n`n是否仍然启用后台代行？`n（发送的代行任务将在后台恢复后执行）", POPUP_TITLE, "4096 icon! OKCancel")
-            if (changeSafePost == "OK") {
-                agent.safePost := false
-            }
-            else {
-                return
-            }
-        }
-
         posts := []
         showMyOwnPosts := App["sent-posts-show-my-own-posts"].Value
 
         ; check pmn posts
         loop files (agent.pool . "\*.json") {
-            if (A_LoopFileName.includes("PING") || A_LoopFileName.includes("ONLINE")) {
-                continue
-            }
-
             if (showMyOwnPosts && !A_LoopFileName.includes(A_ComputerName)) {
                 continue
             }
 
-            status := StrSplit(A_LoopFileName, "==")[1].split("$$")[1]
-            postHandler := StrSplit(A_LoopFileName, "==")[1].split("$$")[2]
+            postParams := agent.params(A_LoopFileName)
             try {
                 post := JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8"))
             }
@@ -65,8 +48,8 @@ SentPosts(App, isDelegate, listContent) {
                 continue
             }
 
-            post["status"] := postStatus[status]
-            post["time"] := FormatTime(post["id"].substr(1, 14), "yyyy/MM/dd HH:mm")
+            post["status"] := postStatus[postParams.status]
+            post["time"] := FormatTime(A_LoopFileTimeCreated, "yyyy/MM/dd HH:mm")
             post["action"] := "Profile"
 
             posts.InsertAt(1, post)
@@ -78,7 +61,7 @@ SentPosts(App, isDelegate, listContent) {
                 continue
             }
 
-            status := StrSplit(A_LoopFileName, "==")[1]
+            postParams := agent.params(A_LoopFileName)
             try {
                 post := JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8"))
             }
@@ -86,8 +69,8 @@ SentPosts(App, isDelegate, listContent) {
                 continue
             }
 
-            post["status"] := postStatus[status]
-            post["time"] := FormatTime(post["id"].substr(1, 14), "yyyy/MM/dd HH:mm")
+            post["status"] := postStatus[postParams.status]
+            post["time"] := FormatTime(A_LoopFileTimeCreated, "yyyy/MM/dd HH:mm")
             post["action"] := match(post["content"]["module"], Map(
                 "BlankShare", "Share",
                 "PaymentRelation", "PayBy PayFor",
@@ -157,7 +140,7 @@ SentPosts(App, isDelegate, listContent) {
         searchPool := selectedPost["action"] == "Profile" ? agent.pool : agent.qmPool
         loop files (searchPool . "\*.json") {
             if (A_LoopFileName.includes(selectedPost["id"])) {
-                status := StrSplit(A_LoopFileName, "==")[1].split("$$")[1]
+                status := agent.params(A_LoopFileName).status
                 if (status != "PENDING" && status != "COLLECTED" && status != "RETRY") {
                     return
                 }

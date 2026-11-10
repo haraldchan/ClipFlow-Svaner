@@ -61,23 +61,19 @@ ClientPosts(App, enabled) {
 
         ; check pmn posts
         loop files (agent.pool . "\*.json") {
-            if (A_LoopFileName.includes("PING") || A_LoopFileName.includes("ONLINE")) {
-                continue
-            }
-
             if (showMyOwnPosts && !A_LoopFileName.includes(A_ComputerName)) {
                 continue
             }
 
-            status := StrSplit(A_LoopFileName, "==")[1].split("$$")[1]
+            postParams := agent.params(A_LoopFileName)
             try {
                 post := JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8"))
             }
             catch {
                 continue
             }
-            post["status"] := postStatus[status]
-            post["time"] := FormatTime(post["id"].substr(1, 14), "yyyy/MM/dd HH:mm")
+            post["status"] := postStatus[postParams.status]
+            post["time"] := FormatTime(A_LoopFileTimeCreated, "yyyy/MM/dd HH:mm")
             post["action"] := "Profile"
 
             posts.InsertAt(1, post)
@@ -89,15 +85,16 @@ ClientPosts(App, enabled) {
                 continue
             }
 
-            status := StrSplit(A_LoopFileName, "==")[1]
+            postParams := agent.params(A_LoopFileName)
             try {
                 post := JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8"))
             }
             catch {
                 continue
             }
-            post["status"] := postStatus[status]
-            post["time"] := FormatTime(post["id"].substr(1, 14), "yyyy/MM/dd HH:mm")
+
+            post["status"] := postStatus[postParams.status]
+            post["time"] := FormatTime(A_LoopFileTimeCreated, "yyyy/MM/dd HH:mm")
             post["action"] := match(post["content"]["module"], Map(
                 "BlankShare", "Share",
                 "PaymentRelation", "PayBy PayFor",
@@ -252,7 +249,7 @@ ClientPosts(App, enabled) {
         searchPool := selectedPost["action"] == "Profile" ? agent.pool : agent.qmPool
         loop files (searchPool . "\*.json") {
             if (A_LoopFileName.includes(selectedPost["id"])) {
-                status := StrSplit(A_LoopFileName, "==")[1].split("$$")[1]
+                status := agent.params(A_LoopFileName).status
                 if (status != "PENDING" && status != "COLLECTED" && status != "RETRY") {
                     return
                 }
