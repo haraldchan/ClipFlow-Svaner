@@ -27,6 +27,8 @@ PMN_App(App, moduleTitle, db, identifier) {
     }
 
     handleDelegateActivate(ctrl, _) {
+        isDelegate.set(ctrl.Value)
+
         if (ctrl.Value == false) {
             return
         }
@@ -47,6 +49,10 @@ PMN_App(App, moduleTitle, db, identifier) {
                 if (agent.safePost) {
                     isDelegate.set(false)
                     ctrl.Value := false
+                    changeSafePost := MsgBox("后台服务不在线。`n`n是否仍然启用后台代行？`n（发送的代行任务将在后台恢复后执行）", POPUP_TITLE, "4096 icon! OKCancel")
+                    if (changeSafePost == "OK") {
+                        agent.safePost := false
+                    }
                 }
                 serverConnection.set("超时无响应")    
             }
@@ -92,7 +98,7 @@ PMN_App(App, moduleTitle, db, identifier) {
             isDelegate.set(false)
         }
         else {
-            ControlClick(App["delegate-check-box"])
+            SetTimer(() => ControlClick(App["delegate-check-box"]), -200)
         }
     }
 
