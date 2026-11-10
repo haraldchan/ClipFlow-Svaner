@@ -41,6 +41,7 @@ ServerAgentPanel(App) {
                 return
             }
             isListening.set("在线")
+            CONFIG.write(["serverAgent", "isRecovering"], false)
         }
     }
 
