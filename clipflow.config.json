@@ -1,6 +1,6 @@
 {
 	"auto-update": true,
-	"version": "1.14.1",
+	"version": "1.15.0",
 	"app": {
 		"moduleSelected": 1,
 		"tabPos": 1,
@@ -104,6 +104,9 @@
 			"host": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本\\ClipFlow-server-posts",
 			"isAutoRestart": true
 		},
-		"isRecovering": false
+		"isRecovering": false,
+		"pmsURL": "https://wsh-opr-app1",
+		"pmsUsername": "FOHARALDC",
+		"pmsPassword": "sxzc123456"
 	}
 }
