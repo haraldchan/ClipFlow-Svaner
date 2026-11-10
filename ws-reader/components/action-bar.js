@@ -77,7 +77,7 @@ ${actionBarStyle}
 <div class="action-bar">
     <button class="btn btn-secondary" id="read-btn">读取证件</button>
     <button class="btn btn-secondary" id="scan-btn">扫描证件</button>
-    <button class="btn btn-primary" id="send-btn" type="sumit">发 送</button>
+    <button class="btn btn-primary" id="send-btn" type="submit">发 送</button>
 </div>
 `
 
@@ -147,8 +147,8 @@ class ActionBar extends HTMLElement {
                 tsId: Date.now(),
                 curPhoto: currentData.curPhoto,
                 name: currentData.name ?? '',
-                nameLast: currentData.lastName ?? '',
-                nameFirst: currentData.firstName ?? '',
+                lastName: currentData.lastName ?? '',
+                firstName: currentData.firstName ?? '',
                 roomNum: currentData.roomNum ?? '',
                 tel: currentData.tel ?? '',
                 guestType: currentData.guestType,
@@ -169,6 +169,7 @@ class ActionBar extends HTMLElement {
             }
 
             await navigator.clipboard.writeText(JSON.stringify(sendClip))
+            console.log(sendClip)
         })
     }
 }
