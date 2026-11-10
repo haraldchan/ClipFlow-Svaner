@@ -161,108 +161,6 @@ class useServerAgent {
         this.role := "FD"
     }
 
-
-
-    /**
-     * Updates post status
-     * @param {String} postPath full post json file path
-     * @param {String} newStatus updated status
-     * @returns {{ header: { status: String, sender: String, id: String }, err: 0 | Error }} 
-     */
-    updatePostStatus(postPath, newStatus) {
-        curHeader := postPath.split("\").at(-1).replace(".json", "").split("==")
-        updatedPostHeader := 0
-        err := 0
-
-        try {
-            FileMove(postPath, postPath.replace(curHeader[1].split("$$")[1], newStatus), true)
-            updatedPostHeader := {
-                status: newStatus,
-                sender: curHeader[2],
-                id: curHeader[3]
-            }
-        }
-        catch Error as err {
-            ; if (USE_ERROR_LOG) {
-            ;     logError(err)
-            ; }
-        }
-
-        return {
-            header: updatedPostHeader,
-            err: err
-        }
-    }
-
-    /**
-     * <Client> Post to pool
-     * @param {Object} content 
-     */
-    POST(content, pool := this.pool) {
-        if (this.safePost) {
-            isAlive := this.pingBO()
-            if (!isAlive) {
-                MsgBox("Service offline.", , "4096 T2 iconx")
-                return false
-            } 
-        }
-
-        message := {
-            id: A_Now . A_MSec . Random(100, 999),
-            method: "POST",
-            sender: A_ComputerName,
-            content: content
-        }
-
-        ; future test: add STATUS$$BO_NAME in the first section of header
-        post := Format("{1}\{2}=={3}=={4}.json", pool, "PENDING", A_ComputerName, message.id)
-        FileAppend(JSON.stringify(message), post, "UTF-8")
-
-        return message
-    }
-
-    /**
-     * @typedef {Object} CollectedPost
-     * @property {String} name file name
-     * @property {String} path file fullpath
-     * @property {String} timeCreated file created time in YYYYMMDDHH24MISS
-     */
-    /**
-     * <Server> Collect posts
-     * @param {String} method 
-     * @returns {Array<CollectedPost>}
-     */
-    COLLECT(status, pool := this.pool) {
-        posts := []
-        loop files (pool . "\*.json") {
-            postID := A_LoopFileName.split("==")[3]
-            postTimestamp := postID.substr(1, 14)
-
-            if (DateDiff(A_Now, postTimestamp, "Minutes") >= this.collectRange && A_LoopFileName.includes(status)) {
-                this.updatePostStatus(A_LoopFileFullPath, "ABANDONED")
-                continue
-            }
-
-            if (InStr(A_LoopFileFullPath, status)) {
-                try {
-                    this.updatePostStatus(A_LoopFileFullPath, "COLLECTED$$" A_ComputerName)
-                }
-                catch {
-                    ; if post filename changed, just ignore it
-                    continue
-                }
-
-                posts.Push({
-                    id: postID,
-                    path: StrReplace(A_LoopFileFullPath, status, "COLLECTED$$" A_ComputerName),
-                    timeCreated: A_LoopFileTimeCreated
-                })
-            }
-        }
-
-        return posts
-    }
-
     class TcpServer extends Socket.Server {
         __New(port) {
             this.clients := []
@@ -301,6 +199,145 @@ class useServerAgent {
                 OutputDebug('TCP read error: ' e.Message)
             }
         }
+    }
+
+
+
+    /**
+     * Updates post status
+     * @param {String} postPath full post json file path
+     * @param {String} newStatus updated status
+     * @returns {{ params: PostParams }, err: 0 | Error }} 
+     */
+    updatePostStatus(postPath, newStatus) {
+        SplitPath(postPath, &filename)
+        postParams := this.params(filename)
+        err := 0
+
+        try {
+            FileMove(postPath, postPath.replace(postParams.status, newStatus), true)
+            updatedParams := {
+                status: newStatus,
+                bo: postParams.bo,
+                sender: postParams.sender,
+                id: postParams.id
+            }
+        }
+        catch Error as err {
+            ; if (USE_ERROR_LOG) {
+            ;     logError(err)
+            ; }
+        }
+
+        return {
+            params: updatedParams,
+            err: err
+        }
+    }
+
+    /**
+     * @typedef {Object} PostParams
+     * @property {"PENDING"|"COLLECTED"|"MODIFIED"|"ABORTED"|"RETRY"|"RESENT"|"ABANDONED"|"NOTFOUND"|"ONLINE"|"IGNORE"} status
+     * @property {String} bo
+     * @property {String} sender
+     * @property {String} id
+     */
+    /**
+     * Resolve params from post filename
+     * @param {String} post
+     * @returns {PostParams}
+     */
+    params(post) {
+        params := {}
+
+        entries := post.replace(".json").split("&").map(entry => entry.split("="))
+        for (entry in entries) {
+            params.%entry[1]% := entry[2]
+        }
+
+        return params
+    }
+
+    /**
+     * <Client> Post to pool
+     * @param {Object} content 
+     */
+    POST(content, pool := this.pool) {
+        if (this.safePost) {
+            isAlive := this.pingBO()
+            if (!isAlive) {
+                MsgBox("Service offline.", , "4096 T2 iconx")
+                return false
+            } 
+        }
+
+        message := {
+            id: utils.newGuid(),
+            time: A_Now,
+            method: "POST",
+            bo: this.liveBO.value.name,
+            sender: A_ComputerName,
+            content: content
+        }
+
+        ; future test: add STATUS$$BO_NAME in the first section of header
+        post := Format(
+            "{}\status={}&bo={}&sender={}&id={}.json", 
+            pool, 
+            "PENDING", 
+            this.liveBO.value.name, 
+            A_ComputerName, 
+            message.id
+        )
+        FileAppend(JSON.stringify(message), post, "UTF-8")
+
+        return message
+    }
+
+    /**
+     * @typedef {Object} CollectedPost
+     * @property {String} name file name
+     * @property {String} path file fullpath
+     * @property {String} timeCreated file created time in YYYYMMDDHH24MISS
+     */
+    /**
+     * <Server> Collect posts
+     * @param {String} method 
+     * @returns {Array<CollectedPost>}
+     */
+    COLLECT(status, pool := this.pool) {
+        posts := []
+        loop files (pool . "\*.json") {
+            try {
+                postParams := this.params(A_LoopFileName)
+            }
+            catch {
+                continue
+            }
+
+            if (DateDiff(A_Now, A_LoopFileTimeCreated, "Minutes") >= this.collectRange && A_LoopFileName.includes(status)) {
+                this.updatePostStatus(A_LoopFileFullPath, "ABANDONED")
+                continue
+            }
+
+            if (InStr(A_LoopFileFullPath, status)) {
+                try {
+                    this.updatePostStatus(A_LoopFileFullPath, "COLLECTED")
+                }
+                catch {
+                    ; if post filename changed, just ignore it
+                    continue
+                }
+
+                posts.Push({
+                    id: postParams.id,
+                    path: StrReplace(A_LoopFileFullPath, status, "COLLECTED"),
+                    timeCreated: A_LoopFileTimeCreated
+                })
+            }
+        }
+
+        return posts
     }
 
 }

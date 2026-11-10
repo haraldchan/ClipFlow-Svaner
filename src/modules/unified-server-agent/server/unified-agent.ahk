@@ -29,15 +29,6 @@ class UnifiedAgent extends useServerAgent {
         this.cleanup(this.landowPool)
     }
 
-
-    /**
-     * <Agent>
-     * @param {String} postPath full post json file path
-     * @param {"PENDING"|"COLLECTED"|"MODIFIED"|"ABORTED"|"RETRY"|"RESENT"|"ABANDONED"|"NOTFOUND"|"ONLINE"|"IGNORE"} newStatus
-     */
-    updatePostStatus(postPath, newStatus) => super.updatePostStatus(postPath, newStatus)
-
-
     /**
      * <Client | Agent>
      * @param {String} pool 
@@ -52,10 +43,8 @@ class UnifiedAgent extends useServerAgent {
             if (A_LoopFileName == "online-status.json") {
                 continue
             }
-            header := StrSplit(A_LoopFileName, "==")
-            method := header[1]
-            date := SubStr(header[3], 1, 14)
-            if (DateDiff(A_Now, date, "Minutes") >= exp) {
+
+            if (DateDiff(A_Now, A_LoopFileTimeCreated, "Minutes") >= exp) {
                 FileDelete(A_LoopFileFullPath)
             }
         }
@@ -141,9 +130,9 @@ class UnifiedAgent extends useServerAgent {
     resetPostsToPending() {
         postsToReset := []
 
-        postsToReset.Push(this.COLLECT("COLLECTED$$" A_ComputerName, this.qmPool)*)
+        postsToReset.Push(this.COLLECT("COLLECTED" A_ComputerName, this.qmPool)*)
         postsToReset.Push(this.COLLECT("RETRY", this.qmPool)*)
-        postsToReset.Push(this.COLLECT("COLLECTED$$" A_ComputerName)*)
+        postsToReset.Push(this.COLLECT("COLLECTED" A_ComputerName)*)
         postsToReset.Push(this.COLLECT("RETRY")*)
 
         for post in postsToReset {
@@ -159,11 +148,11 @@ class UnifiedAgent extends useServerAgent {
         BROWSER := FileExist("F:\360\360se6\Application\360se.exe")
             ? "F:\360\360se6\Application\360se.exe"
             : A_AppData . "\360se6\Application\360se.exe"
-        PMS_URL := "https://wsh-opr-app1"
-        PMS_USERNAME := "FOHARALDC"
-        PMS_PASSWORD := "sxzc123456"
+        PMS_URL := CONFIG.read(["serverAgent", "pmsURL"])
+        PMS_USERNAME := CONFIG.read(["serverAgent", "pmsUsername"])
+        PMS_PASSWORD := CONFIG.read(["serverAgent", "pmsPassword"])
 
-        Run(BROWSER . " " . PMS_URL)
+        Run(BROWSER " " PMS_URL)
         WinWait("OPERA Login")
         WinMaximize("OPERA Login")
         WinActivate("OPERA Login")
@@ -176,11 +165,11 @@ class UnifiedAgent extends useServerAgent {
         }
         Click(found.outX + 29, found.outY - 168)
         Sleep(100)
-        Send("{TEXT}" . PMS_USERNAME)
+        Send("{TEXT}" PMS_USERNAME)
         Sleep(100)
         Send("{Tab}")
         Sleep(100)
-        Send("{TEXT}" . PMS_PASSWORD)
+        Send("{TEXT}" PMS_PASSWORD)
         Sleep(100)
         loop 3 {
             Send("{Tab}")
@@ -263,7 +252,12 @@ class UnifiedAgent extends useServerAgent {
         for post in sortedPosts {
             this.currentHandlingPost := post.path
 
-            read := FileRead(post.path, "utf-8")
+            try {
+                read := FileRead(post.path, "utf-8")
+            }
+            catch {
+                throw Error("read failed:`n`npath not found: " post.path)
+            }
             if (!read) {
                 this.updatePostStatus(post.path, "ABORTED")
                 continue
@@ -306,9 +300,18 @@ class UnifiedAgent extends useServerAgent {
                             profiles: content["profiles"],
                         }
 
+                        this.safePost := false
                         message := this.delegate(delegateContent)
+                        this.safePost := true
 
-                        postCreatedPath := Format("{1}\{2}=={3}=={4}.json", this.pool, "PENDING", A_ComputerName, message.id)
+                        postCreatedPath := Format(
+                            "{}\status={}&bo={}&sender={}&id={}.json", 
+                            this.pool, 
+                            "PENDING", 
+                            A_ComputerName, 
+                            A_ComputerName, 
+                            message.id
+                        )
                         loop {
                             if (FileExist(postCreatedPath)) {
                                 break
@@ -338,7 +341,6 @@ class UnifiedAgent extends useServerAgent {
         }
 
         this.currentHandlingPost := ""
-
     }
 
 
