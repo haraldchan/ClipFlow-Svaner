@@ -174,7 +174,7 @@ appInit() {
 		return
 	}
 
-	localConfig := JSON.parse(FileRead(A_AppData . "\ClipFlow\clipflow.config.json"))
+	localConfig := JSON.parse(FileRead(A_AppData . "\ClipFlow\clipflow.config.json", "utf-8"))
 	VERSION := localConfig["version"]
 	isAutoUpdate := localConfig["auto-update"]
 	if (!isAutoUpdate) {
@@ -193,7 +193,7 @@ appInit() {
 
 	if (DirExist(UNC_PATH)) {
 		; compare version
-		uncVersion := JSON.parse(FileRead(uncScriptDir . "\clipflow.config.json"))["version"]
+		uncVersion := JSON.parse(FileRead(uncScriptDir . "\clipflow.config.json", "utf-8"))["version"]
 		if (VERSION != uncVersion) {
 			; close app if running
 			DetectHiddenWindows(true)
