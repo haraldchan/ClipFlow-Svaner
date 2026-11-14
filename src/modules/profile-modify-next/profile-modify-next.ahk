@@ -53,6 +53,8 @@ class ProfileModifyNext {
         }
         effect(this.usingDB, newUsingDB => (
             this.db.close(),
+            !FileExist(this.%newUsingDB%.dbPath) && DirCreate("c:\ClipFlow\db\GuestProfilesDB"),
+
             this.db := Datebase(this.%newUsingDB%)
         ))
 
