@@ -163,64 +163,62 @@ class JSON {
 }
 
 appInit() {
-	UNC_PATH := "\\10.0.2.13\fd"
-	uncScriptDir := UNC_PATH . "\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow-Svaner"
+	DetectHiddenWindows(true)
+	loop {
+		if (id := WinExist("app\ClipFlow_")) {
+			pid := WinGetPID("ahk_id " . id)
+			if (!pid) {
+				break
+			}
+			ProcessClose(pid)
+		}
+	} until (!WinExist("app\ClipFlow_"))
 
-	; fresh copy
-	if (!DirExist(A_AppData . "\ClipFlow")) {
+	; UNC_PATH := "\\10.0.2.13\fd"
+	UNC_PATH := "c:\Users\haraldchan\Code"
+	; uncScriptDir := UNC_PATH . "\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow-Svaner"
+	uncScriptDir := UNC_PATH "\ClipFlow - Svaner"
+
+	; no config json found, copy as fresh deploy
+	if (DirExist(uncScriptDir) && !FileExist(A_AppData "\ClipFlow\clipflow.config.json")) {
+		; create app data folder
+		DirCreate(A_AppData "\ClipFlow")
+		FileCopy(uncScriptDir "\clipflow.config.json", A_AppData "\ClipFlow\clipflow.config.json", true)
+		DirCopy(uncScriptDir . "\lib\ahk-sqlite\sqlite", A_AppData "\ClipFlow\sqlite", true)
+		; copy app
 		DirCopy(uncScriptDir, "C:\ClipFlow\app", true)
-		FileCopy(uncScriptDir . "\clipflow.config.json", A_AppData . "\ClipFlow\clipflow.config.json", true)
-		DirCopy(uncScriptDir . "\lib\ahk-sqlite\sqlite", A_AppData . "\ClipFlow\sqlite", true)
+		Run("C:\ClipFlow\app\ClipFlow_x64.ahk")
 		return
 	}
 
-	localConfig := JSON.parse(FileRead(A_AppData . "\ClipFlow\clipflow.config.json", "utf-8"))
+	localConfig := JSON.parse(FileRead(A_AppData "\ClipFlow\clipflow.config.json", "utf-8"))
 	VERSION := localConfig["version"]
 	isAutoUpdate := localConfig["auto-update"]
 	if (!isAutoUpdate) {
 		updateNow := MsgBox("检测到新版本，是否更新？", , "4096 iconi OKCancel")
 		if (updateNow == "Cancel") {
 			try {
-				Run("C:\ClipFlow\app\ClipFlow_x86.ahk")
+				Run("C:\ClipFlow\app\ClipFlow_x64.ahk")
 			}
 			catch {
-				Run("\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow-Svaner\ClipFlow_x86.ahk")
+				Run(uncScriptDir "\ClipFlow_x64.ahk")
 			}
-			ExitApp()
+			return
 		}
-	}
-
-
-	if (DirExist(UNC_PATH)) {
-		; compare version
-		uncVersion := JSON.parse(FileRead(uncScriptDir . "\clipflow.config.json", "utf-8"))["version"]
-		if (VERSION != uncVersion) {
-			; close app if running
-			DetectHiddenWindows(true)
-			loop {
-				if (id := WinExist("app\ClipFlow_")) {
-					pid := WinGetPID("ahk_id " . id)
-					if (!pid) {
-						break
-					}
-					ProcessClose(pid)
+		else {
+			if (DirExist(UNC_PATH)) {
+				TrayTip("更新中，请稍候...")
+				; compare version
+				uncVersion := JSON.parse(FileRead(uncScriptDir . "\clipflow.config.json", "utf-8"))["version"]
+				if (VERSION != uncVersion) {
+					; create app data folder
+					DirCreate(A_AppData "\ClipFlow")
+					FileCopy(uncScriptDir "\clipflow.config.json", A_AppData "\ClipFlow\clipflow.config.json", true)
+					DirCopy(uncScriptDir "\lib\ahk-sqlite\sqlite", A_AppData "\ClipFlow\sqlite", true)
+					; copy app
+					DirCopy(uncScriptDir, "C:\ClipFlow\app", true)
 				}
-			} until (!WinExist("app\ClipFlow_"))
-
-			; update app dir
-			if (DirExist("C:\ClipFlow\app")) {
-				DirDelete("C:\ClipFlow\app", true)
 			}
-			DirCopy(uncScriptDir, "C:\ClipFlow\app", true)
-
-			; copy config
-			FileCopy(uncScriptDir . "\clipflow.config.json", A_AppData . "\ClipFlow\clipflow.config.json", true)
-
-			; copy sqlite
-			if (!DirExist(A_AppData . "\ClipFlow\sqlite")) {
-				DirCopy(uncScriptDir . "\lib\ahk-sqlite\sqlite", A_AppData . "\ClipFlow\sqlite", true)
-			}
-			Reload()
 		}
 	}
 
@@ -228,7 +226,7 @@ appInit() {
 		Run("C:\ClipFlow\app\ClipFlow_x64.ahk")
 	}
 	catch {
-		Run("\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow-Svaner\ClipFlow_x64.ahk")
+		Run(uncScriptDir "\ClipFlow_x64.ahk")
 	}
 }
 
