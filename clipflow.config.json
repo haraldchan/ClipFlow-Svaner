@@ -1,6 +1,6 @@
 {
-	"auto-update": true,
-	"version": "1.15.1",
+	"auto-update": false,
+	"version": "1.15.2",
 	"app": {
 		"moduleSelected": 1,
 		"tabPos": 1,
