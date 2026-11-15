@@ -20,7 +20,12 @@ PostDetails_QM2(post, moduleName, props) {
     )
 
     handleRepost(*) {
-        profiles := (App["send-pm-post"].Value == false || moduleName != "BlankShare") ? Map() : post["content"]["profiles"]
+        if (moduleName != "BlankShare") {
+            profiles := Map()
+        }
+        else {
+            profiles := App["send-pm-post"].Value == false ? Map() : post["content"]["profiles"]
+        }
 
         form := App.Submit()
         
