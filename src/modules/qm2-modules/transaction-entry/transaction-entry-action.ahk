@@ -50,23 +50,13 @@ class TransactionEntry_Action {
         SUSPEND_CONTROLLER.restoreAllScripts()
     }
 
-    static startCopy(&prevX, &prevY, &prevW, &prevH) {
+    static startCopy() {
         BlockInput(true)
-        WinGetPos(&prevX, &prevY, &prevW, &prevH, this.SPAY)
-        WinMove(0, 0, 1305, 800, this.SPAY)
-        WinSetAlwaysOnTop(false, this.SPAY)
-        CoordMode("Mouse", "Window")
-
         SUSPEND_CONTROLLER.suspendOtherScripts()
     }
 
-    static endCopy(prevX, prevY, prevW, prevH) {
+    static endCopy() {
         BlockInput(false)
-        WinRestore(this.SPAY)
-        WinSetAlwaysOnTop(false, this.SPAY)
-        WinMove(prevX, prevY, prevW, prevH, this.SPAY)
-        CoordMode("Mouse", "Screen")
-
         SUSPEND_CONTROLLER.restoreAllScripts()
     }
 
@@ -75,182 +65,104 @@ class TransactionEntry_Action {
             return
         }
 
-        this.startCopy(&prevX, &prevY, &prevW, &prevH)
-
-        cardInfoCopied := A_Clipboard
-        parsedCard := cardInfoCopied.replaceThese([";", "?"]).split("=")
-        cardNum := parsedCard[1]
-        exp := parsedCard[2].substr(3, 4) . parsedCard[2].substr(1, 2)
-
-        CoordMode("Pixel", "Window")
-        found := PixelSearch(&x, &y, 0, 0, 1300, 800, this.isSelected)
-        if (!found) {
-            MsgBox("未选中交易。", , "icon! T2")
-            return
-        }
-        CoordMode("Pixel", "Screen")
-
-        ; copy room num
-        room := ""
-        loop {
-            MouseMove(547, 191)
-            Sleep(50)
-            Click(2)
-            Sleep(10)
-            Send("^c")
-            Sleep(10)
-            room := StrLen(A_Clipboard) == 3 ? "0" . A_Clipboard : A_Clipboard
-            if (this.Transaction.typeMap["room"](room)) {
-                break
+        this.startCopy()
+        isCard := SubStr(A_Clipboard, 2, 1) != "1" && SubStr(A_Clipboard, 2, 1) != "2"
+        if (isCard) {
+            CoordMode("Pixel", "Screen")
+            loop {
+                if (ImageSearch(&outX, &outY, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["spay-card-detail.png"])) {
+                    break
+                }
+                Sleep(200)
+                if (A_Index > 20) {
+                    return
+                }
             }
 
-            if (A_Index > 5) {
-                MsgBox("复制信息有误，请重试！", "Transaction Entry", "4096 T2 icon!")
-                this.endCopy(prevX, prevY, prevW, prevH)
-                return
-            }
-        }
-
-        ; copy auth num
-        auth := ""
-        loop {
-            MouseMove(x + 232, y + 30)
-            Sleep(50)
-            Click(2)
-            Sleep(10)
-            Send("^c")
-            Sleep(10)
-            auth := A_Clipboard.replace("`t", "")
-            if (this.Transaction.typeMap["auth"](auth)) {
-                break
-            }
-
-            if (A_Index > 5) {
-                MsgBox("复制信息有误，请重试！", "Transaction Entry", "4096 T2 icon!")
-                this.endCopy(prevX, prevY, prevW, prevH)
-                return
-            }
-        }
-
-
-        ; copy amount
-        amount := ""
-        loop {
-            MouseMove(x + 704, y + 27)
-            Sleep(50)
-            Click(3)
-            Sleep(10)
-            Send("^c")
-            Sleep(10)
-            amount := A_Clipboard.replace("`t", "")
-            if (this.Transaction.typeMap["amount"](amount)) {
-                break
-            }
-
-            if (A_Index > 5) {
-                MsgBox("复制信息有误，请重试！", "Transaction Entry", "4096 T2 icon!")
-                this.endCopy(prevX, prevY, prevW, prevH)
-                return
-            }          
-        }
-
-
-        ; copy transaction type
-        transType := ""
-        loop {
-            MouseMove(x + 861, y + 26)
-            Sleep(50)
-            Click(3)
-            Sleep(10)
-            Send("^c")
-            Sleep(10)
-            transType := A_Clipboard.replaceThese(["`t", " "], "")
-            if (this.Transaction.typeMap["transType"].find(t => t == transType)) {
-                break
-            }
-
-            if (A_Index > 5) {
-                MsgBox("复制信息有误，请重试！", "Transaction Entry", "4096 T2 icon!")
-                this.endCopy(prevX, prevY, prevW, prevH)
-                return
-            } 
-        }
-
-        ; copy card type
-        cardType := ""
-        loop {
-            MouseMove(x + 1015, y + 31)
-            Sleep(50)
-            Click(3)
-            Sleep(10)
-            Send("^c")
-            Sleep(10)
-
-            cardType := match(A_Clipboard, Map(
-                card => card.includes("VISA"), "VS",
-                card => card.includes("MASTER"), "MC",
-                card => card.includes("AMEX"), "AE",
-                card => card.includes("JCB"), "JC",
-            ), "UP")
-
-            if (this.Transaction.typeMap["cardType"].find(t => t == cardType)) {
-                break
-            }
-
-            if (A_Index > 5) {
-                MsgBox("复制信息有误，请重试！", "Transaction Entry", "4096 T2 icon!")
-                this.endCopy(prevX, prevY, prevW, prevH)
-                return
-            }
-        }
-
-        ; get full credit card num
-        if (!cardNum.startsWith(1) && !cardNum.startsWith(2)) {
-            MouseMove(368, 115)
-            Sleep(100)
-            Click()
-            Sleep(100)
+            Click(outX + 5, outY + 5)
+            Sleep(500)
             Send("{Text}123456")
             Sleep(100)
             Send("{Enter}")
-            Sleep(500)
-            MouseMove(368, 479)
-            Click()
-            Sleep(200)
-            MouseMove(544, 707)
-            Click(2)
-            Sleep(10)
-            Send("^c")
-            Sleep(10)
-            cardNum := A_Clipboard.replace("`t", "")
-            Send("{Esc}")
-            Sleep(300)
+            Sleep(1000)
+            loop 3 {
+                Send("{Tab}")
+                Sleep(100)
+            }
+            Send("{Enter}")
+            Sleep(100)
+
         }
 
-        capturedTransaction := {
-            cardType: cardType,
-            cardNum: cardNum,
-            exp: exp,
-            amount: amount.replace("`t", ""),
-            transType: transType.replace("`t", ""),
-            auth: auth,
-            room: room
+        Send("^a")
+        Sleep(100)
+        Send("^c")
+        Sleep(100)
+
+        rawInfo := A_Clipboard.split("`r`n")
+
+        room := pipe(
+            r => r.findIndex(line => line.includes("房号")),
+            i => rawInfo[i + 1],
+            n => StrLen(n) == 3 ? "0" . n : n
+        )(rawInfo)
+
+        unmaskedCardNum := isCard ? rawInfo.at(-4) : ""
+
+        start := rawInfo.findIndex(line => line.includes("交易检索号"))
+        rawInfo.RemoveAt(1, start)
+        transactions := []
+        for (line in rawInfo) {
+            splittedLine := line.split("`t")
+            if (IsNumber(splittedLine[1])) {
+                transType := splittedLine[6]
+                if (transType.includes("已撤销")) {
+                    continue
+                }
+
+                auth := splittedLine[2]
+
+                cardNum := isCard && (splittedLine[3].substr(1, 6) == unmaskedCardNum.substr(1, 6) && splittedLine[3].substr(-4) == unmaskedCardNum.substr(-4))
+                    ? unmaskedCardNum
+                    : splittedLine[3].replace("*", "0")
+
+                exp := splittedLine[4].substr(3, 4) . splittedLine[4].substr(1, 2)
+
+                amount := splittedLine[5]
+
+                cardType := match(splittedLine[7], Map(
+                        card => card.includes("VISA"), "VS",
+                        card => card.includes("MASTER"), "MC",
+                        card => card.includes("AMEX"), "AE",
+                        card => card.includes("JCB"), "JC",
+                    ), "UP")
+
+                time := splittedLine[8]
+
+                transactions.Push({
+                    room: room,
+                    auth: auth,
+                    cardNum: cardNum,
+                    exp: exp,
+                    amount: amount,
+                    transType: transType,
+                    cardType: cardType,
+                    time: time
+                })
+            }
+            else {
+                break
+            }
         }
 
-        if (!capturedTransaction.satisfies(this.Transaction)) {
-            MsgBox("复制信息有误，请重试！", "Transaction Entry", "4096 T2 icon!")
-            this.endCopy(prevX, prevY, prevW, prevH)
-            return
-        }
-
-        this.endCopy(prevX, prevY, prevW, prevH)
-        this.promptCompleteInfo(capturedTransaction)
+        this.endCopy()
+        this.promptCompleteInfo(transactions)
     }
 
     /**
      * @param {Transaction} transactionInfo 
      */
-    static promptCompleteInfo(transactionInfo) {
+    static promptCompleteInfo(transactions) {
         if (WinExist("Transaction Entry")) {
             WinClose("Transaction Entry")
         }
@@ -273,7 +185,7 @@ class TransactionEntry_Action {
         }
 
         return (
-            TransactionEntry(Prompt, { transactionInfo: transactionInfo }).render(),
+            transactions.map((info, index) => TransactionEntry(Prompt, { transactionInfo: info, index: index }).render()),
             onMount()
         )
     }
