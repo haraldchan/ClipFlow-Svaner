@@ -174,7 +174,8 @@ class TransactionEntry_Action {
             },
             font: { name: "微软雅黑" },
             events: {
-                close: (thisGui) => thisGui.Destroy()
+                close: (thisGui) => thisGui.Destroy(),
+                escape: (thisGui) => thisGui.Destroy()
             }
         })
 
