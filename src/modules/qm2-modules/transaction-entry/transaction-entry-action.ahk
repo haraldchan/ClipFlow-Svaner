@@ -326,6 +326,7 @@ class TransactionEntry_Action {
         }
 
         Send(Format("{Text}{1}", transactionInfo.cardType))
+	Sleep(100)
         Send("{Tab}")
         utils.waitLoading()
 
@@ -340,9 +341,11 @@ class TransactionEntry_Action {
         Send(transactionInfo.amount)
         Sleep(100)
         Send("{Tab}")
+	utils.waitLoading()
         Send(transactionInfo.cardNum)
-        Sleep(100)
+        utils.waitLoading()
         Send("{Tab}")
+	utils.waitLoading()
         Send(transactionInfo.exp)
         Sleep(100)
         Send("!p")
