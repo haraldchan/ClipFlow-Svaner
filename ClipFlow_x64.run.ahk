@@ -179,6 +179,11 @@ appInit() {
 	; uncScriptDir := UNC_PATH . "\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow-Svaner"
 	uncScriptDir := UNC_PATH "\ClipFlow - Svaner"
 
+	if (!DirExist(uncScriptDir)) {
+		Run("C:\ClipFlow\app\ClipFlow_x64.ahk")
+		return
+	}
+
 	; no config json found, copy as fresh deploy
 	if (DirExist(uncScriptDir) && !FileExist(A_AppData "\ClipFlow\clipflow.config.json")) {
 		; create app data folder
@@ -191,10 +196,18 @@ appInit() {
 		return
 	}
 
-	localConfig := JSON.parse(FileRead(A_AppData "\ClipFlow\clipflow.config.json", "utf-8"))
-	VERSION := localConfig["version"]
-	isAutoUpdate := localConfig["auto-update"]
-	if (!isAutoUpdate) {
+	try {
+		localConfig := JSON.parse(FileRead(A_AppData "\ClipFlow\clipflow.config.json", "utf-8"))
+		VERSION := localConfig["version"]
+		uncVersion := JSON.parse(FileRead(uncScriptDir . "\clipflow.config.json", "utf-8"))["version"]
+		isAutoUpdate := localConfig["auto-update"]
+	}
+	catch {
+		FileCopy(uncScriptDir "\clipflow.config.json", A_AppData "\ClipFlow\clipflow.config.json", true)
+		Reload()
+	}
+
+	if (!isAutoUpdate && VERSION != uncVersion) {
 		updateNow := MsgBox("检测到新版本，是否更新？", , "4096 iconi OKCancel")
 		if (updateNow == "Cancel") {
 			try {
@@ -205,21 +218,14 @@ appInit() {
 			}
 			return
 		}
-		else {
-			if (DirExist(UNC_PATH)) {
-				TrayTip("更新中，请稍候...")
-				; compare version
-				uncVersion := JSON.parse(FileRead(uncScriptDir . "\clipflow.config.json", "utf-8"))["version"]
-				if (VERSION != uncVersion) {
-					; create app data folder
-					DirCreate(A_AppData "\ClipFlow")
-					FileCopy(uncScriptDir "\clipflow.config.json", A_AppData "\ClipFlow\clipflow.config.json", true)
-					DirCopy(uncScriptDir "\lib\ahk-sqlite\sqlite", A_AppData "\ClipFlow\sqlite", true)
-					; copy app
-					DirCopy(uncScriptDir, "C:\ClipFlow\app", true)
-				}
-			}
-		}
+
+		TrayTip("更新中，请稍候...")
+		; create app data folder
+		DirCreate(A_AppData "\ClipFlow")
+		FileCopy(uncScriptDir "\clipflow.config.json", A_AppData "\ClipFlow\clipflow.config.json", true)
+		DirCopy(uncScriptDir "\lib\ahk-sqlite\sqlite", A_AppData "\ClipFlow\sqlite", true)
+		; copy app
+		DirCopy(uncScriptDir, "C:\ClipFlow\app", true)
 	}
 
 	try {
