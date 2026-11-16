@@ -66,7 +66,10 @@ class TransactionEntry_Action {
         }
 
         this.startCopy()
-        isCard := SubStr(A_Clipboard, 2, 1) != "1" && SubStr(A_Clipboard, 2, 1) != "2"
+
+        maskedCardNum := A_Clipboard.split("=")[1].replace(";")
+        
+        isCard := !maskedCardNum.startsWith("1") && !maskedCardNum.startsWith("2")
         if (isCard) {
             CoordMode("Pixel", "Screen")
             loop {
@@ -107,14 +110,19 @@ class TransactionEntry_Action {
             n => StrLen(n) == 3 ? "0" . n : n
         )(rawInfo)
 
-        unmaskedCardNum := isCard ? rawInfo.at(-4) : ""
-
         start := rawInfo.findIndex(line => line.includes("交易检索号"))
         rawInfo.RemoveAt(1, start)
         transactions := []
         for (line in rawInfo) {
             splittedLine := line.split("`t")
+            
             if (IsNumber(splittedLine[1])) {
+                ; only show matched card transactions
+                isMatchedCardNum := splittedLine[3].substr(1, 6) == maskedCardNum.substr(1, 6) && splittedLine[3].substr(-4) == maskedCardNum.substr(-4)
+                if (!isMatchedCardNum) {
+                    continue
+                }
+                ; skip voided transactions
                 transType := splittedLine[6]
                 if (transType.includes("已撤销")) {
                     continue
@@ -122,9 +130,7 @@ class TransactionEntry_Action {
 
                 auth := splittedLine[2]
 
-                cardNum := isCard && (splittedLine[3].substr(1, 6) == unmaskedCardNum.substr(1, 6) && splittedLine[3].substr(-4) == unmaskedCardNum.substr(-4))
-                    ? unmaskedCardNum
-                    : splittedLine[3].replace("*", "0")
+                cardNum := isCard ? rawInfo.at(-4) : maskedCardNum
 
                 exp := splittedLine[4].substr(3, 4) . splittedLine[4].substr(1, 2)
 
