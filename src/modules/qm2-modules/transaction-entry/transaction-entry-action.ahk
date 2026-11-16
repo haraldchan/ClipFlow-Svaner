@@ -350,6 +350,8 @@ class TransactionEntry_Action {
         Sleep(100)
         Send("!p")
         utils.waitLoading()
+	Send("{Esc}")
+	utils.waitLoading()
 
         this.end()
     }
