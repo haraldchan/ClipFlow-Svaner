@@ -67,6 +67,7 @@ class TransactionEntry_Action {
 
         this.startCopy()
 
+        rawCardInfo := A_Clipboard
         maskedCardNum := A_Clipboard.split("=")[1].replace(";")
         
         isCard := !maskedCardNum.startsWith("1") && !maskedCardNum.startsWith("2")
@@ -164,6 +165,9 @@ class TransactionEntry_Action {
 
         this.endCopy()
         this.promptCompleteInfo(transactions)
+
+        ; restore clipboard
+        A_Clipboard := rawCardInfo
     }
 
     /**
