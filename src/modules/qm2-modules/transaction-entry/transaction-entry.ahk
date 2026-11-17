@@ -7,11 +7,13 @@
  */
 TransactionEntry(App, props := {}) {
     transactionInfo := props.transactionInfo
-    index := props.index
+    index := props.hasOwnProp("index") ? props.index : "1"
+
     (!props.hasOwnProp("style") && props.style := {})
     s := useProps(props.style, {
-        xyPos: ""
+        xyPos: "",
     })
+
     comp := Component(App, A_ThisFunc, props)
 
     destroy(*) {
@@ -38,13 +40,15 @@ TransactionEntry(App, props := {}) {
     }
 
     completeInfo(*) {
-        selectedTransaction := {}
-        selectedTransaction.cardType := App["typeAll:Radio"].filter(r => r.name.includes("-" index)).find(r => r.Value == true).Text
-        selectedTransaction.cardNum := App["card-num-" index].Value
-        selectedTransaction.exp := App["exp-" index].Value
-        selectedTransaction.amount := App["amount-" index].Value
-        selectedTransaction.auth := App["auth-" index].Value
-        selectedTransaction.room := App["room-" index].Value
+        selectedTransaction := {
+            transType: transactionInfo.transType,
+            cardType: App["typeAll:Radio"].filter(r => r.name.includes("-" index)).find(r => r.Value == true).Text,
+            cardNum: App["card-num-" index].Value,
+            exp: App["exp-" index].Value,
+            amount: App["amount-" index].Value,
+            auth: App["auth-" index].Value,
+            room: App["room-" index].Value,
+        }
 
         if (!selectedTransaction.room || selectedTransaction.room == "(房间号)" || !selectedTransaction.exp || !selectedTransaction.amount) {
             return
@@ -80,7 +84,7 @@ TransactionEntry(App, props := {}) {
                 font: { options: "bold" },
                 groupbox: {
                     title: Format("{1}信息", transactionInfo.transType),
-                    options: "Section vdeposit-info-gb-" index " x20 w350 h150" 
+                    options: "Section vdeposit-info-gb-" index " w350 h150 " (props.hasOwnProp("index") ? "x20" : "xs10 yp+30")
                 }
             },
             () => [
