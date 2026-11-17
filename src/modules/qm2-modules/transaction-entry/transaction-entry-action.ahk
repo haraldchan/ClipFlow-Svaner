@@ -61,7 +61,7 @@ class TransactionEntry_Action {
     }
 
     static copyFromSPayPos() {
-        if (!RegExMatch(A_Clipboard, "^;\d+=\d+\?$") || !WinExist(this.SPAY)) {
+        if (!RegExMatch(A_Clipboard, "^;\d+=\d+\?$") || !WinActive(this.SPAY)) {
             return
         }
 
