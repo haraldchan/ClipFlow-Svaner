@@ -98,8 +98,9 @@ class TransactionEntry_Action {
         }
 
         Send("^a")
-        Sleep(100)
+        Sleep(50)
         Send("^c")
+        Send("^+{Home}")
         Sleep(100)
 
         rawInfo := A_Clipboard.split("`r`n")
