@@ -65,11 +65,8 @@ ClipHistoryItem(App, clipHistory, index) {
     handleHistoryContentCopy(ctrl, _) {
         if (!clipHistory.value[index].text) {
             return
-        }   
+        }
 
-        Sleep(200)
-        
-        A_Clipboard := clipHistory.value[index].content
         btn := App["chi-function-btn" . index]
         pic := App["chi-pic" . index]
         isPic := ctrl is Gui.Pic
@@ -83,7 +80,8 @@ ClipHistoryItem(App, clipHistory, index) {
             btn.Enabled := true,
             pic.Visible := isPic,
             btn.Visible := !isPic,
-            btn.setIcon(curIcon)
+            btn.setIcon(curIcon),
+            A_Clipboard := ClipboardAll(clipHistory.value[index].content)
 		), -1000)
     }
 
