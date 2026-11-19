@@ -228,6 +228,18 @@ class SQLite {
         }
     }
 
+    bindBlob(stmt, index, buffer) {
+        return DllCall(
+            this.DLL . "\sqlite3_bind_blob",
+            "Ptr", stmt,
+            "Int", index,
+            "Ptr", buffer.Ptr,
+            "Int", buffer.Size,
+            "Ptr", -1,
+            "CDecl Int"
+        )
+    }
+
     reset(stmt) {
         rc := DllCall(
             this.DLL . "\sqlite3_reset",
@@ -280,5 +292,27 @@ class SQLite {
             "Int", index,
             "CDecl Int64"
         )
+    }
+
+    columnBlob(stmt, index) {
+        ptr := DllCall(
+            this.DLL . "\sqlite3_column_blob",
+            "Ptr", stmt,
+            "Int", index,
+            "CDecl Ptr"        )
+
+        size := DllCall(
+            this.DLL . "\sqlite3_column_bytes",
+            "Ptr", stmt,
+            "Int", index,
+            "CDecl Int"
+        )
+
+        buf := Buffer(size)
+
+        if (size > 0)
+            DllCall("RtlMoveMemory", "Ptr", buf.Ptr, "Ptr", ptr, "UPtr", size)
+
+        return buf
     }
 }
