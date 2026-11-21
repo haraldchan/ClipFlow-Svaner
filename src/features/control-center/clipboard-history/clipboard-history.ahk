@@ -24,7 +24,6 @@ ClipboardHistory(App) {
     loop fillerTimes {
         clipHistoryContent.Push(clipTemplate)
     }
-    msgbox clipHistoryContent.length
 
     clipHistory := signal(clipHistoryContent, { forceUpdagte: true })
     clipHistoryPage := signal(1)
